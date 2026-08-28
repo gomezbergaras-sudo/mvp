@@ -1,0 +1,921 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sistema de Hábitos</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.112.4/dist/umd/supabase.js"></script>
+<style>
+:root{
+  --bg:#0d1117; --panel:#161b22; --panel2:#1c232c; --line:#2a3441;
+  --tx:#e6edf3; --tx2:#8b949e; --acc:#3fb950; --acc2:#58a6ff;
+  --warn:#d29922; --bad:#f85149; --r:12px;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);
+  font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;font-size:15px;line-height:1.5}
+button{font:inherit;cursor:pointer;border:none;border-radius:8px;padding:9px 14px;
+  background:var(--panel2);color:var(--tx);border:1px solid var(--line)}
+button:hover{background:#232c37}
+button.pri{background:var(--acc);color:#06210d;border-color:var(--acc);font-weight:600}
+button.pri:hover{filter:brightness(1.1)}
+button.gh{background:transparent}
+button.sm{padding:5px 10px;font-size:13px}
+input,select,textarea{font:inherit;background:#0b0f14;color:var(--tx);border:1px solid var(--line);
+  border-radius:8px;padding:9px 11px;width:100%}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--acc2);outline-offset:-1px}
+label{display:block;font-size:12px;color:var(--tx2);margin:0 0 4px;text-transform:uppercase;letter-spacing:.4px}
+a{color:var(--acc2)}
+.wrap{max-width:940px;margin:0 auto;padding:16px 16px 64px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:18px;margin-bottom:14px}
+.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.grid{display:grid;gap:12px}
+.g2{grid-template-columns:repeat(auto-fit,minmax(190px,1fr))}
+.g4{grid-template-columns:repeat(auto-fit,minmax(140px,1fr))}
+h1{font-size:20px;margin:0}
+h2{font-size:16px;margin:0 0 12px}
+.muted{color:var(--tx2);font-size:13px}
+.hidden{display:none !important}
+
+header{position:sticky;top:0;z-index:10;background:rgba(13,17,23,.92);
+  backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+.hd{max-width:940px;margin:0 auto;padding:12px 16px;display:flex;justify-content:space-between;align-items:center;gap:10px}
+nav{display:flex;gap:4px;overflow-x:auto;max-width:940px;margin:0 auto;padding:0 12px 10px}
+nav button{background:transparent;border:1px solid transparent;color:var(--tx2);padding:7px 13px;white-space:nowrap}
+nav button.on{background:var(--panel2);border-color:var(--line);color:var(--tx);font-weight:600}
+
+.stat{background:var(--panel2);border:1px solid var(--line);border-radius:var(--r);padding:14px}
+.stat .n{font-size:26px;font-weight:700;line-height:1.1}
+.stat .l{font-size:11px;color:var(--tx2);text-transform:uppercase;letter-spacing:.5px;margin-top:4px}
+
+.hab{display:flex;gap:12px;align-items:flex-start;padding:13px;border:1px solid var(--line);
+  border-radius:var(--r);background:var(--panel2);margin-bottom:9px}
+.hab.done{border-color:rgba(63,185,80,.5);background:rgba(63,185,80,.08)}
+.chk{width:26px;height:26px;border-radius:50%;border:2px solid var(--line);background:transparent;
+  flex:0 0 26px;padding:0;display:grid;place-items:center;font-size:14px;color:transparent;margin-top:2px}
+.hab.done .chk{background:var(--acc);border-color:var(--acc);color:#06210d;font-weight:800}
+.hab .b{flex:1;min-width:0}
+.hab .t{font-weight:600}
+.hab.done .t{text-decoration:line-through;opacity:.75}
+.tag{display:inline-block;font-size:11px;padding:2px 8px;border-radius:99px;background:#21262d;
+  color:var(--tx2);border:1px solid var(--line);margin-right:5px}
+.tag.fire{background:rgba(210,153,34,.15);color:#e3b341;border-color:rgba(210,153,34,.35)}
+
+.bar{height:8px;background:#0b0f14;border-radius:99px;overflow:hidden;border:1px solid var(--line)}
+.bar>i{display:block;height:100%;background:var(--acc);border-radius:99px;transition:width .3s}
+
+.heat{display:flex;gap:3px;flex-wrap:wrap}
+.heat span{width:15px;height:15px;border-radius:3px;background:#161b22;border:1px solid var(--line)}
+.badge{display:inline-flex;align-items:center;gap:6px;background:var(--panel2);border:1px solid var(--line);
+  border-radius:99px;padding:6px 13px;margin:0 6px 6px 0;font-size:13px}
+
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:22px;background:var(--panel2);
+  border:1px solid var(--acc);border-radius:10px;padding:11px 18px;z-index:99;box-shadow:0 8px 24px rgba(0,0,0,.5)}
+.err{color:var(--bad);font-size:13px;margin-top:8px}
+pre.rep{white-space:pre-wrap;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:13px;
+  background:#0b0f14;border:1px solid var(--line);border-radius:var(--r);padding:14px;margin:0}
+dialog{background:var(--panel);color:var(--tx);border:1px solid var(--line);border-radius:var(--r);
+  padding:20px;max-width:520px;width:calc(100% - 32px)}
+dialog::backdrop{background:rgba(0,0,0,.6)}
+</style>
+</head>
+<body>
+
+<!-- ================= CONFIG / LOGIN ================= -->
+<div id="vLogin" class="wrap hidden" style="max-width:440px;padding-top:60px">
+  <div class="card">
+    <h1 style="margin-bottom:4px">Sistema de Hábitos</h1>
+    <p class="muted" style="margin-top:0">Disciplina medida es disciplina que se mantiene.</p>
+
+    <div id="cfgBox" class="grid" style="margin:16px 0">
+      <div><label>Supabase URL</label><input id="cfgUrl" placeholder="https://xxxx.supabase.co"></div>
+      <div><label>Supabase anon key</label><input id="cfgKey" placeholder="eyJhbGciOi..."></div>
+      <button class="pri" id="btnCfg">Guardar conexión</button>
+      <p class="muted">Se guarda solo en este navegador. La llave <b>anon</b> es pública por diseño; RLS protege tus datos.</p>
+    </div>
+
+    <div id="authBox" class="grid hidden">
+      <div><label>Correo</label><input id="inEmail" type="email" autocomplete="email"></div>
+      <div><label>Contraseña</label><input id="inPass" type="password" autocomplete="current-password"></div>
+      <div class="row">
+        <button class="pri" id="btnIn" style="flex:1">Entrar</button>
+        <button id="btnUp" style="flex:1">Crear cuenta</button>
+      </div>
+      <div id="authErr" class="err"></div>
+      <button class="gh sm" id="btnCfgEdit" style="justify-self:start">Cambiar conexión</button>
+    </div>
+  </div>
+</div>
+
+<!-- ================= APP ================= -->
+<div id="vApp" class="hidden">
+  <header>
+    <div class="hd">
+      <div>
+        <h1>Sistema de Hábitos</h1>
+        <div class="muted" id="hdSub">—</div>
+      </div>
+      <div class="row">
+        <span class="tag" id="hdNivel">Principiante</span>
+        <button class="gh sm" id="btnOut">Salir</button>
+      </div>
+    </div>
+    <nav>
+      <button data-t="hoy" class="on">Hoy</button>
+      <button data-t="habitos">Hábitos</button>
+      <button data-t="progreso">Progreso</button>
+      <button data-t="metas">Metas semanales</button>
+      <button data-t="reporte">Reporte</button>
+    </nav>
+  </header>
+
+  <div class="wrap">
+
+    <!-- HOY -->
+    <section id="tHoy">
+      <div class="grid g4" style="margin-bottom:14px">
+        <div class="stat"><div class="n" id="sHoy">0/0</div><div class="l">Hábitos de hoy</div></div>
+        <div class="stat"><div class="n" id="sPunt">0</div><div class="l">Puntuación del día</div></div>
+        <div class="stat"><div class="n" id="sPts">0</div><div class="l">Puntos totales</div></div>
+        <div class="stat"><div class="n" id="sRacha">0</div><div class="l">Mejor racha activa</div></div>
+      </div>
+      <div class="card">
+        <div class="row" style="justify-content:space-between;margin-bottom:12px">
+          <h2 style="margin:0" id="tituloHoy">Hoy</h2>
+          <div class="row">
+            <button class="sm" id="btnAyer">&#9664; Día anterior</button>
+            <button class="sm hidden" id="btnHoyVolver">Volver a hoy</button>
+          </div>
+        </div>
+        <div id="listaHoy"></div>
+        <div id="vacioHoy" class="hidden">
+          <p class="muted">No tienes hábitos para este día.</p>
+          <button class="pri" id="btnSeed">Crear rutina sugerida (día perfecto)</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- HABITOS -->
+    <section id="tHabitos" class="hidden">
+      <div class="card">
+        <div class="row" style="justify-content:space-between">
+          <h2 style="margin:0">Mis hábitos</h2>
+          <button class="pri sm" id="btnNuevo">+ Nuevo hábito</button>
+        </div>
+      </div>
+      <div id="listaHabitos"></div>
+    </section>
+
+    <!-- PROGRESO -->
+    <section id="tProgreso" class="hidden">
+      <div class="card">
+        <h2>Nivel y puntos</h2>
+        <div class="row" style="justify-content:space-between">
+          <div><span id="pgNivel" style="font-size:20px;font-weight:700">Principiante</span>
+            <span class="muted" id="pgPts"> · 0 pts</span></div>
+          <span class="muted" id="pgFalta"></span>
+        </div>
+        <div class="bar" style="margin-top:10px"><i id="pgBar" style="width:0%"></i></div>
+      </div>
+      <div class="card">
+        <h2>Constancia · últimos 30 días</h2>
+        <div class="heat" id="heat"></div>
+        <p class="muted" style="margin-bottom:0">Cada cuadro es un día. Más verde = más hábitos cumplidos.</p>
+      </div>
+      <div class="card">
+        <h2>Cumplimiento por hábito (30 días)</h2>
+        <div id="pgHabitos"></div>
+      </div>
+      <div class="card">
+        <h2>Insignias</h2>
+        <div id="pgInsignias"><p class="muted">Aún ninguna. La primera llega a los 7 días de racha.</p></div>
+      </div>
+    </section>
+
+    <!-- METAS -->
+    <section id="tMetas" class="hidden">
+      <div class="card">
+        <div class="row" style="justify-content:space-between">
+          <h2 style="margin:0">Semana del <span id="mtSemana"></span></h2>
+          <button class="pri sm" id="btnMeta">+ Meta</button>
+        </div>
+        <p class="muted">3 a 5 metas. Más de eso no es ambición, es dispersión.</p>
+      </div>
+      <div id="listaMetas"></div>
+    </section>
+
+    <!-- REPORTE -->
+    <section id="tReporte" class="hidden">
+      <div class="card">
+        <div class="row" style="justify-content:space-between;margin-bottom:12px">
+          <h2 style="margin:0">Reporte</h2>
+          <div class="row">
+            <button class="sm" id="btnRepDia">Diario</button>
+            <button class="sm" id="btnRepSem">Semanal</button>
+            <button class="pri sm" id="btnRepGuardar">Guardar</button>
+          </div>
+        </div>
+        <pre class="rep" id="repTxt">Genera un reporte.</pre>
+      </div>
+    </section>
+
+  </div>
+</div>
+
+<!-- DIALOGO HABITO -->
+<dialog id="dlgHab">
+  <h2 id="dlgTit">Nuevo hábito</h2>
+  <div class="grid">
+    <div><label>Nombre</label><input id="fNombre" placeholder="Beber 3 litros de agua"></div>
+    <div class="grid g2">
+      <div><label>Categoría</label><select id="fCat">
+        <option value="salud">Salud</option><option value="estudio">Estudio</option>
+        <option value="finanzas">Finanzas</option><option value="trabajo">Trabajo</option>
+        <option value="personal">Personal</option><option value="descanso">Descanso</option>
+      </select></div>
+      <div><label>Momento</label><select id="fMom">
+        <option value="manana">Mañana</option><option value="tarde">Tarde</option><option value="noche">Noche</option>
+      </select></div>
+    </div>
+    <div class="grid g2">
+      <div><label>Meta diaria</label><input id="fMeta" type="number" step="0.5" value="1"></div>
+      <div><label>Unidad</label><input id="fUni" value="vez" placeholder="litros, minutos, páginas"></div>
+    </div>
+    <div class="grid g2">
+      <div><label>Duración (min)</label><input id="fDur" type="number" placeholder="30"></div>
+      <div><label>Dificultad 1-10</label><input id="fDif" type="number" min="1" max="10" value="5"></div>
+    </div>
+    <div><label>Disparador (después de qué)</label><input id="fTrig" placeholder="Después de levantarme"></div>
+    <div><label>Recompensa inmediata</label><input id="fRec" placeholder="Café tranquilo"></div>
+    <div><label>Días</label><div class="row" id="fDias"></div></div>
+    <div><label>Puntos por cumplir</label><input id="fPts" type="number" value="10"></div>
+    <div class="row" style="justify-content:flex-end;margin-top:6px">
+      <button id="btnDelHab" class="sm" style="margin-right:auto;color:var(--bad)">Eliminar</button>
+      <button class="gh" id="btnCancelHab">Cancelar</button>
+      <button class="pri" id="btnSaveHab">Guardar</button>
+    </div>
+  </div>
+</dialog>
+
+<!-- DIALOGO REGISTRO -->
+<dialog id="dlgReg">
+  <h2 id="regTit">Registro</h2>
+  <div class="grid">
+    <div><label>Cantidad lograda</label><input id="rCant" type="number" step="0.5"></div>
+    <div class="grid g2">
+      <div><label>Energía antes 1-10</label><input id="rEa" type="number" min="1" max="10"></div>
+      <div><label>Energía después 1-10</label><input id="rEd" type="number" min="1" max="10"></div>
+    </div>
+    <div><label>Dificultad percibida 1-10</label><input id="rDif" type="number" min="1" max="10"></div>
+    <div><label>¿Qué te lo facilitó o impidió?</label><textarea id="rNotas" rows="2"></textarea></div>
+    <div class="row" style="justify-content:flex-end">
+      <button class="gh" id="btnCancelReg">Cerrar</button>
+      <button class="pri" id="btnSaveReg">Guardar</button>
+    </div>
+  </div>
+</dialog>
+
+<!-- DIALOGO META -->
+<dialog id="dlgMeta">
+  <h2>Meta de la semana</h2>
+  <div class="grid">
+    <div><label>Título</label><input id="gTit" placeholder="Cerrar el reporte de ventas del mes"></div>
+    <div><label>Categoría</label><input id="gCat" value="trabajo"></div>
+    <div><label>Obstáculo que anticipas</label><input id="gObs"></div>
+    <div class="row" style="justify-content:flex-end">
+      <button class="gh" id="btnCancelMeta">Cancelar</button>
+      <button class="pri" id="btnSaveMeta">Guardar</button>
+    </div>
+  </div>
+</dialog>
+
+<script>
+/* =====================================================================
+   SISTEMA DE HABITOS — logica de la app
+   ===================================================================== */
+const $ = (s) => document.querySelector(s);
+const $$ = (s) => Array.from(document.querySelectorAll(s));
+
+const NIVELES = [
+  { min: 3000, n: 'Maestro' }, { min: 1501, n: 'Experto' },
+  { min: 501,  n: 'Dedicado' }, { min: 101, n: 'Constante' }, { min: 0, n: 'Principiante' }
+];
+const DIAS = ['Lun','Mar','Mié','Jue','Vie','Sáb','Dom'];
+
+let sb = null;
+const S = { user:null, perfil:null, habitos:[], registros:[], metas:[], puntos:0,
+            insignias:[], fecha: hoyISO(), tab:'hoy', editando:null, regActual:null, repTipo:'diario' };
+
+/* ---------- utilidades de fecha (siempre en hora local) ---------- */
+function hoyISO(){ return aISO(new Date()); }
+function aISO(d){
+  return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+}
+function deISO(s){ const [a,m,d] = s.split('-').map(Number); return new Date(a, m-1, d); }
+function sumarDias(iso, n){ const d = deISO(iso); d.setDate(d.getDate()+n); return aISO(d); }
+function isodow(iso){ const g = deISO(iso).getDay(); return g === 0 ? 7 : g; }
+function lunesDe(iso){ return sumarDias(iso, -(isodow(iso)-1)); }
+function bonito(iso){
+  return deISO(iso).toLocaleDateString('es-VE',{weekday:'long', day:'numeric', month:'long'});
+}
+function toast(msg){
+  const t = document.createElement('div');
+  t.className = 'toast'; t.textContent = msg;
+  document.body.appendChild(t); setTimeout(()=>t.remove(), 2600);
+}
+function ok(res, msg){
+  if (res && res.error){ toast('Error: ' + res.error.message); console.error(res.error); return false; }
+  if (msg) toast(msg);
+  return true;
+}
+function guardarLocal(k,v){ try{ localStorage.setItem(k,v); }catch(e){} }
+function leerLocal(k){ try{ return localStorage.getItem(k); }catch(e){ return null; } }
+
+/* =====================================================================
+   CONEXION Y SESION
+   ===================================================================== */
+// Puedes dejar tus datos fijos aquí y la app no volverá a pedírtelos:
+const URL_FIJA = '';   // ej: 'https://abcdefgh.supabase.co'
+const KEY_FIJA = '';   // ej: 'eyJhbGciOiJIUzI1NiIs...'
+
+function arrancar(){
+  if (!window.supabase || !window.supabase.createClient){
+    document.body.innerHTML = '<div class="wrap"><div class="card"><h1>No cargó la librería de Supabase</h1>' +
+      '<p class="muted">Necesitas conexión a internet la primera vez que abre la página. ' +
+      'Si estás detrás de un firewall que bloquea jsdelivr, descarga supabase.js y cámbialo por una ruta local.</p></div></div>';
+    return;
+  }
+  const url = URL_FIJA || leerLocal('sb_url');
+  const key = KEY_FIJA || leerLocal('sb_key');
+  $('#vLogin').classList.remove('hidden');
+  if (url && key){
+    sb = window.supabase.createClient(url, key);
+    $('#cfgBox').classList.add('hidden');
+    $('#authBox').classList.remove('hidden');
+    sb.auth.getSession().then(({data}) => { if (data.session) entrar(data.session.user); });
+  }
+}
+
+$('#btnCfg').onclick = () => {
+  const u = $('#cfgUrl').value.trim().replace(/\/+$/,''), k = $('#cfgKey').value.trim();
+  if (!u.startsWith('http') || k.length < 20) return toast('Revisa la URL y la llave');
+  guardarLocal('sb_url', u); guardarLocal('sb_key', k);
+  location.reload();
+};
+$('#btnCfgEdit').onclick = () => {
+  $('#cfgBox').classList.remove('hidden'); $('#authBox').classList.add('hidden');
+  $('#cfgUrl').value = leerLocal('sb_url') || ''; $('#cfgKey').value = leerLocal('sb_key') || '';
+};
+
+$('#btnIn').onclick = async () => {
+  $('#authErr').textContent = '';
+  const { data, error } = await sb.auth.signInWithPassword({
+    email: $('#inEmail').value.trim(), password: $('#inPass').value });
+  if (error) return $('#authErr').textContent = error.message;
+  entrar(data.user);
+};
+$('#btnUp').onclick = async () => {
+  $('#authErr').textContent = '';
+  const { data, error } = await sb.auth.signUp({
+    email: $('#inEmail').value.trim(), password: $('#inPass').value });
+  if (error) return $('#authErr').textContent = error.message;
+  if (!data.session) return $('#authErr').textContent = 'Cuenta creada. Confirma el correo y vuelve a entrar.';
+  entrar(data.user);
+};
+$('#btnOut').onclick = async () => { await sb.auth.signOut(); location.reload(); };
+
+async function entrar(user){
+  S.user = user;
+  $('#vLogin').classList.add('hidden');
+  $('#vApp').classList.remove('hidden');
+  await cargarTodo();
+}
+
+/* =====================================================================
+   CARGA DE DATOS
+   ===================================================================== */
+const ORDEN_MOM = { manana:0, tarde:1, noche:2 };
+
+// PostgREST corta las respuestas (por defecto 1000 filas): traemos por paginas
+async function traerRegistros(desde){
+  const paso = 500; let inicio = 0, todo = [];
+  for (;;){
+    const { data, error } = await sb.from('registros').select('*')
+      .gte('fecha', desde).order('fecha').range(inicio, inicio + paso - 1);
+    if (error){ toast('Error: ' + error.message); break; }
+    todo = todo.concat(data || []);
+    if (!data || data.length < paso) break;
+    inicio += paso;
+  }
+  return todo;
+}
+
+async function cargarTodo(){
+  const desde = sumarDias(hoyISO(), -120);
+  const [h, m, nv, i, pf] = await Promise.all([
+    sb.from('habitos').select('*').eq('activo', true).order('orden'),
+    sb.from('metas_semanales').select('*').eq('semana_inicio', lunesDe(hoyISO())),
+    sb.from('v_nivel').select('total').maybeSingle(),
+    sb.from('insignias').select('*'),
+    sb.from('perfiles').select('*').maybeSingle()
+  ]);
+  const err = [h,m,i].find(x => x.error);
+  if (err) { toast('Error: ' + err.error.message); console.error(err.error); return; }
+  S.habitos = (h.data || []).sort((a,b) =>
+    (ORDEN_MOM[a.momento] - ORDEN_MOM[b.momento]) || ((a.orden||0) - (b.orden||0)));
+  S.metas = m.data || []; S.insignias = i.data || []; S.perfil = pf.data || null;
+  S.puntos = (nv.data && nv.data.total) || 0;
+  S.registros = await traerRegistros(desde);
+  pintar();
+}
+
+function regDe(habitoId, fecha){ return S.registros.find(r => r.habito_id === habitoId && r.fecha === fecha); }
+function tocaHoy(h, fecha){ return (h.dias_semana || []).includes(isodow(fecha)); }
+function habitosDe(fecha){ return S.habitos.filter(h => tocaHoy(h, fecha)); }
+
+function racha(habitoId){
+  const hechos = new Set(S.registros.filter(r => r.habito_id === habitoId && r.cumplido).map(r => r.fecha));
+  let d = hoyISO(), n = 0;
+  if (!hechos.has(d)) d = sumarDias(d, -1);
+  while (hechos.has(d)) { n++; d = sumarDias(d, -1); }
+  return n;
+}
+function nivelDe(pts){ return NIVELES.find(x => pts >= x.min); }
+
+/* =====================================================================
+   PINTADO
+   ===================================================================== */
+function pintar(){ pintarHoy(); pintarHabitos(); pintarProgreso(); pintarMetas(); }
+
+function pintarHoy(){
+  const f = S.fecha, lista = habitosDe(f);
+  const hechos = lista.filter(h => { const r = regDe(h.id, f); return r && r.cumplido; }).length;
+  const pct = lista.length ? Math.round(100*hechos/lista.length) : 0;
+  const rachas = S.habitos.map(h => racha(h.id));
+
+  $('#sHoy').textContent  = hechos + '/' + lista.length;
+  $('#sPunt').textContent = pct;
+  $('#sPts').textContent  = S.puntos;
+  $('#sRacha').textContent = rachas.length ? Math.max(...rachas) : 0;
+  const nv = nivelDe(S.puntos);
+  $('#hdNivel').textContent = nv.n;
+  $('#hdSub').textContent = (S.perfil && S.perfil.nombre ? S.perfil.nombre + ' · ' : '') + bonito(hoyISO());
+  $('#tituloHoy').textContent = f === hoyISO() ? 'Hoy · ' + bonito(f) : bonito(f);
+  $('#btnHoyVolver').classList.toggle('hidden', f === hoyISO());
+
+  const cont = $('#listaHoy'); cont.innerHTML = '';
+  const sinNada = S.habitos.length === 0;
+  $('#vacioHoy').classList.toggle('hidden', lista.length > 0 || !sinNada);
+  if (!lista.length && !sinNada)
+    cont.innerHTML = '<p class="muted">Hoy no toca ningún hábito. Descansa o adelanta algo de mañana.</p>';
+
+  ['manana','tarde','noche'].forEach(mom => {
+    const grupo = lista.filter(h => h.momento === mom);
+    if (!grupo.length) return;
+    const t = document.createElement('div');
+    t.className = 'muted'; t.style.margin = '14px 0 7px';
+    t.textContent = ({manana:'MAÑANA', tarde:'TARDE', noche:'NOCHE'})[mom];
+    cont.appendChild(t);
+
+    grupo.forEach(h => {
+      const r = regDe(h.id, f), done = !!(r && r.cumplido), rc = racha(h.id);
+      const el = document.createElement('div');
+      el.className = 'hab' + (done ? ' done' : '');
+      el.innerHTML =
+        '<button class="chk">&#10003;</button>' +
+        '<div class="b"><div class="t"></div><div style="margin-top:5px">' +
+          '<span class="tag cat"></span>' +
+          (rc > 1 ? '<span class="tag fire">' + rc + ' días seguidos</span>' : '') +
+          '<span class="tag">+' + h.puntos + ' pts</span>' +
+          '<span class="tag">dif. ' + h.dificultad + '/10</span>' +
+        '</div>' +
+        (h.disparador ? '<div class="muted" style="margin-top:5px">Disparador: ' + h.disparador + '</div>' : '') +
+        '</div>' +
+        '<button class="sm gh det">Detalle</button>';
+      const meta = (h.meta_diaria > 1 || h.unidad !== 'vez') ? h.meta_diaria + ' ' + h.unidad : '';
+      el.querySelector('.t').textContent = h.nombre +
+        (meta && !h.nombre.toLowerCase().includes(h.unidad.toLowerCase()) ? '  ·  ' + meta : '');
+      el.querySelector('.cat').textContent = h.categoria;
+      el.querySelector('.chk').onclick = () => alternar(h);
+      el.querySelector('.det').onclick = () => abrirRegistro(h);
+      cont.appendChild(el);
+    });
+  });
+}
+
+function pintarHabitos(){
+  const c = $('#listaHabitos'); c.innerHTML = '';
+  if (!S.habitos.length){ c.innerHTML = '<div class="card"><p class="muted">Sin hábitos todavía.</p></div>'; return; }
+  S.habitos.forEach(h => {
+    const el = document.createElement('div');
+    el.className = 'card';
+    el.innerHTML =
+      '<div class="row" style="justify-content:space-between">' +
+        '<div><div style="font-weight:600" class="nm"></div>' +
+        '<div style="margin-top:6px"><span class="tag cat"></span><span class="tag">' + h.momento + '</span>' +
+        '<span class="tag">' + (h.dias_semana||[]).map(d => DIAS[d-1]).join(' ') + '</span>' +
+        '<span class="tag">+' + h.puntos + ' pts</span></div></div>' +
+        '<button class="sm ed">Editar</button></div>';
+    el.querySelector('.nm').textContent = h.nombre;
+    el.querySelector('.cat').textContent = h.categoria;
+    el.querySelector('.ed').onclick = () => abrirHabito(h);
+    c.appendChild(el);
+  });
+}
+
+function pintarProgreso(){
+  const pts = S.puntos, nv = nivelDe(pts);
+  const idx = NIVELES.indexOf(nv), sig = idx > 0 ? NIVELES[idx-1] : null;
+  $('#pgNivel').textContent = nv.n;
+  $('#pgPts').textContent = ' · ' + pts + ' pts';
+  if (sig){
+    $('#pgFalta').textContent = 'Faltan ' + (sig.min - pts) + ' pts para ' + sig.n;
+    $('#pgBar').style.width = Math.min(100, Math.round(100*(pts - nv.min)/(sig.min - nv.min))) + '%';
+  } else { $('#pgFalta').textContent = 'Nivel máximo'; $('#pgBar').style.width = '100%'; }
+
+  // Mapa de calor 30 dias
+  const heat = $('#heat'); heat.innerHTML = '';
+  for (let i = 29; i >= 0; i--){
+    const f = sumarDias(hoyISO(), -i), lista = habitosDe(f);
+    const hechos = lista.filter(h => { const r = regDe(h.id, f); return r && r.cumplido; }).length;
+    const p = lista.length ? hechos/lista.length : 0;
+    const s = document.createElement('span');
+    if (p > 0) s.style.background = 'rgba(63,185,80,' + (0.22 + 0.78*p).toFixed(2) + ')';
+    s.title = f + ' — ' + hechos + '/' + lista.length;
+    heat.appendChild(s);
+  }
+
+  // Cumplimiento por habito
+  const c = $('#pgHabitos'); c.innerHTML = '';
+  S.habitos.forEach(h => {
+    let tocaban = 0, hechos = 0;
+    for (let i = 29; i >= 0; i--){
+      const f = sumarDias(hoyISO(), -i);
+      if (!tocaHoy(h, f)) continue;
+      tocaban++; const r = regDe(h.id, f); if (r && r.cumplido) hechos++;
+    }
+    const p = tocaban ? Math.round(100*hechos/tocaban) : 0;
+    const el = document.createElement('div');
+    el.style.marginBottom = '13px';
+    el.innerHTML = '<div class="row" style="justify-content:space-between"><span class="nm"></span>' +
+      '<span class="muted">' + hechos + '/' + tocaban + ' · ' + p + '%</span></div>' +
+      '<div class="bar" style="margin-top:5px"><i style="width:' + p + '%' +
+      (p < 50 ? ';background:var(--bad)' : p < 80 ? ';background:var(--warn)' : '') + '"></i></div>';
+    el.querySelector('.nm').textContent = h.nombre;
+    c.appendChild(el);
+  });
+
+  const ins = $('#pgInsignias');
+  if (S.insignias.length){
+    ins.innerHTML = '';
+    S.insignias.forEach(b => {
+      const e = document.createElement('span'); e.className = 'badge';
+      e.textContent = '★ ' + b.titulo; ins.appendChild(e);
+    });
+  }
+}
+
+function pintarMetas(){
+  $('#mtSemana').textContent = bonito(lunesDe(hoyISO()));
+  const c = $('#listaMetas'); c.innerHTML = '';
+  if (!S.metas.length){ c.innerHTML = '<div class="card"><p class="muted">Sin metas esta semana. Define 3.</p></div>'; return; }
+  S.metas.forEach(m => {
+    const el = document.createElement('div');
+    el.className = 'card';
+    el.innerHTML =
+      '<div class="row" style="justify-content:space-between"><div style="font-weight:600" class="tt"></div>' +
+      '<span class="tag">' + m.categoria + '</span></div>' +
+      (m.obstaculo ? '<div class="muted ob" style="margin-top:4px"></div>' : '') +
+      '<div class="row" style="margin-top:10px">' +
+      '<input type="range" min="0" max="100" step="10" value="' + (m.progreso || 0) + '" style="flex:1">' +
+      '<span class="muted pc" style="width:46px;text-align:right">' + (m.progreso || 0) + '%</span>' +
+      '<button class="sm del">×</button></div>';
+    el.querySelector('.tt').textContent = m.titulo;
+    if (m.obstaculo) el.querySelector('.ob').textContent = 'Obstáculo: ' + m.obstaculo;
+    const rng = el.querySelector('input');
+    rng.oninput = () => el.querySelector('.pc').textContent = rng.value + '%';
+    rng.onchange = async () => {
+      const v = Number(rng.value), yaEstaba = !!m.completada;
+      if (!ok(await sb.from('metas_semanales')
+              .update({ progreso: v, completada: v === 100 }).eq('id', m.id))) return;
+      if (v === 100 && !yaEstaba){
+        await sumarPuntos('meta', m.id, m.puntos || 50);
+        toast('Meta cerrada. +' + (m.puntos || 50) + ' pts');
+      } else if (v < 100 && yaEstaba){
+        await sb.from('puntos_log').delete().eq('concepto','meta').eq('detalle', m.id);
+      }
+      await cargarTodo();
+    };
+    el.querySelector('.del').onclick = async () => {
+      if (!ok(await sb.from('metas_semanales').delete().eq('id', m.id))) return;
+      await sb.from('puntos_log').delete().eq('concepto','meta').eq('detalle', m.id);
+      await cargarTodo();
+    };
+    c.appendChild(el);
+  });
+}
+
+/* =====================================================================
+   ACCIONES
+   ===================================================================== */
+async function sumarPuntos(concepto, detalle, puntos, fecha){
+  await sb.from('puntos_log').insert({
+    user_id: S.user.id, fecha: fecha || S.fecha, concepto, detalle, puntos });
+}
+
+async function alternar(h){
+  const f = S.fecha, r = regDe(h.id, f);
+  if (r){
+    if (!ok(await sb.from('registros').delete().eq('id', r.id))) return;
+    await sb.from('puntos_log').delete().eq('fecha', f).eq('concepto','habito').eq('detalle', h.id);
+    await sb.from('puntos_log').delete().eq('fecha', f).eq('concepto','dia_perfecto');
+  } else {
+    const { error } = await sb.from('registros').insert({
+      user_id: S.user.id, habito_id: h.id, fecha: f, cantidad: h.meta_diaria, cumplido: true });
+    if (error) return toast('Error: ' + error.message);
+    await sumarPuntos('habito', h.id, h.puntos, f);
+  }
+  await cargarTodo();
+  await revisarLogros();
+}
+
+async function revisarLogros(){
+  const f = S.fecha, lista = habitosDe(f);
+  const hechos = lista.filter(x => { const r = regDe(x.id, f); return r && r.cumplido; }).length;
+
+  if (lista.length && hechos === lista.length){
+    const { data } = await sb.from('puntos_log').select('id').eq('fecha', f).eq('concepto','dia_perfecto');
+    if (!data || !data.length){
+      await sumarPuntos('dia_perfecto', 'Todos los hábitos del día', 50, f);
+      toast('DÍA PERFECTO. +50 pts');
+      await cargarTodo();
+    }
+  }
+
+  const max = S.habitos.length ? Math.max(...S.habitos.map(x => racha(x.id))) : 0;
+  const metas = [[7,'Racha de 7 días'],[30,'Racha de 30 días'],[100,'Racha de 100 días']];
+  for (const [d, titulo] of metas){
+    if (max >= d && !S.insignias.some(b => b.clave === 'racha_' + d)){
+      if (!ok(await sb.from('insignias').insert({ user_id: S.user.id, clave: 'racha_' + d, titulo }))) continue;
+      toast('Insignia desbloqueada: ' + titulo);
+      await cargarTodo();
+    }
+  }
+}
+
+/* ---------- dialogo registro (detalle del habito del dia) ---------- */
+function abrirRegistro(h){
+  S.regActual = h;
+  const r = regDe(h.id, S.fecha);
+  $('#regTit').textContent = h.nombre;
+  $('#rCant').value  = r ? r.cantidad : h.meta_diaria;
+  $('#rEa').value    = r && r.energia_antes   || '';
+  $('#rEd').value    = r && r.energia_despues || '';
+  $('#rDif').value   = r && r.dificultad_percibida || '';
+  $('#rNotas').value = r && r.notas || '';
+  $('#dlgReg').showModal();
+}
+$('#btnCancelReg').onclick = () => $('#dlgReg').close();
+$('#btnSaveReg').onclick = async () => {
+  const h = S.regActual, f = S.fecha, r = regDe(h.id, f);
+  const num = (id) => {
+    const v = $(id).value;
+    if (v === '') return null;
+    return Math.min(10, Math.max(1, Math.round(Number(v)) || 1));
+  };
+  const cant = $('#rCant').value;
+  const fila = { user_id:S.user.id, habito_id:h.id, fecha:f, cumplido:true,
+    cantidad: cant === '' ? h.meta_diaria : Number(cant),
+    energia_antes: num('#rEa'), energia_despues: num('#rEd'),
+    dificultad_percibida: num('#rDif'), notas: $('#rNotas').value || null };
+  const res = r ? await sb.from('registros').update(fila).eq('id', r.id)
+                : await sb.from('registros').insert(fila);
+  if (!ok(res)) return;
+  if (!r) await sumarPuntos('habito', h.id, h.puntos, f);
+  $('#dlgReg').close(); await cargarTodo(); await revisarLogros();
+};
+
+/* ---------- dialogo habito ---------- */
+function pintarDiasCheck(sel){
+  const c = $('#fDias'); c.innerHTML = '';
+  DIAS.forEach((d, i) => {
+    const b = document.createElement('button');
+    b.type = 'button'; b.className = 'sm'; b.dataset.d = i+1; b.textContent = d;
+    b.style.opacity = sel.includes(i+1) ? '1' : '.35';
+    b.onclick = () => { b.style.opacity = (b.style.opacity === '1') ? '0.35' : '1'; };
+    c.appendChild(b);
+  });
+}
+function abrirHabito(h){
+  S.editando = h || null;
+  $('#dlgTit').textContent = h ? 'Editar hábito' : 'Nuevo hábito';
+  $('#fNombre').value = h ? h.nombre : '';
+  $('#fCat').value = h ? h.categoria : 'salud';
+  $('#fMom').value = h ? h.momento : 'manana';
+  $('#fMeta').value = h ? h.meta_diaria : 1;
+  $('#fUni').value = h ? h.unidad : 'vez';
+  $('#fDur').value = h && h.duracion_min || '';
+  $('#fDif').value = h ? h.dificultad : 5;
+  $('#fTrig').value = h && h.disparador || '';
+  $('#fRec').value = h && h.recompensa || '';
+  $('#fPts').value = h ? h.puntos : 10;
+  pintarDiasCheck(h ? h.dias_semana : [1,2,3,4,5,6,7]);
+  $('#btnDelHab').classList.toggle('hidden', !h);
+  $('#dlgHab').showModal();
+}
+$('#btnNuevo').onclick = () => abrirHabito(null);
+$('#btnCancelHab').onclick = () => $('#dlgHab').close();
+$('#btnSaveHab').onclick = async () => {
+  const dias = $$('#fDias button').filter(b => b.style.opacity === '1').map(b => Number(b.dataset.d));
+  if (!$('#fNombre').value.trim()) return toast('Ponle nombre');
+  if (!dias.length) return toast('Elige al menos un día');
+  const fila = {
+    user_id: S.user.id, nombre: $('#fNombre').value.trim(), categoria: $('#fCat').value,
+    momento: $('#fMom').value, meta_diaria: Number($('#fMeta').value) || 1, unidad: $('#fUni').value || 'vez',
+    duracion_min: $('#fDur').value ? Number($('#fDur').value) : null,
+    dificultad: Number($('#fDif').value) || 5, disparador: $('#fTrig').value || null,
+    recompensa: $('#fRec').value || null, puntos: Number($('#fPts').value) || 10, dias_semana: dias };
+  const { error } = S.editando
+    ? await sb.from('habitos').update(fila).eq('id', S.editando.id)
+    : await sb.from('habitos').insert(fila);
+  if (error) return toast('Error: ' + error.message);
+  $('#dlgHab').close(); await cargarTodo();
+};
+$('#btnDelHab').onclick = async () => {
+  if (!S.editando) return;
+  if (!ok(await sb.from('habitos').update({ activo:false }).eq('id', S.editando.id))) return;
+  $('#dlgHab').close(); await cargarTodo();
+};
+
+/* ---------- dialogo meta ---------- */
+$('#btnMeta').onclick = () => { $('#gTit').value=''; $('#gObs').value=''; $('#dlgMeta').showModal(); };
+$('#btnCancelMeta').onclick = () => $('#dlgMeta').close();
+$('#btnSaveMeta').onclick = async () => {
+  if (!$('#gTit').value.trim()) return toast('Escribe la meta');
+  if (S.metas.length >= 5) return toast('Máximo 5 metas por semana');
+  if (!ok(await sb.from('metas_semanales').insert({ user_id:S.user.id, semana_inicio: lunesDe(hoyISO()),
+    titulo: $('#gTit').value.trim(), categoria: $('#gCat').value || 'personal',
+    obstaculo: $('#gObs').value || null }))) return;
+  $('#dlgMeta').close(); await cargarTodo();
+};
+
+/* ---------- navegacion ---------- */
+$$('nav button').forEach(b => b.onclick = () => {
+  $$('nav button').forEach(x => x.classList.remove('on')); b.classList.add('on');
+  S.tab = b.dataset.t;
+  ['hoy','habitos','progreso','metas','reporte'].forEach(t => {
+    $('#t' + t.charAt(0).toUpperCase() + t.slice(1)).classList.toggle('hidden', t !== S.tab);
+  });
+});
+$('#btnAyer').onclick = () => { S.fecha = sumarDias(S.fecha, -1); pintarHoy(); };
+$('#btnHoyVolver').onclick = () => { S.fecha = hoyISO(); pintarHoy(); };
+
+/* ---------- rutina sugerida ---------- */
+$('#btnSeed').onclick = async () => {
+  const base = [
+    ['Agua al despertar','salud','manana',500,'ml',5,2,'Apenas abrir los ojos',10,[1,2,3,4,5,6,7]],
+    ['Movimiento y estiramiento','salud','manana',10,'minutos',10,3,'Después del agua',10,[1,2,3,4,5,6,7]],
+    ['Planificar el día (3 prioridades)','trabajo','manana',1,'vez',10,3,'Antes de abrir el correo',10,[1,2,3,4,5]],
+    ['Bloque de trabajo profundo','trabajo','manana',4,'pomodoros',120,7,'Teléfono en otra habitación',20,[1,2,3,4,5]],
+    ['Beber 3 litros de agua','salud','tarde',3,'litros',0,4,'Botella siempre en el escritorio',10,[1,2,3,4,5,6,7]],
+    ['Entrenar','salud','tarde',45,'minutos',45,7,'Ropa lista desde la mañana',20,[1,2,4,5,6]],
+    ['Estudiar','estudio','noche',2,'pomodoros',60,6,'Después de cenar',15,[1,2,3,4,5]],
+    ['Leer','personal','noche',20,'minutos',20,3,'Libro sobre la almohada',10,[1,2,3,4,5,6,7]],
+    ['Registrar gastos del día','finanzas','noche',1,'vez',5,2,'Antes de cerrar el día',10,[1,2,3,4,5,6,7]],
+    ['Sin pantallas y a dormir','descanso','noche',1,'vez',0,6,'A las 22:00 el teléfono se carga fuera',10,[1,2,3,4,5,6,7]]
+  ];
+  const filas = base.map((b, i) => ({ user_id:S.user.id, nombre:b[0], categoria:b[1], momento:b[2],
+    meta_diaria:b[3], unidad:b[4], duracion_min:b[5]||null, dificultad:b[6], disparador:b[7],
+    puntos:b[8], dias_semana:b[9], orden:i }));
+  const { error } = await sb.from('habitos').insert(filas);
+  if (error) return toast('Error: ' + error.message);
+  toast('Rutina creada. Ahora ajústala a tu horario.');
+  await cargarTodo();
+};
+
+/* =====================================================================
+   REPORTES (Modulo 9) — tono firme y directo
+   ===================================================================== */
+function reporteDiario(){
+  const f = S.fecha, lista = habitosDe(f);
+  const hechos = lista.filter(h => { const r = regDe(h.id, f); return r && r.cumplido; });
+  const faltan = lista.filter(h => !hechos.includes(h));
+  const pct = lista.length ? Math.round(100*hechos.length/lista.length) : 0;
+  const porMomento = m => {
+    const g = lista.filter(h => h.momento === m);
+    return g.length ? Math.round(100*g.filter(h => hechos.includes(h)).length/g.length) : null;
+  };
+  const moms = [['Mañana', porMomento('manana')], ['Tarde', porMomento('tarde')], ['Noche', porMomento('noche')]]
+               .filter(x => x[1] !== null);
+  const mejor = moms.length ? moms.slice().sort((a,b) => b[1]-a[1])[0] : null;
+  const peor  = moms.length ? moms.slice().sort((a,b) => a[1]-b[1])[0] : null;
+
+  const veredicto =
+    pct === 100 ? 'Día perfecto. No lo celebres de más: mañana empieza en cero y la racha solo cuenta si sigue.' :
+    pct >= 80 ? 'Buen día, no un gran día. Te faltó poco y eso es justamente lo que separa constante de dedicado.' :
+    pct >= 50 ? 'Medio cumplido es medio incumplido. Elige UNO de los pendientes y no lo negocies mañana.' :
+    pct > 0   ? 'Día flojo. No te justifiques: revisa a qué hora se rompió el plan y mueve ese hábito de horario.' :
+                'Cero. Un día así no arruina nada; dos seguidos sí. Mañana haz solo el más fácil y rompe la caída.';
+
+  return [
+    'REPORTE DIARIO · ' + bonito(f).toUpperCase(),
+    '='.repeat(46), '',
+    'Hábitos completados : ' + hechos.length + '/' + lista.length,
+    'Puntuación del día  : ' + pct + '/100',
+    'Puntos acumulados   : ' + S.puntos + ' (' + nivelDe(S.puntos).n + ')',
+    mejor ? 'Mejor momento       : ' + mejor[0] + ' (' + mejor[1] + '%)' : null,
+    peor && peor[1] < 100 ? 'Área de mejora      : ' + peor[0] + ' (' + peor[1] + '%)' : null,
+    '',
+    'CUMPLIDOS', hechos.length ? hechos.map(h => '  [x] ' + h.nombre + '  (+' + h.puntos + ')').join('\n') : '  (ninguno)',
+    '',
+    'PENDIENTES', faltan.length ? faltan.map(h => '  [ ] ' + h.nombre).join('\n') : '  (ninguno)',
+    '',
+    'RACHAS ACTIVAS',
+    S.habitos.map(h => [h, racha(h.id)]).filter(x => x[1] > 0)
+      .sort((a,b) => b[1]-a[1]).map(x => '  ' + dias(x[1]) + ' · ' + x[0].nombre).join('\n') || '  (sin rachas)',
+    '', '-'.repeat(46), veredicto
+  ].filter(x => x !== null).join('\n');
+}
+
+function reporteSemanal(){
+  const lun = lunesDe(hoyISO());
+  let tocaban = 0, hechos = 0;
+  const porDia = [];
+  for (let i = 0; i < 7; i++){
+    const f = sumarDias(lun, i);
+    if (f > hoyISO()) break;
+    const l = habitosDe(f);
+    const c = l.filter(h => { const r = regDe(h.id, f); return r && r.cumplido; }).length;
+    tocaban += l.length; hechos += c;
+    porDia.push([DIAS[i], c, l.length, l.length ? Math.round(100*c/l.length) : 0]);
+  }
+  // semana anterior para comparar
+  let tAnt = 0, hAnt = 0;
+  for (let i = 0; i < 7; i++){
+    const f = sumarDias(sumarDias(lun,-7), i), l = habitosDe(f);
+    tAnt += l.length;
+    hAnt += l.filter(h => { const r = regDe(h.id, f); return r && r.cumplido; }).length;
+  }
+  const pct = tocaban ? Math.round(100*hechos/tocaban) : 0;
+  const pctAnt = tAnt ? Math.round(100*hAnt/tAnt) : 0;
+  const dif = pct - pctAnt;
+
+  const porHab = S.habitos.map(h => {
+    let t = 0, c = 0;
+    for (let i = 0; i < 7; i++){
+      const f = sumarDias(lun, i); if (f > hoyISO() || !tocaHoy(h, f)) continue;
+      t++; const r = regDe(h.id, f); if (r && r.cumplido) c++;
+    }
+    return [h.nombre, c, t, t ? Math.round(100*c/t) : 0];
+  }).filter(x => x[2] > 0).sort((a,b) => b[3]-a[3]);
+
+  const mejorDia = porDia.slice().sort((a,b) => b[3]-a[3])[0];
+  const peorDia  = porDia.slice().sort((a,b) => a[3]-b[3])[0];
+
+  return [
+    'REPORTE SEMANAL · semana del ' + bonito(lun),
+    '='.repeat(46), '',
+    'Cumplimiento general : ' + pct + '%  (' + hechos + '/' + tocaban + ')',
+    'Semana anterior      : ' + pctAnt + '%  → ' + (dif >= 0 ? '+' : '') + dif + ' pp de cumplimiento',
+    'Puntos acumulados    : ' + S.puntos + ' (' + nivelDe(S.puntos).n + ')',
+    mejorDia ? 'Día más productivo   : ' + mejorDia[0] + ' (' + mejorDia[3] + '%)' : null,
+    peorDia  ? 'Día más débil        : ' + peorDia[0] + ' (' + peorDia[3] + '%)' : null,
+    '', 'POR DÍA',
+    porDia.map(d => '  ' + d[0] + '  ' + String(d[1] + '/' + d[2]).padEnd(7) + barra(d[3])).join('\n'),
+    '', 'POR HÁBITO',
+    porHab.map(h => '  ' + h[3].toString().padStart(3) + '%  ' + h[0] + '  (' + h[1] + '/' + h[2] + ')').join('\n'),
+    '', 'METAS DE LA SEMANA',
+    S.metas.length ? S.metas.map(m => '  ' + (m.completada ? '[x]' : '[ ]') + ' ' + m.titulo + ' · ' + (m.progreso || 0) + '%').join('\n')
+                   : '  (no definiste metas esta semana — eso ya es un hallazgo)',
+    '', '-'.repeat(46),
+    'REFUERZO PARA LA PRÓXIMA SEMANA',
+    (function(){
+      const debiles = porHab.filter(h => h[3] < 70).sort((a,b) => a[3]-b[3]).slice(0,3);
+      return debiles.length
+        ? debiles.map(h => '  · ' + h[0] + ' (' + h[3] + '%): bájale la meta o cámbiale la hora. A ese nivel el problema es el diseño, no tu voluntad.').join('\n')
+        : '  · Todo por encima del 70%. Sube la exigencia de un hábito, no de todos.';
+    })(),
+    '',
+    dif >= 0 ? 'Vas hacia arriba. Mantén el mismo plan una semana más antes de cambiar nada.'
+             : 'Bajaste respecto a la semana pasada. Recorta a 3 hábitos innegociables hasta recuperar el ritmo.'
+  ].filter(x => x !== null).join('\n');
+}
+function dias(n){ return n + (n === 1 ? ' día' : ' días'); }
+function barra(p){ const n = Math.round(p/10); return '#'.repeat(n) + '.'.repeat(10-n) + ' ' + p + '%'; }
+
+$('#btnRepDia').onclick = () => { S.repTipo = 'diario';  $('#repTxt').textContent = reporteDiario(); };
+$('#btnRepSem').onclick = () => { S.repTipo = 'semanal'; $('#repTxt').textContent = reporteSemanal(); };
+$('#btnRepGuardar').onclick = async () => {
+  const f = S.repTipo === 'diario' ? S.fecha : hoyISO(), lista = habitosDe(f);
+  const hechos = lista.filter(h => { const r = regDe(h.id, f); return r && r.cumplido; }).length;
+  const { error } = await sb.from('reportes').upsert({
+    user_id:S.user.id, fecha:f, tipo:S.repTipo, cumplidos:hechos, totales:lista.length,
+    puntuacion: lista.length ? Math.round(100*hechos/lista.length) : 0,
+    mensaje: $('#repTxt').textContent }, { onConflict:'user_id,fecha,tipo' });
+  toast(error ? 'Error: ' + error.message : 'Reporte guardado');
+};
+
+arrancar();
+</script>
+</body>
+</html>
