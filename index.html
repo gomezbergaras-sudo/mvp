@@ -3,29 +3,53 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Sistema de Hábitos</title>
+<title>STRICTO</title>
+<meta name="theme-color" content="#0B0D11">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='5' fill='%230B0D11'/%3E%3Crect x='3' y='13' width='4.4' height='8' rx='1.5' fill='%23F0A73A' opacity='.45'/%3E%3Crect x='9.8' y='8' width='4.4' height='13' rx='1.5' fill='%23F0A73A' opacity='.75'/%3E%3Crect x='16.6' y='3' width='4.4' height='18' rx='1.5' fill='%23F0A73A'/%3E%3C/svg%3E">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.112.4/dist/umd/supabase.js"></script>
 <style>
 :root{
-  --bg:#0d1117; --panel:#161b22; --panel2:#1c232c; --line:#2a3441;
-  --tx:#e6edf3; --tx2:#8b949e; --acc:#3fb950; --acc2:#58a6ff;
-  --warn:#d29922; --bad:#f85149; --r:12px;
+  color-scheme: dark;
+  --bg:#0B0D11; --panel:#13171D; --panel2:#1A1F27; --line:#2A313B;
+  --input:#0A0D12; --hover:#212934; --chip:#1F252F; --header:rgba(11,13,17,.92);
+  --tx:#E9EDF2; --tx2:#98A3B2;
+  --brand:#F0A73A; --brand-tx:#F0A73A; --brand-ink:#1B1204; --brand-soft:rgba(240,167,58,.14);
+  --ok:#3DD68C; --ok-soft:rgba(61,214,140,.10); --bad:#F2555A;
+  --r:12px; --sombra:0 8px 24px rgba(0,0,0,.5);
 }
+:root[data-tema="acero"]{
+  color-scheme: dark;
+  --bg:#0A0E14; --panel:#111823; --panel2:#18202C; --line:#25303F;
+  --input:#080C12; --hover:#1F2937; --chip:#1D2836; --header:rgba(10,14,20,.92);
+  --tx:#E8EEF6; --tx2:#93A2B5;
+  --brand:#38BDF8; --brand-tx:#38BDF8; --brand-ink:#04202D; --brand-soft:rgba(56,189,248,.14);
+  --ok:#3DD68C; --ok-soft:rgba(61,214,140,.10); --bad:#F2555A;
+}
+:root[data-tema="papel"]{
+  color-scheme: light;
+  --bg:#F5F6F8; --panel:#FFFFFF; --panel2:#F0F2F5; --line:#DEE3EA;
+  --input:#FFFFFF; --hover:#E7EBF0; --chip:#EDF0F4; --header:rgba(245,246,248,.92);
+  --tx:#111720; --tx2:#5B6672;
+  --brand:#E89416; --brand-tx:#9A5F02; --brand-ink:#2A1A02; --brand-soft:rgba(232,148,22,.16);
+  --ok:#0F7A4C; --ok-soft:rgba(15,122,76,.10); --bad:#C8383D;
+  --sombra:0 8px 24px rgba(16,24,40,.14);
+}
+
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--tx);
   font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;font-size:15px;line-height:1.5}
-button{font:inherit;cursor:pointer;border:none;border-radius:8px;padding:9px 14px;
+button{font:inherit;cursor:pointer;border-radius:8px;padding:9px 14px;
   background:var(--panel2);color:var(--tx);border:1px solid var(--line)}
-button:hover{background:#232c37}
-button.pri{background:var(--acc);color:#06210d;border-color:var(--acc);font-weight:600}
-button.pri:hover{filter:brightness(1.1)}
+button:hover{background:var(--hover)}
+button.pri{background:var(--brand);color:var(--brand-ink);border-color:var(--brand);font-weight:650}
+button.pri:hover{filter:brightness(1.08)}
 button.gh{background:transparent}
 button.sm{padding:5px 10px;font-size:13px}
-input,select,textarea{font:inherit;background:#0b0f14;color:var(--tx);border:1px solid var(--line);
+input,select,textarea{font:inherit;background:var(--input);color:var(--tx);border:1px solid var(--line);
   border-radius:8px;padding:9px 11px;width:100%}
-input:focus,select:focus,textarea:focus{outline:2px solid var(--acc2);outline-offset:-1px}
+input:focus,select:focus,textarea:focus,button:focus-visible{outline:2px solid var(--brand);outline-offset:1px}
 label{display:block;font-size:12px;color:var(--tx2);margin:0 0 4px;text-transform:uppercase;letter-spacing:.4px}
-a{color:var(--acc2)}
+a{color:var(--brand-tx)}
 .wrap{max-width:940px;margin:0 auto;padding:16px 16px 64px}
 .card{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:18px;margin-bottom:14px}
 .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
@@ -37,46 +61,77 @@ h2{font-size:16px;margin:0 0 12px}
 .muted{color:var(--tx2);font-size:13px}
 .hidden{display:none !important}
 
-header{position:sticky;top:0;z-index:10;background:rgba(13,17,23,.92);
+/* ---------- marca STRICTO ---------- */
+.marca{display:flex;align-items:center;gap:10px}
+.marca svg{display:block;flex:0 0 auto}
+.marca .wm{font-weight:800;letter-spacing:.22em;font-size:19px;line-height:1;text-transform:uppercase}
+.marca .wm b{color:var(--brand-tx);font-weight:800}
+.lema{color:var(--tx2);font-size:11px;letter-spacing:.18em;text-transform:uppercase;margin-top:5px}
+
+header{position:sticky;top:0;z-index:10;background:var(--header);
   backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
 .hd{max-width:940px;margin:0 auto;padding:12px 16px;display:flex;justify-content:space-between;align-items:center;gap:10px}
 nav{display:flex;gap:4px;overflow-x:auto;max-width:940px;margin:0 auto;padding:0 12px 10px}
 nav button{background:transparent;border:1px solid transparent;color:var(--tx2);padding:7px 13px;white-space:nowrap}
-nav button.on{background:var(--panel2);border-color:var(--line);color:var(--tx);font-weight:600}
+nav button.on{background:var(--brand-soft);border-color:var(--brand);color:var(--brand-tx);font-weight:650}
 
 .stat{background:var(--panel2);border:1px solid var(--line);border-radius:var(--r);padding:14px}
-.stat .n{font-size:26px;font-weight:700;line-height:1.1}
+.stat .n{font-size:26px;font-weight:700;line-height:1.1;font-variant-numeric:tabular-nums}
 .stat .l{font-size:11px;color:var(--tx2);text-transform:uppercase;letter-spacing:.5px;margin-top:4px}
 
 .hab{display:flex;gap:12px;align-items:flex-start;padding:13px;border:1px solid var(--line);
   border-radius:var(--r);background:var(--panel2);margin-bottom:9px}
-.hab.done{border-color:rgba(63,185,80,.5);background:rgba(63,185,80,.08)}
+.hab.done{border-color:color-mix(in srgb, var(--ok) 45%, transparent);background:var(--ok-soft)}
 .chk{width:26px;height:26px;border-radius:50%;border:2px solid var(--line);background:transparent;
   flex:0 0 26px;padding:0;display:grid;place-items:center;font-size:14px;color:transparent;margin-top:2px}
-.hab.done .chk{background:var(--acc);border-color:var(--acc);color:#06210d;font-weight:800}
+.hab.done .chk{background:var(--ok);border-color:var(--ok);color:var(--panel);font-weight:800}
 .hab .b{flex:1;min-width:0}
 .hab .t{font-weight:600}
 .hab.done .t{text-decoration:line-through;opacity:.75}
-.tag{display:inline-block;font-size:11px;padding:2px 8px;border-radius:99px;background:#21262d;
+.tag{display:inline-block;font-size:11px;padding:2px 8px;border-radius:99px;background:var(--chip);
   color:var(--tx2);border:1px solid var(--line);margin-right:5px}
-.tag.fire{background:rgba(210,153,34,.15);color:#e3b341;border-color:rgba(210,153,34,.35)}
+.tag.fire{background:var(--brand-soft);color:var(--brand-tx);border-color:color-mix(in srgb, var(--brand) 40%, transparent)}
+.tag.yo{background:var(--brand-soft);color:var(--brand-tx);border-color:color-mix(in srgb, var(--brand) 40%, transparent)}
 
-.bar{height:8px;background:#0b0f14;border-radius:99px;overflow:hidden;border:1px solid var(--line)}
-.bar>i{display:block;height:100%;background:var(--acc);border-radius:99px;transition:width .3s}
+.bar{height:8px;background:var(--input);border-radius:99px;overflow:hidden;border:1px solid var(--line)}
+.bar>i{display:block;height:100%;background:var(--brand);border-radius:99px;transition:width .3s}
 
+/* heatmap: una sola tinta, cinco pasos de intensidad */
 .heat{display:flex;gap:3px;flex-wrap:wrap}
-.heat span{width:15px;height:15px;border-radius:3px;background:#161b22;border:1px solid var(--line)}
-.badge{display:inline-flex;align-items:center;gap:6px;background:var(--panel2);border:1px solid var(--line);
+.heat span{width:15px;height:15px;border-radius:3px;background:var(--panel2);border:1px solid var(--line)}
+.heat span.n1{background:color-mix(in srgb, var(--brand) 32%, var(--panel2))}
+.heat span.n2{background:color-mix(in srgb, var(--brand) 58%, var(--panel2))}
+.heat span.n3{background:color-mix(in srgb, var(--brand) 80%, var(--panel2))}
+.heat span.n4{background:var(--brand);border-color:var(--brand)}
+
+.badge{display:inline-flex;align-items:center;gap:6px;background:var(--brand-soft);
+  border:1px solid color-mix(in srgb, var(--brand) 35%, transparent);
   border-radius:99px;padding:6px 13px;margin:0 6px 6px 0;font-size:13px}
 
+table.datos{width:100%;border-collapse:collapse;font-size:14px}
+table.datos th{text-align:left;color:var(--tx2);font-size:12px;font-weight:600;padding:6px 8px;
+  text-transform:uppercase;letter-spacing:.4px}
+table.datos td{padding:8px;border-top:1px solid var(--line);font-variant-numeric:tabular-nums}
+table.datos tr.yo{background:var(--brand-soft)}
+table.datos tr.total td{border-top:2px solid var(--line);font-weight:700}
+.sube{color:var(--ok);font-weight:600}
+.baja{color:var(--bad);font-weight:600}
+
 .toast{position:fixed;left:50%;transform:translateX(-50%);bottom:22px;background:var(--panel2);
-  border:1px solid var(--acc);border-radius:10px;padding:11px 18px;z-index:99;box-shadow:0 8px 24px rgba(0,0,0,.5)}
+  border:1px solid var(--brand);border-radius:10px;padding:11px 18px;z-index:99;box-shadow:var(--sombra)}
 .err{color:var(--bad);font-size:13px;margin-top:8px}
 pre.rep{white-space:pre-wrap;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:13px;
-  background:#0b0f14;border:1px solid var(--line);border-radius:var(--r);padding:14px;margin:0}
+  background:var(--input);border:1px solid var(--line);border-radius:var(--r);padding:14px;margin:0}
 dialog{background:var(--panel);color:var(--tx);border:1px solid var(--line);border-radius:var(--r);
   padding:20px;max-width:520px;width:calc(100% - 32px)}
 dialog::backdrop{background:rgba(0,0,0,.6)}
+
+/* selector de tema */
+.temas{display:grid;gap:10px;grid-template-columns:repeat(auto-fit,minmax(150px,1fr))}
+.tema{border:1px solid var(--line);border-radius:var(--r);padding:12px;background:var(--panel2);text-align:left}
+.tema.on{border-color:var(--brand);box-shadow:0 0 0 1px var(--brand) inset}
+.tema .sw{display:flex;gap:5px;margin-bottom:9px}
+.tema .sw i{width:22px;height:22px;border-radius:6px;border:1px solid rgba(128,128,128,.35)}
 </style>
 </head>
 <body>
@@ -84,8 +139,9 @@ dialog::backdrop{background:rgba(0,0,0,.6)}
 <!-- ================= CONFIG / LOGIN ================= -->
 <div id="vLogin" class="wrap hidden" style="max-width:440px;padding-top:60px">
   <div class="card">
-    <h1 style="margin-bottom:4px">Sistema de Hábitos</h1>
-    <p class="muted" style="margin-top:0">Disciplina medida es disciplina que se mantiene.</p>
+    <div class="marca" style="color:var(--brand-tx)"><svg class="mk" width="26" height="26" viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="13" width="4.6" height="8" rx="1.6" fill="currentColor" opacity=".45"/><rect x="9.7" y="8" width="4.6" height="13" rx="1.6" fill="currentColor" opacity=".75"/><rect x="17.4" y="3" width="4.6" height="18" rx="1.6" fill="currentColor"/></svg><span class="wm" style="color:var(--tx)">Stric<b>to</b></span></div>
+    <div class="lema">Disciplina medida</div>
+    <p class="muted" style="margin-top:14px">Lo que no se mide, no se sostiene.</p>
 
     <div id="cfgBox" class="grid" style="margin:16px 0">
       <div><label>Supabase URL</label><input id="cfgUrl" placeholder="https://xxxx.supabase.co"></div>
@@ -112,11 +168,12 @@ dialog::backdrop{background:rgba(0,0,0,.6)}
   <header>
     <div class="hd">
       <div>
-        <h1>Sistema de Hábitos</h1>
-        <div class="muted" id="hdSub">—</div>
+        <div class="marca" style="color:var(--brand-tx)"><svg class="mk" width="26" height="26" viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="13" width="4.6" height="8" rx="1.6" fill="currentColor" opacity=".45"/><rect x="9.7" y="8" width="4.6" height="13" rx="1.6" fill="currentColor" opacity=".75"/><rect x="17.4" y="3" width="4.6" height="18" rx="1.6" fill="currentColor"/></svg><h1 class="wm" style="color:var(--tx)">Stric<b>to</b></h1></div>
+        <div class="muted" id="hdSub" style="margin-top:3px">—</div>
       </div>
       <div class="row">
         <span class="tag" id="hdNivel">Principiante</span>
+        <button class="gh sm" id="btnTema" title="Cambiar tema">Tema</button>
         <button class="gh sm" id="btnOut">Salir</button>
       </div>
     </div>
@@ -181,7 +238,7 @@ dialog::backdrop{background:rgba(0,0,0,.6)}
       <div class="card">
         <h2>Constancia · últimos 30 días</h2>
         <div class="heat" id="heat"></div>
-        <p class="muted" style="margin-bottom:0">Cada cuadro es un día. Más verde = más hábitos cumplidos.</p>
+        <p class="muted" style="margin-bottom:0">Cada cuadro es un día. Mientras más intenso el color, más hábitos cumpliste ese día.</p>
       </div>
       <div class="card">
         <h2>Cumplimiento por hábito (30 días)</h2>
@@ -272,8 +329,20 @@ dialog::backdrop{background:rgba(0,0,0,.6)}
       </div>
     </section>
 
+    <p class="muted" style="text-align:center;letter-spacing:.16em;text-transform:uppercase;font-size:11px;margin-top:28px">
+      Stricto · disciplina medida</p>
   </div>
 </div>
+
+<!-- DIALOGO TEMA -->
+<dialog id="dlgTema">
+  <h2>Tema de Stricto</h2>
+  <p class="muted" style="margin-top:0">El acento de la marca marca progreso; el verde y el rojo quedan reservados para estados: cumplido, caída, récord.</p>
+  <div class="temas" id="temaLista"></div>
+  <div class="row" style="justify-content:flex-end;margin-top:14px">
+    <button class="pri" id="btnCerrarTema">Listo</button>
+  </div>
+</dialog>
 
 <!-- DIALOGO HABITO -->
 <dialog id="dlgHab">
@@ -431,6 +500,30 @@ function ok(res, msg){
   if (res && res.error){ toast('Error: ' + res.error.message); console.error(res.error); return false; }
   if (msg) toast(msg);
   return true;
+}
+const TEMAS = [
+  { id:'grafito', nombre:'Grafito', desc:'Oscuro, acento ámbar', sw:['#0B0D11','#1A1F27','#F0A73A'], meta:'#0B0D11' },
+  { id:'acero',   nombre:'Acero',   desc:'Oscuro, acento cian',  sw:['#0A0E14','#18202C','#38BDF8'], meta:'#0A0E14' },
+  { id:'papel',   nombre:'Papel',   desc:'Claro, acento ámbar',  sw:['#F5F6F8','#E7EBF0','#E89416'], meta:'#F5F6F8' }
+];
+function aplicarTema(id){
+  const t = TEMAS.find(x => x.id === id) || TEMAS[0];
+  document.documentElement.dataset.tema = t.id;
+  const m = document.querySelector('meta[name=theme-color]');
+  if (m) m.setAttribute('content', t.meta);
+  guardarLocal('stricto_tema', t.id);
+}
+function pintarTemas(){
+  const actual = leerLocal('stricto_tema') || 'grafito';
+  const c = document.getElementById('temaLista'); c.innerHTML = '';
+  TEMAS.forEach(t => {
+    const b = document.createElement('button');
+    b.className = 'tema' + (t.id === actual ? ' on' : '');
+    b.innerHTML = '<div class="sw">' + t.sw.map(x => '<i style="background:' + x + '"></i>').join('') + '</div>' +
+      '<div style="font-weight:650">' + t.nombre + '</div><div class="muted">' + t.desc + '</div>';
+    b.onclick = () => { aplicarTema(t.id); pintarTemas(); };
+    c.appendChild(b);
+  });
 }
 function guardarLocal(k,v){ try{ localStorage.setItem(k,v); }catch(e){} }
 function leerLocal(k){ try{ return localStorage.getItem(k); }catch(e){ return null; } }
@@ -644,8 +737,8 @@ function pintarProgreso(){
     const hechos = lista.filter(h => { const r = regDe(h.id, f); return r && r.cumplido; }).length;
     const p = lista.length ? hechos/lista.length : 0;
     const s = document.createElement('span');
-    if (p > 0) s.style.background = 'rgba(63,185,80,' + (0.22 + 0.78*p).toFixed(2) + ')';
-    s.title = f + ' — ' + hechos + '/' + lista.length;
+    if (p > 0) s.className = 'n' + Math.min(4, Math.ceil(p * 4));
+    s.title = f + ' — ' + hechos + '/' + lista.length + ' hábitos';
     heat.appendChild(s);
   }
 
@@ -662,9 +755,9 @@ function pintarProgreso(){
     const el = document.createElement('div');
     el.style.marginBottom = '13px';
     el.innerHTML = '<div class="row" style="justify-content:space-between"><span class="nm"></span>' +
-      '<span class="muted">' + hechos + '/' + tocaban + ' · ' + p + '%</span></div>' +
-      '<div class="bar" style="margin-top:5px"><i style="width:' + p + '%' +
-      (p < 50 ? ';background:var(--bad)' : p < 80 ? ';background:var(--warn)' : '') + '"></i></div>';
+      '<span class="muted">' + hechos + '/' + tocaban + ' · ' + p + '%' +
+      (p < 70 ? ' <span class="tag" style="margin-left:6px">refuerzo</span>' : '') + '</span></div>' +
+      '<div class="bar" style="margin-top:5px"><i style="width:' + p + '%"></i></div>';
     el.querySelector('.nm').textContent = h.nombre;
     c.appendChild(el);
   });
@@ -923,7 +1016,7 @@ function reporteDiario(){
                 'Cero. Un día así no arruina nada; dos seguidos sí. Mañana haz solo el más fácil y rompe la caída.';
 
   return [
-    'REPORTE DIARIO · ' + bonito(f).toUpperCase(),
+    'STRICTO · REPORTE DIARIO · ' + bonito(f).toUpperCase(),
     '='.repeat(46), '',
     'Hábitos completados : ' + hechos.length + '/' + lista.length,
     'Puntuación del día  : ' + pct + '/100',
@@ -979,7 +1072,7 @@ function reporteSemanal(){
   const peorDia  = porDia.slice().sort((a,b) => a[3]-b[3])[0];
 
   return [
-    'REPORTE SEMANAL · semana del ' + bonito(lun),
+    'STRICTO · REPORTE SEMANAL · semana del ' + bonito(lun),
     '='.repeat(46), '',
     'Cumplimiento general : ' + pct + '%  (' + hechos + '/' + tocaban + ')',
     'Semana anterior      : ' + pctAnt + '%  → ' + (dif >= 0 ? '+' : '') + dif + ' pp de cumplimiento',
@@ -1228,22 +1321,19 @@ function pintarComparativa(){
 
   const totalA = volumen(estaSem), totalB = volumen(semPrev);
   const difT = totalB > 0 ? Math.round(100*(totalA - totalB)/totalB) : (totalA > 0 ? 100 : 0);
-  const flecha = d => d > 0 ? '<span style="color:var(--acc)">▲ ' + d + '%</span>'
-                  : d < 0 ? '<span style="color:var(--bad)">▼ ' + Math.abs(d) + '%</span>'
-                  : '<span class="muted">=</span>';
+  const flecha = d => d > 0 ? '<span class="sube">▲ ' + d + '%</span>'
+                  : d < 0 ? '<span class="baja">▼ ' + Math.abs(d) + '%</span>'
+                  : '<span class="muted">sin cambio</span>';
   const kg = n => Math.round(n).toLocaleString('es');
 
   c.innerHTML =
-    '<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:14px">' +
-    '<tr style="text-align:left;color:var(--tx2);font-size:12px">' +
-      '<th style="padding:6px 8px">Ejercicio</th><th>Esta semana</th><th>Anterior</th><th>Cambio</th><th>Mejor peso</th></tr>' +
+    '<div style="overflow-x:auto"><table class="datos">' +
+    '<tr><th>Ejercicio</th><th>Esta semana</th><th>Anterior</th><th>Cambio</th><th>Mejor peso</th></tr>' +
     filas.map(f =>
-      '<tr style="border-top:1px solid var(--line)">' +
-      '<td style="padding:8px">' + f.nombre + (f.pr ? ' <span class="tag fire">PR</span>' : '') + '</td>' +
+      '<tr><td>' + f.nombre + (f.pr ? ' <span class="tag fire">récord</span>' : '') + '</td>' +
       '<td>' + kg(f.va) + ' kg</td><td class="muted">' + kg(f.vb) + ' kg</td>' +
       '<td>' + flecha(f.dif) + '</td><td>' + (f.maxA ? f.maxA + ' kg' : '—') + '</td></tr>').join('') +
-    '<tr style="border-top:2px solid var(--line);font-weight:700">' +
-      '<td style="padding:8px">TOTAL</td><td>' + kg(totalA) + ' kg</td>' +
+    '<tr class="total"><td>TOTAL</td><td>' + kg(totalA) + ' kg</td>' +
       '<td class="muted">' + kg(totalB) + ' kg</td><td>' + flecha(difT) + '</td><td></td></tr>' +
     '</table></div>';
 }
@@ -1256,17 +1346,19 @@ function pintarRanking(){
   }
   const medalla = p => p === 1 ? '🥇' : p === 2 ? '🥈' : p === 3 ? '🥉' : p + '.';
   c.innerHTML =
-    '<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:14px">' +
-    '<tr style="text-align:left;color:var(--tx2);font-size:12px">' +
-      '<th style="padding:6px 8px">#</th><th>Quién</th><th>Puntaje</th><th>Crecimiento</th><th>PRs</th><th>Días</th><th>Volumen</th></tr>' +
-    G.ranking.map(r =>
-      '<tr style="border-top:1px solid var(--line);' + (r.soy_yo ? 'background:rgba(63,185,80,.08)' : '') + '">' +
-      '<td style="padding:8px">' + medalla(r.posicion) + '</td>' +
-      '<td>' + r.nombre + (r.soy_yo ? ' <span class="tag">tú</span>' : '') + '</td>' +
+    '<div style="overflow-x:auto"><table class="datos">' +
+    '<tr><th>#</th><th>Quién</th><th>Puntaje</th><th>Crecimiento</th><th>Récords</th><th>Días</th><th>Volumen</th></tr>' +
+    G.ranking.map(r => {
+      const cr = Number(r.crecimiento);
+      return '<tr' + (r.soy_yo ? ' class="yo"' : '') + '>' +
+      '<td>' + medalla(r.posicion) + '</td>' +
+      '<td>' + r.nombre + (r.soy_yo ? ' <span class="tag yo">tú</span>' : '') + '</td>' +
       '<td style="font-weight:700">' + Number(r.puntaje).toFixed(1) + '</td>' +
-      '<td>' + (Number(r.crecimiento) > 0 ? '+' : '') + Number(r.crecimiento).toFixed(1) + '%</td>' +
+      '<td class="' + (cr > 0 ? 'sube' : cr < 0 ? 'baja' : 'muted') + '">' +
+        (cr > 0 ? '▲ +' : cr < 0 ? '▼ ' : '') + cr.toFixed(1) + '%</td>' +
       '<td>' + r.prs + '</td><td>' + r.dias + '</td>' +
-      '<td class="muted">' + Math.round(Number(r.volumen)).toLocaleString('es') + ' kg</td></tr>').join('') +
+      '<td class="muted">' + Math.round(Number(r.volumen)).toLocaleString('es') + ' kg</td></tr>';
+    }).join('') +
     '</table></div>';
 }
 
@@ -1381,6 +1473,9 @@ $('#btnSaveRank').onclick = async () => {
   toast('Listo');
 };
 
+aplicarTema(leerLocal('stricto_tema') || 'grafito');
+document.getElementById('btnTema').onclick = () => { pintarTemas(); document.getElementById('dlgTema').showModal(); };
+document.getElementById('btnCerrarTema').onclick = () => document.getElementById('dlgTema').close();
 arrancar();
 </script>
 </body>
