@@ -125,6 +125,7 @@ dialog::backdrop{background:rgba(0,0,0,.6)}
       <button data-t="habitos">Hábitos</button>
       <button data-t="progreso">Progreso</button>
       <button data-t="metas">Metas semanales</button>
+      <button data-t="gym">Gym</button>
       <button data-t="reporte">Reporte</button>
     </nav>
   </header>
@@ -202,6 +203,58 @@ dialog::backdrop{background:rgba(0,0,0,.6)}
         <p class="muted">3 a 5 metas. Más de eso no es ambición, es dispersión.</p>
       </div>
       <div id="listaMetas"></div>
+    </section>
+
+
+    <!-- GYM -->
+    <section id="tGym" class="hidden">
+      <div class="card">
+        <div class="row" style="justify-content:space-between">
+          <div>
+            <h2 style="margin:0" id="gyDia">Hoy</h2>
+            <div class="muted" id="gyGrupos">Sin rutina configurada</div>
+          </div>
+          <button class="sm" id="btnRutina">Configurar rutina</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Registrar serie</h2>
+        <div class="grid g2">
+          <div><label>Grupo</label><select id="gyGrupo"></select></div>
+          <div><label>Ejercicio</label><select id="gyEj"></select></div>
+        </div>
+        <div class="grid g4" style="margin-top:10px">
+          <div><label>Repeticiones</label><input id="gyReps" type="number" min="1" max="500" value="10"></div>
+          <div><label>Peso (kg)</label><input id="gyPeso" type="number" step="0.5" min="0" value="20"></div>
+          <div><label>RPE (opcional)</label><input id="gyRpe" type="number" min="1" max="10" placeholder="1-10"></div>
+          <div style="display:flex;align-items:flex-end"><button class="pri" id="btnSerie" style="width:100%">+ Serie</button></div>
+        </div>
+        <div class="muted" id="gyUltima" style="margin-top:10px"></div>
+        <button class="gh sm" id="btnNuevoEj" style="margin-top:10px">+ Crear ejercicio que no está en la lista</button>
+      </div>
+
+      <div class="card">
+        <div class="row" style="justify-content:space-between;margin-bottom:10px">
+          <h2 style="margin:0">Sesión de hoy</h2>
+          <span class="tag" id="gyVolHoy">0 kg de volumen</span>
+        </div>
+        <div id="gySesion"><p class="muted">Todavía no registras series hoy.</p></div>
+      </div>
+
+      <div class="card">
+        <h2>Comparativa con la semana pasada</h2>
+        <div id="gyComp"></div>
+      </div>
+
+      <div class="card">
+        <div class="row" style="justify-content:space-between;margin-bottom:4px">
+          <h2 style="margin:0">Ranking de progreso</h2>
+          <button class="sm" id="btnRankCfg">Mi participación</button>
+        </div>
+        <p class="muted" style="margin-top:0">Puntaje 0-100 = 50% crecimiento de volumen + 30% récords nuevos + 20% días entrenados. Nadie ve tus series, solo estos números.</p>
+        <div id="gyRank"></div>
+      </div>
     </section>
 
     <!-- REPORTE -->
@@ -285,6 +338,57 @@ dialog::backdrop{background:rgba(0,0,0,.6)}
     <div class="row" style="justify-content:flex-end">
       <button class="gh" id="btnCancelMeta">Cancelar</button>
       <button class="pri" id="btnSaveMeta">Guardar</button>
+    </div>
+  </div>
+</dialog>
+
+
+<!-- DIALOGO RUTINA SEMANAL -->
+<dialog id="dlgRutina">
+  <h2>Rutina semanal</h2>
+  <p class="muted" style="margin-top:0">Qué toca cada día. Deja vacío el día de descanso.</p>
+  <div id="rtLista" class="grid"></div>
+  <div class="row" style="justify-content:flex-end;margin-top:14px">
+    <button class="sm" id="btnRutinaClasica" style="margin-right:auto">Cargar clásico de 5 días</button>
+    <button class="gh" id="btnCancelRutina">Cerrar</button>
+    <button class="pri" id="btnSaveRutina">Guardar</button>
+  </div>
+</dialog>
+
+<!-- DIALOGO EJERCICIO NUEVO -->
+<dialog id="dlgEj">
+  <h2>Nuevo ejercicio</h2>
+  <div class="grid">
+    <div><label>Nombre</label><input id="ejNombre" placeholder="Press inclinado en Smith"></div>
+    <div class="grid g2">
+      <div><label>Grupo</label><select id="ejGrupo"></select></div>
+      <div><label>Equipo</label><select id="ejEquipo">
+        <option value="barra">Barra</option><option value="mancuerna">Mancuerna</option>
+        <option value="maquina">Máquina</option><option value="polea">Polea</option>
+        <option value="peso_corporal">Peso corporal</option><option value="kettlebell">Kettlebell</option>
+        <option value="banda">Banda</option><option value="cardio">Cardio</option>
+      </select></div>
+    </div>
+    <div class="row" style="justify-content:flex-end">
+      <button class="gh" id="btnCancelEj">Cancelar</button>
+      <button class="pri" id="btnSaveEj">Crear</button>
+    </div>
+  </div>
+</dialog>
+
+<!-- DIALOGO PARTICIPACION EN RANKING -->
+<dialog id="dlgRank">
+  <h2>Mi participación en el ranking</h2>
+  <div class="grid">
+    <div><label>Nombre que verán los demás</label><input id="rkAlias" placeholder="Jose B."></div>
+    <div class="row" style="gap:8px;align-items:center">
+      <input type="checkbox" id="rkPublico" style="width:18px;height:18px">
+      <label for="rkPublico" style="margin:0;text-transform:none;font-size:14px;color:var(--tx)">Aparecer en el ranking</label>
+    </div>
+    <p class="muted" style="margin:0">Solo se comparte tu nombre y los números de progreso: volumen, récords, días y puntaje. Tus series y tus pesos exactos por ejercicio no los ve nadie.</p>
+    <div class="row" style="justify-content:flex-end">
+      <button class="gh" id="btnCancelRank">Cancelar</button>
+      <button class="pri" id="btnSaveRank">Guardar</button>
     </div>
   </div>
 </dialog>
@@ -763,9 +867,10 @@ $('#btnSaveMeta').onclick = async () => {
 $$('nav button').forEach(b => b.onclick = () => {
   $$('nav button').forEach(x => x.classList.remove('on')); b.classList.add('on');
   S.tab = b.dataset.t;
-  ['hoy','habitos','progreso','metas','reporte'].forEach(t => {
+  ['hoy','habitos','progreso','metas','gym','reporte'].forEach(t => {
     $('#t' + t.charAt(0).toUpperCase() + t.slice(1)).classList.toggle('hidden', t !== S.tab);
   });
+  if ((S.tab === 'gym' || S.tab === 'reporte') && !G.cargado) cargarGym();
 });
 $('#btnAyer').onclick = () => { S.fecha = sumarDias(S.fecha, -1); pintarHoy(); };
 $('#btnHoyVolver').onclick = () => { S.fecha = hoyISO(); pintarHoy(); };
@@ -833,6 +938,7 @@ function reporteDiario(){
     'RACHAS ACTIVAS',
     S.habitos.map(h => [h, racha(h.id)]).filter(x => x[1] > 0)
       .sort((a,b) => b[1]-a[1]).map(x => '  ' + dias(x[1]) + ' · ' + x[0].nombre).join('\n') || '  (sin rachas)',
+    bloqueGymDiario(f),
     '', '-'.repeat(46), veredicto
   ].filter(x => x !== null).join('\n');
 }
@@ -884,6 +990,7 @@ function reporteSemanal(){
     porDia.map(d => '  ' + d[0] + '  ' + String(d[1] + '/' + d[2]).padEnd(7) + barra(d[3])).join('\n'),
     '', 'POR HÁBITO',
     porHab.map(h => '  ' + h[3].toString().padStart(3) + '%  ' + h[0] + '  (' + h[1] + '/' + h[2] + ')').join('\n'),
+    bloqueGymSemanal(lun),
     '', 'METAS DE LA SEMANA',
     S.metas.length ? S.metas.map(m => '  ' + (m.completada ? '[x]' : '[ ]') + ' ' + m.titulo + ' · ' + (m.progreso || 0) + '%').join('\n')
                    : '  (no definiste metas esta semana — eso ya es un hallazgo)',
@@ -900,6 +1007,42 @@ function reporteSemanal(){
              : 'Bajaste respecto a la semana pasada. Recorta a 3 hábitos innegociables hasta recuperar el ritmo.'
   ].filter(x => x !== null).join('\n');
 }
+function bloqueGymDiario(f){
+  if (!G.cargado) return null;
+  const hoy = G.series.filter(s => s.fecha === f);
+  if (!hoy.length) return null;
+  const vol = Math.round(volumen(hoy));
+  const ejs = Array.from(new Set(hoy.map(s => s.ejercicio_id)));
+  const prs = ejs.filter(id => {
+    const max = Math.max(...hoy.filter(s => s.ejercicio_id === id).map(s => Number(s.peso)));
+    const ant = G.series.filter(s => s.ejercicio_id === id && s.fecha < f).map(s => Number(s.peso));
+    return ant.length && max > Math.max(...ant);
+  }).map(id => (ejercicioPorId(id) || {}).nombre);
+  return ['', 'GYM',
+    '  Volumen: ' + vol.toLocaleString('es') + ' kg en ' + hoy.length + (hoy.length === 1 ? ' serie' : ' series') +
+      ' · ' + ejs.length + (ejs.length === 1 ? ' ejercicio' : ' ejercicios'),
+    prs.length ? '  Récords nuevos: ' + prs.join(', ') : '  Sin récords nuevos hoy'
+  ].join('\n');
+}
+
+function bloqueGymSemanal(lun){
+  if (!G.cargado) return null;
+  const enR = (s,a,b) => s.fecha >= a && s.fecha < b;
+  const act = G.series.filter(s => enR(s, lun, sumarDias(lun,7)));
+  const prev = G.series.filter(s => enR(s, sumarDias(lun,-7), lun));
+  if (!act.length && !prev.length) return null;
+  const va = Math.round(volumen(act)), vb = Math.round(volumen(prev));
+  const dif = vb > 0 ? Math.round(100*(va-vb)/vb) : (va > 0 ? 100 : 0);
+  const diasEnt = new Set(act.map(s => s.fecha)).size;
+  const yo = G.ranking.find(r => r.soy_yo);
+  return ['', 'GYM',
+    '  Volumen semanal  : ' + va.toLocaleString('es') + ' kg  (anterior ' + vb.toLocaleString('es') + ' kg, ' +
+      (dif >= 0 ? '+' : '') + dif + '%)',
+    '  Días entrenados  : ' + diasEnt,
+    yo ? '  Ranking          : puesto ' + yo.posicion + ' con ' + Number(yo.puntaje).toFixed(1) + ' pts' : null
+  ].filter(x => x !== null).join('\n');
+}
+
 function dias(n){ return n + (n === 1 ? ' día' : ' días'); }
 function barra(p){ const n = Math.round(p/10); return '#'.repeat(n) + '.'.repeat(10-n) + ' ' + p + '%'; }
 
@@ -913,6 +1056,329 @@ $('#btnRepGuardar').onclick = async () => {
     puntuacion: lista.length ? Math.round(100*hechos/lista.length) : 0,
     mensaje: $('#repTxt').textContent }, { onConflict:'user_id,fecha,tipo' });
   toast(error ? 'Error: ' + error.message : 'Reporte guardado');
+};
+
+/* =====================================================================
+   MODULO GYM
+   ===================================================================== */
+const GRUPOS = [
+  ['pecho','Pecho'], ['espalda','Espalda'], ['pierna','Pierna'], ['gluteo','Glúteo'],
+  ['pantorrilla','Pantorrilla'], ['hombro','Hombro'], ['trapecio','Trapecio'],
+  ['biceps','Bíceps'], ['triceps','Tríceps'], ['antebrazo','Antebrazo'],
+  ['abdomen','Abdomen'], ['cuerpo_completo','Cuerpo completo'], ['cardio','Cardio']
+];
+const NOMBRE_GRUPO = Object.fromEntries(GRUPOS);
+const CLASICO = {
+  1: ['Pecho y tríceps', ['pecho','triceps']],
+  2: ['Espalda y bíceps', ['espalda','biceps']],
+  3: ['Pierna y glúteo', ['pierna','gluteo','pantorrilla']],
+  4: ['Hombro y trapecio', ['hombro','trapecio']],
+  5: ['Brazo y abdomen', ['biceps','triceps','abdomen']],
+  6: ['', []], 7: ['', []]
+};
+
+const G = { ejercicios:[], dias:{}, series:[], ranking:[], cargado:false };
+
+async function cargarGym(){
+  const desde = sumarDias(hoyISO(), -120);
+  const [e, d] = await Promise.all([
+    sb.from('ejercicios').select('*').eq('activo', true).order('grupo').order('nombre'),
+    sb.from('dias_entreno').select('*')
+  ]);
+  if (e.error){ toast('Error: ' + e.error.message); return; }
+  G.ejercicios = e.data || [];
+  G.dias = {};
+  (d.data || []).forEach(x => G.dias[x.dia] = x);
+
+  const paso = 500; let inicio = 0, todo = [];
+  for (;;){
+    const { data, error } = await sb.from('series_gym').select('*')
+      .gte('fecha', desde).order('fecha').range(inicio, inicio + paso - 1);
+    if (error){ toast('Error: ' + error.message); break; }
+    todo = todo.concat(data || []);
+    if (!data || data.length < paso) break;
+    inicio += paso;
+  }
+  G.series = todo;
+
+  const r = await sb.rpc('ranking_gym');
+  G.ranking = r.error ? [] : (r.data || []);
+  if (r.error) console.warn('ranking:', r.error.message);
+
+  G.cargado = true;
+  pintarGym();
+}
+
+function ejercicioPorId(id){ return G.ejercicios.find(x => x.id === id); }
+function seriesDe(fecha){ return G.series.filter(s => s.fecha === fecha); }
+function volumen(lista){ return lista.reduce((a,s) => a + Number(s.peso) * s.repeticiones, 0); }
+
+function pintarGym(){
+  const f = hoyISO(), dow = isodow(f), cfg = G.dias[dow];
+  const grupos = (cfg && cfg.grupos) || [];
+  $('#gyDia').textContent = bonito(f).replace(/^\w/, c => c.toUpperCase()) +
+    (cfg && cfg.titulo ? ' · ' + cfg.titulo : '');
+  $('#gyGrupos').textContent = grupos.length
+    ? 'Toca: ' + grupos.map(g => NOMBRE_GRUPO[g] || g).join(', ')
+    : 'Sin rutina para hoy. Configúrala o registra lo que hagas.';
+
+  // selector de grupo
+  const gsel = $('#gyGrupo');
+  if (!gsel.dataset.listo){
+    gsel.innerHTML = '<option value="__hoy">Los de hoy</option>' +
+      GRUPOS.map(g => '<option value="' + g[0] + '">' + g[1] + '</option>').join('');
+    gsel.dataset.listo = '1';
+    gsel.onchange = pintarEjercicios;
+  }
+  pintarEjercicios();
+  pintarSesion();
+  pintarComparativa();
+  pintarRanking();
+}
+
+function pintarEjercicios(){
+  const dow = isodow(hoyISO()), cfg = G.dias[dow];
+  const sel = $('#gyGrupo').value;
+  let lista = G.ejercicios;
+  if (sel === '__hoy'){
+    const gs = (cfg && cfg.grupos) || [];
+    if (gs.length) lista = G.ejercicios.filter(e => gs.includes(e.grupo));
+  } else {
+    lista = G.ejercicios.filter(e => e.grupo === sel);
+  }
+  const ant = $('#gyEj').value;
+  $('#gyEj').innerHTML = lista.map(e =>
+    '<option value="' + e.id + '">' + e.nombre + ' · ' + e.equipo.replace('_',' ') + '</option>').join('')
+    || '<option value="">(sin ejercicios en este grupo)</option>';
+  if (lista.some(e => e.id === ant)) $('#gyEj').value = ant;
+  $('#gyEj').onchange = pintarUltima;
+  pintarUltima();
+}
+
+function pintarUltima(){
+  const id = $('#gyEj').value, hoy = hoyISO();
+  const previas = G.series.filter(s => s.ejercicio_id === id && s.fecha < hoy);
+  if (!previas.length){ $('#gyUltima').textContent = 'Primera vez que registras este ejercicio.'; return; }
+  const ultima = previas.reduce((a,b) => a.fecha >= b.fecha ? a : b).fecha;
+  const dia = previas.filter(s => s.fecha === ultima);
+  const max = Math.max(...previas.map(s => Number(s.peso)));
+  $('#gyUltima').textContent = 'Última vez (' + bonito(ultima) + '): ' +
+    dia.map(s => s.repeticiones + '×' + Number(s.peso) + ' kg').join(', ') +
+    '  ·  tu récord: ' + max + ' kg';
+  const sug = dia.length ? dia[dia.length-1] : null;
+  if (sug && !$('#gyPeso').dataset.tocado){ $('#gyPeso').value = Number(sug.peso); $('#gyReps').value = sug.repeticiones; }
+}
+$('#gyPeso').oninput = () => $('#gyPeso').dataset.tocado = '1';
+
+function pintarSesion(){
+  const hoy = seriesDe(hoyISO());
+  $('#gyVolHoy').textContent = Math.round(volumen(hoy)).toLocaleString('es') + ' kg de volumen';
+  const c = $('#gySesion');
+  if (!hoy.length){ c.innerHTML = '<p class="muted">Todavía no registras series hoy.</p>'; return; }
+  c.innerHTML = '';
+  const porEj = {};
+  hoy.forEach(s => (porEj[s.ejercicio_id] = porEj[s.ejercicio_id] || []).push(s));
+  Object.keys(porEj).forEach(id => {
+    const e = ejercicioPorId(id) || { nombre:'(ejercicio)' };
+    const ss = porEj[id].sort((a,b) => a.serie - b.serie);
+    const el = document.createElement('div');
+    el.style.marginBottom = '12px';
+    el.innerHTML = '<div class="row" style="justify-content:space-between">' +
+      '<span style="font-weight:600" class="nm"></span>' +
+      '<span class="muted">' + Math.round(volumen(ss)).toLocaleString('es') + ' kg</span></div>' +
+      '<div class="row" style="margin-top:6px" id="ss"></div>';
+    el.querySelector('.nm').textContent = e.nombre;
+    const cont = el.querySelector('#ss'); cont.removeAttribute('id');
+    ss.forEach(s => {
+      const b = document.createElement('button');
+      b.className = 'sm'; b.title = 'Quitar esta serie';
+      b.textContent = s.repeticiones + ' × ' + Number(s.peso) + ' kg' + (s.rpe ? ' · RPE ' + s.rpe : '') + '  ✕';
+      b.onclick = async () => {
+        if (!ok(await sb.from('series_gym').delete().eq('id', s.id))) return;
+        await cargarGym();
+      };
+      cont.appendChild(b);
+    });
+    c.appendChild(el);
+  });
+}
+
+function pintarComparativa(){
+  const lun = lunesDe(hoyISO()), lunPrev = sumarDias(lun, -7);
+  const enRango = (s, a, b) => s.fecha >= a && s.fecha < b;
+  const estaSem = G.series.filter(s => enRango(s, lun, sumarDias(lun, 7)));
+  const semPrev = G.series.filter(s => enRango(s, lunPrev, lun));
+  const c = $('#gyComp');
+
+  if (!estaSem.length && !semPrev.length){
+    c.innerHTML = '<p class="muted">Aún no hay datos. Registra al menos una semana para ver la comparativa.</p>';
+    return;
+  }
+  const ids = Array.from(new Set(estaSem.concat(semPrev).map(s => s.ejercicio_id)));
+  const filas = ids.map(id => {
+    const a = estaSem.filter(s => s.ejercicio_id === id), b = semPrev.filter(s => s.ejercicio_id === id);
+    const va = volumen(a), vb = volumen(b);
+    const maxA = a.length ? Math.max(...a.map(s => Number(s.peso))) : 0;
+    const historico = G.series.filter(s => s.ejercicio_id === id && s.fecha < lun);
+    const maxH = historico.length ? Math.max(...historico.map(s => Number(s.peso))) : 0;
+    const dif = vb > 0 ? Math.round(100*(va - vb)/vb) : (va > 0 ? 100 : 0);
+    const e = ejercicioPorId(id) || { nombre:'(ejercicio)' };
+    return { nombre:e.nombre, va, vb, dif, maxA, pr: maxA > maxH && maxA > 0 };
+  }).sort((x,y) => y.va - x.va);
+
+  const totalA = volumen(estaSem), totalB = volumen(semPrev);
+  const difT = totalB > 0 ? Math.round(100*(totalA - totalB)/totalB) : (totalA > 0 ? 100 : 0);
+  const flecha = d => d > 0 ? '<span style="color:var(--acc)">▲ ' + d + '%</span>'
+                  : d < 0 ? '<span style="color:var(--bad)">▼ ' + Math.abs(d) + '%</span>'
+                  : '<span class="muted">=</span>';
+  const kg = n => Math.round(n).toLocaleString('es');
+
+  c.innerHTML =
+    '<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:14px">' +
+    '<tr style="text-align:left;color:var(--tx2);font-size:12px">' +
+      '<th style="padding:6px 8px">Ejercicio</th><th>Esta semana</th><th>Anterior</th><th>Cambio</th><th>Mejor peso</th></tr>' +
+    filas.map(f =>
+      '<tr style="border-top:1px solid var(--line)">' +
+      '<td style="padding:8px">' + f.nombre + (f.pr ? ' <span class="tag fire">PR</span>' : '') + '</td>' +
+      '<td>' + kg(f.va) + ' kg</td><td class="muted">' + kg(f.vb) + ' kg</td>' +
+      '<td>' + flecha(f.dif) + '</td><td>' + (f.maxA ? f.maxA + ' kg' : '—') + '</td></tr>').join('') +
+    '<tr style="border-top:2px solid var(--line);font-weight:700">' +
+      '<td style="padding:8px">TOTAL</td><td>' + kg(totalA) + ' kg</td>' +
+      '<td class="muted">' + kg(totalB) + ' kg</td><td>' + flecha(difT) + '</td><td></td></tr>' +
+    '</table></div>';
+}
+
+function pintarRanking(){
+  const c = $('#gyRank');
+  if (!G.ranking.length){
+    c.innerHTML = '<p class="muted">Nadie ha registrado entrenamientos esta semana todavía.</p>';
+    return;
+  }
+  const medalla = p => p === 1 ? '🥇' : p === 2 ? '🥈' : p === 3 ? '🥉' : p + '.';
+  c.innerHTML =
+    '<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:14px">' +
+    '<tr style="text-align:left;color:var(--tx2);font-size:12px">' +
+      '<th style="padding:6px 8px">#</th><th>Quién</th><th>Puntaje</th><th>Crecimiento</th><th>PRs</th><th>Días</th><th>Volumen</th></tr>' +
+    G.ranking.map(r =>
+      '<tr style="border-top:1px solid var(--line);' + (r.soy_yo ? 'background:rgba(63,185,80,.08)' : '') + '">' +
+      '<td style="padding:8px">' + medalla(r.posicion) + '</td>' +
+      '<td>' + r.nombre + (r.soy_yo ? ' <span class="tag">tú</span>' : '') + '</td>' +
+      '<td style="font-weight:700">' + Number(r.puntaje).toFixed(1) + '</td>' +
+      '<td>' + (Number(r.crecimiento) > 0 ? '+' : '') + Number(r.crecimiento).toFixed(1) + '%</td>' +
+      '<td>' + r.prs + '</td><td>' + r.dias + '</td>' +
+      '<td class="muted">' + Math.round(Number(r.volumen)).toLocaleString('es') + ' kg</td></tr>').join('') +
+    '</table></div>';
+}
+
+/* ---------- registrar serie ---------- */
+$('#btnSerie').onclick = async () => {
+  const id = $('#gyEj').value;
+  if (!id) return toast('Elige un ejercicio');
+  const reps = Math.round(Number($('#gyReps').value));
+  const peso = Number($('#gyPeso').value);
+  const rpe  = $('#gyRpe').value ? Math.min(10, Math.max(1, Math.round(Number($('#gyRpe').value)))) : null;
+  if (!(reps >= 1 && reps <= 500)) return toast('Repeticiones entre 1 y 500');
+  if (!(peso >= 0 && peso <= 1000)) return toast('Peso entre 0 y 1000 kg');
+
+  const f = hoyISO();
+  const previasHoy = G.series.filter(s => s.fecha === f && s.ejercicio_id === id);
+  const serie = previasHoy.length ? Math.max(...previasHoy.map(s => s.serie)) + 1 : 1;
+  if (serie > 30) return toast('Máximo 30 series por ejercicio y día');
+
+  const eraPrimera = seriesDe(f).length === 0;
+  if (!ok(await sb.from('series_gym').insert({
+    user_id: S.user.id, ejercicio_id: id, fecha: f, serie, repeticiones: reps, peso, rpe }))) return;
+
+  // record nuevo?
+  const historico = G.series.filter(s => s.ejercicio_id === id && s.fecha < f);
+  const maxAnt = historico.length ? Math.max(...historico.map(s => Number(s.peso))) : 0;
+  if (peso > maxAnt && maxAnt > 0) toast('¡RÉCORD! ' + peso + ' kg supera tus ' + maxAnt + ' kg');
+
+  if (eraPrimera){ await sumarPuntos('gym', 'Sesión de gym', 15, f); await cargarTodo(); }
+  await cargarGym();
+};
+
+/* ---------- crear ejercicio propio ---------- */
+function llenarGrupos(sel){ sel.innerHTML = GRUPOS.map(g => '<option value="' + g[0] + '">' + g[1] + '</option>').join(''); }
+$('#btnNuevoEj').onclick = () => {
+  llenarGrupos($('#ejGrupo'));
+  const actual = $('#gyGrupo').value;
+  if (actual !== '__hoy') $('#ejGrupo').value = actual;
+  $('#ejNombre').value = '';
+  $('#dlgEj').showModal();
+};
+$('#btnCancelEj').onclick = () => $('#dlgEj').close();
+$('#btnSaveEj').onclick = async () => {
+  const nombre = $('#ejNombre').value.trim();
+  if (!nombre) return toast('Ponle nombre');
+  const res = await sb.from('ejercicios').insert({
+    user_id: S.user.id, nombre, grupo: $('#ejGrupo').value, equipo: $('#ejEquipo').value,
+    tipo: $('#ejEquipo').value === 'cardio' ? 'cardio' : 'aislamiento' });
+  if (!ok(res)) return;
+  $('#dlgEj').close(); await cargarGym();
+  toast('Ejercicio creado');
+};
+
+/* ---------- rutina semanal ---------- */
+$('#btnRutina').onclick = () => {
+  const c = $('#rtLista'); c.innerHTML = '';
+  DIAS.forEach((nom, i) => {
+    const dia = i + 1, cfg = G.dias[dia] || { titulo:'', grupos:[] };
+    const el = document.createElement('div');
+    el.style.borderTop = '1px solid var(--line)'; el.style.paddingTop = '10px';
+    el.innerHTML = '<label>' + nom + '</label>' +
+      '<input class="tit" placeholder="Ej: Pecho y tríceps" value="">' +
+      '<div class="row" style="margin-top:6px"></div>';
+    el.querySelector('.tit').value = cfg.titulo || '';
+    const row = el.querySelector('.row');
+    GRUPOS.forEach(g => {
+      const b = document.createElement('button');
+      b.type = 'button'; b.className = 'sm'; b.dataset.g = g[0]; b.textContent = g[1];
+      b.style.opacity = (cfg.grupos || []).includes(g[0]) ? '1' : '0.35';
+      b.onclick = () => { b.style.opacity = (b.style.opacity === '1') ? '0.35' : '1'; };
+      row.appendChild(b);
+    });
+    el.dataset.dia = dia;
+    c.appendChild(el);
+  });
+  $('#dlgRutina').showModal();
+};
+$('#btnCancelRutina').onclick = () => $('#dlgRutina').close();
+$('#btnRutinaClasica').onclick = () => {
+  $$('#rtLista > div').forEach(el => {
+    const d = Number(el.dataset.dia), plan = CLASICO[d];
+    el.querySelector('.tit').value = plan[0];
+    Array.from(el.querySelectorAll('button')).forEach(b =>
+      b.style.opacity = plan[1].includes(b.dataset.g) ? '1' : '0.35');
+  });
+  toast('Cargado. Ajusta lo que quieras y guarda.');
+};
+$('#btnSaveRutina').onclick = async () => {
+  const filas = $$('#rtLista > div').map(el => ({
+    user_id: S.user.id,
+    dia: Number(el.dataset.dia),
+    titulo: el.querySelector('.tit').value.trim(),
+    grupos: Array.from(el.querySelectorAll('button')).filter(b => b.style.opacity === '1').map(b => b.dataset.g)
+  }));
+  if (!ok(await sb.from('dias_entreno').upsert(filas, { onConflict:'user_id,dia' }))) return;
+  $('#dlgRutina').close(); await cargarGym();
+  toast('Rutina guardada');
+};
+
+/* ---------- participacion en el ranking ---------- */
+$('#btnRankCfg').onclick = () => {
+  $('#rkAlias').value = (S.perfil && (S.perfil.alias || S.perfil.nombre)) || '';
+  $('#rkPublico').checked = !!(S.perfil && S.perfil.ranking_publico);
+  $('#dlgRank').showModal();
+};
+$('#btnCancelRank').onclick = () => $('#dlgRank').close();
+$('#btnSaveRank').onclick = async () => {
+  if (!ok(await sb.from('perfiles').update({
+    alias: $('#rkAlias').value.trim() || null,
+    ranking_publico: $('#rkPublico').checked }).eq('id', S.user.id))) return;
+  $('#dlgRank').close();
+  await cargarTodo(); await cargarGym();
+  toast('Listo');
 };
 
 arrancar();
