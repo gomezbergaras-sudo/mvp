@@ -335,8 +335,8 @@ function leerLocal(k){ try{ return localStorage.getItem(k); }catch(e){ return nu
    CONEXION Y SESION
    ===================================================================== */
 // Puedes dejar tus datos fijos aquí y la app no volverá a pedírtelos:
-const URL_FIJA = '';   // ej: 'https://abcdefgh.supabase.co'
-const KEY_FIJA = '';   // ej: 'eyJhbGciOiJIUzI1NiIs...'
+const URL_FIJA = 'https://zuavixynazugpkzvvpns.supabase.co';
+const KEY_FIJA = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp1YXZpeHluYXp1Z3BrenZ2cG5zIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc5NDA0NjEsImV4cCI6MjEwMzUxNjQ2MX0.6x8WpTDYiErfLM_MYIKpFvG_-dFKGRosIYA8vUtoVsk';
 
 function arrancar(){
   if (!window.supabase || !window.supabase.createClient){
