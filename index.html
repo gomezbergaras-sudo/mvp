@@ -480,7 +480,8 @@ dialog::backdrop{background:rgba(0,0,0,.6)}
     </section>
 
     <p class="muted" style="text-align:center;letter-spacing:.16em;text-transform:uppercase;font-size:11px;margin-top:28px">
-      Stricto · Mide. Mejora. Triunfa.</p>
+      Stricto · Mide. Mejora. Triunfa.<br>
+      <button class="gh sm" id="btnVersion" style="margin-top:8px;letter-spacing:.06em">versión</button></p>
   </div>
 </div>
 
@@ -525,6 +526,21 @@ dialog::backdrop{background:rgba(0,0,0,.6)}
       <button class="gh" id="btnCancelMoneda">Cancelar</button>
       <button class="pri" id="btnSaveMoneda">Guardar</button>
     </div>
+  </div>
+</dialog>
+
+<!-- DIALOGO VERSION -->
+<dialog id="dlgVersion">
+  <div class="row" style="justify-content:space-between;align-items:flex-start">
+    <div>
+      <h2 style="margin:0">Versión de Stricto</h2>
+      <div class="muted" id="vsActual">—</div>
+    </div>
+    <span class="tag fire" id="vsChip">v0</span>
+  </div>
+  <div id="vsLista" tabindex="-1" style="margin-top:16px;max-height:60vh;overflow-y:auto;outline:none"></div>
+  <div class="row" style="justify-content:flex-end;margin-top:14px">
+    <button class="pri" id="btnCerrarVersion" autofocus>Listo</button>
   </div>
 </dialog>
 
@@ -706,6 +722,68 @@ function ok(res, msg){
   if (msg) toast(msg);
   return true;
 }
+/* =====================================================================
+   VERSION Y NOVEDADES
+   Al publicar una versión nueva: sube VERSION, pon la fecha y agrega
+   su entrada arriba del todo en NOVEDADES.
+   ===================================================================== */
+const VERSION = '1.4.0';
+const FECHA_VERSION = '2026-08-28';
+const NOVEDADES = [
+  ['1.4.0', '2026-08-28', [
+    'Módulo de Finanzas: ingresos, salidas, gastos fijos y balance del mes.',
+    'Gráficos por categoría, fijos vs variables, regla 50/30/20 y últimos 6 meses.',
+    'Bloque "dónde recortar" y consejos calculados con tus propios números.',
+    'Presupuestos por categoría y metas de ahorro.',
+    'Si falta instalar un módulo en Supabase, la app te dice cuál archivo correr.'
+  ]],
+  ['1.3.0', '2026-08-28', [
+    'Identidad de marca: logo, tipografías Exo 2 y Montserrat, paleta oficial.',
+    'Pantalla de inicio de sesión con la imagen de marca.',
+    'Temas Noche y Papel.'
+  ]],
+  ['1.2.0', '2026-08-28', [
+    'Módulo Gym: catálogo de 117 ejercicios y rutina por día de la semana.',
+    'Registro de series con peso, repeticiones y RPE; récords automáticos.',
+    'Comparativa de volumen contra la semana anterior y ranking de progreso.'
+  ]],
+  ['1.1.0', '2026-08-28', [
+    'Metas semanales con avance y puntos.',
+    'Reportes diario y semanal con veredicto y qué reforzar.',
+    'Insignias por racha de 7, 30 y 100 días.'
+  ]],
+  ['1.0.0', '2026-08-28', [
+    'Primera versión: hábitos por momento del día, rachas, puntos y niveles.',
+    'Rutina sugerida de 10 hábitos y mapa de constancia de 30 días.'
+  ]]
+];
+
+function pintarVersion(){
+  $('#vsChip').textContent = 'v' + VERSION;
+  $('#vsActual').textContent = 'Estás en la ' + VERSION + ' · ' + bonito(FECHA_VERSION);
+  $('#vsLista').innerHTML = NOVEDADES.map((n, i) =>
+    '<div style="padding:12px 0;' + (i ? 'border-top:1px solid var(--line)' : '') + '">' +
+      '<div class="row" style="gap:8px">' +
+        '<b style="font-family:var(--f-titulo);letter-spacing:.04em">' + n[0] + '</b>' +
+        (i === 0 ? '<span class="tag fire">actual</span>' : '') +
+        '<span class="muted">' + bonito(n[1]) + '</span>' +
+      '</div>' +
+      '<ul style="margin:8px 0 0;padding-left:18px" class="muted">' +
+        n[2].map(x => '<li style="margin-bottom:3px">' + x + '</li>').join('') +
+      '</ul></div>').join('');
+}
+
+function revisarVersion(){
+  $('#btnVersion').textContent = 'versión ' + VERSION;
+  const previa = leerLocal('stricto_version');
+  if (previa && previa !== VERSION){
+    toast('Actualizado a la versión ' + VERSION);
+    $('#btnVersion').classList.add('pri');
+    setTimeout(() => { pintarVersion(); $('#dlgVersion').showModal(); }, 900);
+  }
+  guardarLocal('stricto_version', VERSION);
+}
+
 const TEMAS = [
   { id:'noche', nombre:'Noche', desc:'Oficial: azul oscuro y verde esmeralda',
     sw:['#0D1B2A','#1B263B','#00E676','#D4AF37'], meta:'#0D1B2A' },
@@ -792,6 +870,7 @@ async function entrar(user){
   $('#vLogin').classList.add('hidden');
   $('#vApp').classList.remove('hidden');
   await cargarTodo();
+  revisarVersion();
 }
 
 /* =====================================================================
@@ -1223,7 +1302,7 @@ function reporteDiario(){
                 'Cero. Un día así no arruina nada; dos seguidos sí. Mañana haz solo el más fácil y rompe la caída.';
 
   return [
-    'STRICTO · REPORTE DIARIO · ' + bonito(f).toUpperCase(),
+    'STRICTO v' + VERSION + ' · REPORTE DIARIO · ' + bonito(f).toUpperCase(),
     '='.repeat(46), '',
     'Hábitos completados : ' + hechos.length + '/' + lista.length,
     'Puntuación del día  : ' + pct + '/100',
@@ -1279,7 +1358,7 @@ function reporteSemanal(){
   const peorDia  = porDia.slice().sort((a,b) => a[3]-b[3])[0];
 
   return [
-    'STRICTO · REPORTE SEMANAL · semana del ' + bonito(lun),
+    'STRICTO v' + VERSION + ' · REPORTE SEMANAL · semana del ' + bonito(lun),
     '='.repeat(46), '',
     'Cumplimiento general : ' + pct + '%  (' + hechos + '/' + tocaban + ')',
     'Semana anterior      : ' + pctAnt + '%  → ' + (dif >= 0 ? '+' : '') + dif + ' pp de cumplimiento',
@@ -1702,6 +1781,12 @@ $('#btnSaveRank').onclick = async () => {
 aplicarTema(leerLocal('stricto_tema') || 'noche');
 document.getElementById('btnTema').onclick = () => { pintarTemas(); document.getElementById('dlgTema').showModal(); };
 document.getElementById('btnCerrarTema').onclick = () => document.getElementById('dlgTema').close();
+document.getElementById('btnVersion').onclick = () => {
+  pintarVersion();
+  document.getElementById('btnVersion').classList.remove('pri');
+  document.getElementById('dlgVersion').showModal();
+};
+document.getElementById('btnCerrarVersion').onclick = () => document.getElementById('dlgVersion').close();
 /* =====================================================================
    MODULO FINANZAS
    ===================================================================== */
