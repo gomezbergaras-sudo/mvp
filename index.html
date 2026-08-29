@@ -764,6 +764,12 @@ dialog::backdrop{background:rgba(0,0,0,.6)}
       <option value="salud">Salud general</option>
       <option value="estres">Bajar el estrés y dormir mejor</option>
     </select></div>
+    <div class="grid g2" id="pfMetaBox">
+      <div><label>Peso objetivo (kg)</label><input id="pfPesoObj" type="number" step="0.5" min="30" max="350" placeholder="83"></div>
+      <div><label>¿Para cuándo?</label><input id="pfFechaObj" type="date"></div>
+    </div>
+    <p class="muted" id="pfMetaAyuda" style="margin:-4px 0 0;font-size:12px">
+      Si pides un plazo muy corto, la app lo ajusta al ritmo máximo saludable y te dice la fecha real.</p>
     <div class="grid g2">
       <div><label>Qué tan activo eres</label><select id="pfActividad">
         <option value="sedentario">Sedentario (escritorio, poco movimiento)</option>
@@ -1010,9 +1016,15 @@ function ok(res, msg){
    Al publicar una versión nueva: sube VERSION, pon la fecha y agrega
    su entrada arriba del todo en NOVEDADES.
    ===================================================================== */
-const VERSION = '2.1.0';
+const VERSION = '2.2.0';
 const FECHA_VERSION = '2026-08-29';
 const NOVEDADES = [
+  ['2.2.0', '2026-08-29', [
+    'Meta de peso con plazo: dices cuánto quieres pesar y para cuándo, y el plan calcula las calorías de ese ritmo.',
+    'Si el plazo es imposible, la app lo ajusta al máximo saludable y te da la fecha real, con el motivo.',
+    'La meta de agua se alinea sola con tu plan (35 ml por kilo más un extra por tu actividad).',
+    'Proteína y grasa calculadas sobre tu peso de referencia: se acabaron los 246 g de proteína.'
+  ]],
   ['2.1.0', '2026-08-29', [
     'Vaso de agua: se llena de verdad con cada vaso que registras, con oleaje y burbujas.',
     'Avisos de hidratación por hora: si a media mañana, media tarde o al anochecer vas atrasado, te lo dice con el monto exacto que falta.',
@@ -2175,26 +2187,89 @@ function planNutricion(p){
   if (!edad || edad < 14 || edad > 100) return null;
   const obj = OBJETIVOS[p.objetivo] || OBJETIVOS.mantener;
   const fa = ACTIVIDAD[p.nivel_actividad] || 1.375;
-  // Mifflin-St Jeor
   const tmb = Math.round(10*peso + 6.25*alt - 5*edad + (p.sexo === 'hombre' ? 5 : -161));
   const gasto = Math.round(tmb * fa);
-  let ajuste = Math.round(gasto * obj.ajuste);
-  if (obj.ajuste < 0) ajuste = Math.max(ajuste, -600);       // nunca un déficit salvaje
-  if (obj.ajuste > 0) ajuste = Math.min(ajuste, 450);
-  let kcal = gasto + ajuste;
-  const minimo = Math.round(tmb * 1.05);
-  const bajoMinimo = kcal < minimo;
-  if (bajoMinimo) kcal = minimo;
-
-  const prot = Math.round(peso * obj.prot);
-  const gras = Math.round(peso * obj.gras);
-  let carb = Math.round((kcal - prot*4 - gras*9) / 4);
-  if (carb < 50) carb = 50;
   const imc = peso / Math.pow(alt/100, 2);
   const pesoIdeal = [18.5, 24.9].map(x => Math.round(x * Math.pow(alt/100,2)));
-  const agua = Math.round(peso * 35 / 100) / 10;             // litros
-  return { tmb, gasto, kcal, ajuste, prot, gras, carb, imc, pesoIdeal, agua, edad,
-           obj, dieta: obj.dieta, bajoMinimo, factor: fa };
+
+  // peso de referencia para las proteínas y grasas:
+  // con mucha grasa corporal, calcular sobre el peso total infla los gramos sin sentido
+  const pesoRef = imc >= 30 ? Math.round(pesoIdeal[1] * 1.05)
+                : imc >= 27 ? Math.round(peso * 0.92) : peso;
+
+  // ---- ritmo: si hay meta de peso con plazo, manda el plazo ----
+  const bajando = p.objetivo === 'bajar_grasa', subiendo = p.objetivo === 'ganar_musculo';
+  const objetivoPeso = p.peso_objetivo ? Number(p.peso_objetivo) : null;
+  const maxSemana = bajando ? peso * 0.010 : peso * 0.005;     // 1% para bajar, 0,5% para subir
+  const minSemana = bajando ? peso * 0.0025 : peso * 0.001;
+  let ritmoPedido = null, ritmoAplicado = null, semanasPedidas = null, semanasReales = null,
+      fechaEstimada = null, demasiadoRapido = false, yaLlegaste = false;
+
+  if (objetivoPeso && (bajando || subiendo)){
+    const dif = bajando ? peso - objetivoPeso : objetivoPeso - peso;
+    if (dif <= 0.2){ yaLlegaste = true; }
+    else {
+      if (p.fecha_objetivo){
+        const d = Math.max(7, (deISO(p.fecha_objetivo) - deISO(hoyISO())) / 86400000);
+        semanasPedidas = d / 7;
+        ritmoPedido = dif / semanasPedidas;
+      } else {
+        ritmoPedido = (minSemana + maxSemana) / 2;      // sin plazo: ritmo cómodo
+      }
+      ritmoAplicado = Math.max(minSemana, Math.min(maxSemana, ritmoPedido));
+      demasiadoRapido = ritmoPedido > maxSemana * 1.02;
+      var topePorcentaje = demasiadoRapido;
+      semanasReales = dif / ritmoAplicado;
+      fechaEstimada = sumarDias(hoyISO(), Math.round(semanasReales * 7));
+    }
+  }
+
+  // ---- calorías ----
+  let ajuste;
+  if (yaLlegaste){
+    ajuste = 0;
+  } else if (ritmoAplicado !== null){
+    const kcalDia = ritmoAplicado * 7700 / 7;            // 1 kg de grasa ≈ 7700 kcal
+    ajuste = Math.round(bajando ? -kcalDia : kcalDia);
+  } else {
+    ajuste = Math.round(gasto * obj.ajuste);
+  }
+  if (ajuste < 0) ajuste = Math.max(ajuste, -Math.round(gasto * 0.25), -900);
+  if (ajuste > 0) ajuste = Math.min(ajuste,  Math.round(gasto * 0.15),  500);
+
+  let kcal = gasto + ajuste;
+  const suelo = Math.max(Math.round(tmb * 1.05), p.sexo === 'hombre' ? 1600 : 1300);
+  const bajoMinimo = kcal < suelo;
+  if (bajoMinimo){ kcal = suelo; }
+
+  // ---- macros sobre el peso de referencia ----
+  const prot = Math.round(pesoRef * obj.prot);
+  const gras = Math.round(pesoRef * obj.gras);
+  let carb = Math.round((kcal - prot*4 - gras*9) / 4);
+  if (carb < 50) carb = 50;
+
+  // el ritmo real es el que permiten las calorías después de los topes de seguridad
+  const ritmoEfectivo = Math.abs(gasto - kcal) * 7 / 7700;
+  if (ritmoAplicado !== null && ritmoEfectivo > 0.02){
+    ritmoAplicado = Math.round(ritmoEfectivo * 100) / 100;
+    const dif2 = Math.abs(peso - objetivoPeso);
+    semanasReales = dif2 / ritmoAplicado;
+    fechaEstimada = sumarDias(hoyISO(), Math.round(semanasReales * 7));
+    demasiadoRapido = ritmoPedido > ritmoAplicado * 1.06;
+  }
+  const motivoTope = !demasiadoRapido ? null
+    : (typeof topePorcentaje !== 'undefined' && topePorcentaje) ? 'porcentaje' : 'calorias';
+
+  // ---- agua: 35 ml/kg + extra por actividad, con techo razonable ----
+  const extraAct = { sedentario:0, ligero:0.2, moderado:0.4, alto:0.6, muy_alto:0.8 }[p.nivel_actividad] || 0.2;
+  let agua = peso * 0.035 + extraAct;
+  agua = Math.max(1.8, Math.min(4.0, agua));
+  agua = Math.round(agua * 10) / 10;
+
+  return { tmb, gasto, kcal, ajuste, prot, gras, carb, imc, pesoIdeal, agua, edad, pesoRef,
+           obj, dieta: obj.dieta, bajoMinimo, factor: fa, suelo,
+           objetivoPeso, ritmoPedido, ritmoAplicado, semanasPedidas, semanasReales,
+           fechaEstimada, demasiadoRapido, yaLlegaste, maxSemana, minSemana, bajando, subiendo, motivoTope };
 }
 
 const IMC_CLASE = (imc) => imc < 18.5 ? ['Bajo peso','baja'] : imc < 25 ? ['Peso normal','sube']
@@ -2286,9 +2361,58 @@ function pintarPlan(){
   const [clase, col] = IMC_CLASE(pl.imc);
   const kcalMacro = { prot: pl.prot*4, carb: pl.carb*4, gras: pl.gras*9 };
   const totalM = kcalMacro.prot + kcalMacro.carb + kcalMacro.gras;
-  const barra = (v, color, etiqueta) => '<div style="width:' + (100*v/totalM).toFixed(1) +
-    '%;background:' + color + ';height:100%" title="' + etiqueta + '"></div>';
-  c.innerHTML =
+  const barra = (v, color, etiqueta) => {
+    const q = totalM > 0 ? (100*v/totalM) : 0;
+    return q <= 0 ? '' : '<div style="width:' + q.toFixed(1) + '%;background:' + color +
+      ';height:100%" title="' + etiqueta + '"></div>';
+  };
+  const hAgua = habitoAgua();
+  const metaAgua = hAgua ? aguaEnLitros(hAgua) : null;
+  const desalineada = hAgua && Math.abs(metaAgua - pl.agua) >= 0.15;
+
+  // ---- bloque de meta de peso ----
+  let bloqueMeta = '';
+  if (pl.objetivoPeso && (pl.bajando || pl.subiendo)){
+    if (pl.yaLlegaste){
+      bloqueMeta = '<div class="card" style="background:var(--panel2);margin:0 0 16px;border-color:var(--brand)">' +
+        '<div style="font-weight:650">Llegaste a tu peso objetivo</div>' +
+        '<div class="muted" style="margin-top:4px">Cambia el objetivo a <b>Mantenerte</b> o pon una meta nueva: ' +
+        'seguir en déficit sin razón solo te quita músculo.</div></div>';
+    } else {
+      const dif = Math.abs(Number(p.peso_kg) - pl.objetivoPeso);
+      const kgSem = pl.ritmoAplicado.toFixed(2).replace('.',',');
+      bloqueMeta =
+        '<div class="card" style="background:var(--panel2);margin:0 0 16px">' +
+          '<div class="row" style="justify-content:space-between">' +
+            '<div style="font-weight:650">' + (pl.bajando ? 'Bajar' : 'Subir') + ' ' +
+              dif.toFixed(1).replace('.',',') + ' kg</div>' +
+            '<div class="muted">' + Number(p.peso_kg) + ' kg → ' + pl.objetivoPeso + ' kg</div>' +
+          '</div>' +
+          '<div class="grid g2" style="margin-top:12px">' +
+            '<div class="stat"><div class="l">Ritmo del plan</div><div style="font-weight:650;margin-top:3px">' +
+              kgSem + ' kg por semana</div></div>' +
+            '<div class="stat"><div class="l">Llegas alrededor del</div><div style="font-weight:650;margin-top:3px">' +
+              bonito(pl.fechaEstimada).replace(/^\w+, /,'') + '</div>' +
+              '<div class="muted" style="font-size:12px">' + Math.round(pl.semanasReales) + ' semanas</div></div>' +
+          '</div>' +
+          (pl.demasiadoRapido
+            ? '<div class="muted" style="margin-top:10px;color:var(--oro-tx)">⚠ Pediste ' +
+                pl.ritmoPedido.toFixed(2).replace('.',',') + ' kg por semana. ' +
+                (pl.motivoTope === 'porcentaje'
+                  ? 'Por encima del 1% de tu peso por semana ' +
+                    (pl.bajando ? 'lo que se pierde es músculo y agua, y vuelve todo.'
+                                : 'lo que se gana es grasa, no músculo.')
+                  : 'Para ese ritmo habría que ' + (pl.bajando ? 'recortar' : 'sumar') +
+                    ' muchísimas más calorías cada día, y un ' + (pl.bajando ? 'déficit' : 'superávit') +
+                    ' así nadie lo sostiene ni es sano.') +
+                ' El plan lo deja en ' + pl.ritmoAplicado.toFixed(2).replace('.',',') +
+                ' kg por semana, y esa es la fecha real de arriba.</div>'
+            : '<div class="muted" style="margin-top:10px">Ritmo dentro de lo saludable. Sostenerlo es todo el truco.</div>') +
+        '</div>';
+    }
+  }
+
+  c.innerHTML = bloqueMeta +
     '<div class="grid g4">' +
       '<div class="stat"><div class="n">' + pl.kcal.toLocaleString('es') + '</div><div class="l">kcal por día</div></div>' +
       '<div class="stat"><div class="n">' + pl.prot + ' g</div><div class="l">Proteína</div></div>' +
@@ -2309,17 +2433,22 @@ function pintarPlan(){
       '<div style="font-family:var(--f-titulo);font-weight:700;letter-spacing:.03em;text-transform:uppercase">' +
         pl.dieta + '</div>' +
       '<div class="muted" style="margin-top:6px">' +
-        'Tu cuerpo gasta <b>' + pl.gasto.toLocaleString('es') + ' kcal</b> al día (metabolismo basal ' +
-        pl.tmb.toLocaleString('es') + ' × actividad ' + pl.factor + '). ' +
+        'Gastas <b>' + pl.gasto.toLocaleString('es') + ' kcal</b> al día (basal ' + pl.tmb.toLocaleString('es') +
+        ' × actividad ' + pl.factor + '). ' +
         (pl.ajuste === 0 ? 'Para tu objetivo comes justo eso.' :
-         pl.ajuste < 0 ? 'Para bajar grasa comes ' + Math.abs(pl.ajuste) + ' kcal menos.' :
-                         'Para ganar músculo comes ' + pl.ajuste + ' kcal más.') +
-        (pl.bajoMinimo ? ' Subí el número: por debajo de eso el déficit se vuelve contraproducente.' : '') +
+         pl.ajuste < 0 ? 'Comes <b>' + Math.abs(pl.ajuste) + ' kcal menos</b> al día, que es lo que hace falta para ese ritmo.' :
+                         'Comes <b>' + pl.ajuste + ' kcal más</b> al día, que es lo que hace falta para ese ritmo.') +
+        (pl.bajoMinimo ? ' Subí el número hasta ' + pl.suelo.toLocaleString('es') +
+          ' kcal: por debajo de ahí el cuerpo se defiende y el plan deja de funcionar.' : '') +
+        (pl.pesoRef !== Number(p.peso_kg) ? ' La proteína y la grasa las calculo sobre ' + pl.pesoRef +
+          ' kg, tu peso de referencia — sobre el peso total darían gramos que nadie come.' : '') +
       '</div>' +
     '</div>' +
 
     '<div class="grid g2" style="margin-top:14px">' +
-      '<div class="stat"><div class="l">Agua al día</div><div style="font-weight:650;margin-top:3px">' + pl.agua + ' litros</div></div>' +
+      '<div class="stat"><div class="l">Agua al día</div><div style="font-weight:650;margin-top:3px">' + pl.agua + ' litros</div>' +
+        (hAgua ? '<div class="muted" style="font-size:12px;margin-top:2px">Tu hábito está en ' +
+          metaAgua.toFixed(2).replace(/\.?0+$/,'').replace('.',',') + ' L</div>' : '') + '</div>' +
       '<div class="stat"><div class="l">IMC</div><div style="font-weight:650;margin-top:3px">' +
         pl.imc.toFixed(1) + ' · <span class="' + col + '">' + clase + '</span></div></div>' +
       '<div class="stat"><div class="l">Rango de peso saludable</div><div style="font-weight:650;margin-top:3px">' +
@@ -2327,14 +2456,37 @@ function pintarPlan(){
       '<div class="stat"><div class="l">Proteína por comida</div><div style="font-weight:650;margin-top:3px">' +
         Math.round(pl.prot/4) + ' g × 4 comidas</div></div>' +
     '</div>' +
+    (desalineada ? '<button class="pri sm" id="btnAjustarAgua" style="margin-top:12px">' +
+        'Ajustar mi meta de agua a ' + pl.agua + ' L</button>' : '') +
 
     '<div style="margin-top:16px"><div style="font-weight:650;margin-bottom:8px">Cómo se come esto</div>' +
       (PAUTAS[p.objetivo] || PAUTAS.mantener).map(x =>
         '<div class="muted" style="padding:7px 0;border-top:1px solid var(--line)">· ' + x + '</div>').join('') +
     '</div>' +
-    '<p class="muted" style="margin-top:14px;font-size:12px">Estos números son una guía calculada con la fórmula de ' +
-      'Mifflin-St Jeor, la más usada. No sustituyen a un nutricionista, y si tienes alguna condición de salud, ' +
-      'estás embarazada o tomas medicación, consúltalo antes de cambiar tu alimentación.</p>';
+    '<p class="muted" style="margin-top:14px;font-size:12px">Números calculados con la fórmula de Mifflin-St Jeor ' +
+      'y ritmos dentro de lo que la evidencia considera seguro. No sustituyen a un nutricionista, y si tienes alguna ' +
+      'condición de salud, estás embarazada o tomas medicación, consúltalo antes de cambiar tu alimentación.</p>';
+
+  const bAgua = $('#btnAjustarAgua');
+  if (bAgua) bAgua.onclick = () => sincronizarAgua(pl.agua);
+}
+
+function aguaEnLitros(h){
+  const u = (h.unidad || '').toLowerCase(), m = Number(h.meta_diaria) || 0;
+  if (u.startsWith('l')) return m;
+  if (u === 'ml') return m/1000;
+  return m * 0.25;                     // vasos de 250 ml
+}
+
+async function sincronizarAgua(litros){
+  const h = habitoAgua();
+  if (!h) return toast('No tienes un hábito de agua. Créalo en Hábitos y lo ajusto solo.');
+  const u = (h.unidad || '').toLowerCase();
+  const meta = u.startsWith('l') ? litros : u === 'ml' ? Math.round(litros*1000) : Math.round(litros/0.25);
+  if (!ok(await sb.from('habitos').update({ meta_diaria: meta }).eq('id', h.id))) return;
+  await cargarTodo();
+  pintarPlan();
+  toast('Tu meta de agua quedó en ' + litros + ' L');
 }
 
 /* ---------- cuerpo dibujado a partir de tus medidas ---------- */
@@ -2483,10 +2635,20 @@ function abrirPerfil(){
   $('#pfPeso').value = p.peso_kg || '';
   $('#pfObjetivo').value = p.objetivo || 'bajar_grasa';
   $('#pfActividad').value = p.nivel_actividad || 'moderado';
+  $('#pfPesoObj').value = p.peso_objetivo || '';
+  $('#pfFechaObj').value = p.fecha_objetivo || '';
+  ajustarCamposMeta();
   $('#pfDiasGym').value = p.dias_entreno_semana != null ? p.dias_entreno_semana : 4;
   $('#pfNotif').checked = p.notificaciones !== false;
   $('#dlgPerfil').showModal();
 }
+function ajustarCamposMeta(){
+  const o = $('#pfObjetivo').value;
+  const mostrar = (o === 'bajar_grasa' || o === 'ganar_musculo');
+  $('#pfMetaBox').classList.toggle('hidden', !mostrar);
+  $('#pfMetaAyuda').classList.toggle('hidden', !mostrar);
+}
+$('#pfObjetivo').onchange = ajustarCamposMeta;
 $('#btnEditarPerfil').onclick = abrirPerfil;
 $('#btnCancelPerfil').onclick = () => $('#dlgPerfil').close();
 $('#btnSavePerfil').onclick = async () => {
@@ -2500,6 +2662,8 @@ $('#btnSavePerfil').onclick = async () => {
     estatura_cm: est, peso_kg: pes, objetivo: $('#pfObjetivo').value,
     nivel_actividad: $('#pfActividad').value,
     dias_entreno_semana: Number($('#pfDiasGym').value) || 0,
+    peso_objetivo: $('#pfPesoObj').value ? Number($('#pfPesoObj').value) : null,
+    fecha_objetivo: $('#pfFechaObj').value || null,
     notificaciones: $('#pfNotif').checked, onboarding: true };
   if (!ok(await sb.from('perfiles').update(fila).eq('id', S.user.id))) return;
   // el peso también queda como medida, para ver la evolución
@@ -2507,7 +2671,14 @@ $('#btnSavePerfil').onclick = async () => {
                                   { onConflict:'user_id,fecha,zona' });
   $('#dlgPerfil').close();
   await cargarTodo(); await cargarCuerpo();
-  toast('Datos guardados');
+  // la meta de agua se alinea sola con el plan
+  const pl = planNutricion(S.perfil), hA = habitoAgua();
+  if (pl && hA && Math.abs(aguaEnLitros(hA) - pl.agua) >= 0.15){
+    await sincronizarAgua(pl.agua);
+    toast('Datos guardados · tu meta de agua quedó en ' + pl.agua + ' L');
+  } else {
+    toast('Datos guardados');
+  }
 };
 
 function abrirMedida(k){
