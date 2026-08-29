@@ -227,6 +227,20 @@ dialog::backdrop{background:rgba(0,0,0,.6)}
 .tc-t{font-family:var(--f-titulo);font-weight:700;text-transform:uppercase;letter-spacing:.06em;
       font-size:13px;color:var(--brand-tx);margin:16px 0 4px}
 
+/* ---------- cuerpo anatómico ---------- */
+.cuerpo path.piel,.cuerpo ellipse.piel{fill:var(--panel2);stroke:var(--line);stroke-width:1.4}
+.cuerpo path.mus{fill:var(--panel2);stroke:var(--line);stroke-width:1.4;
+  transition:d .45s cubic-bezier(.2,.8,.2,1),fill .3s}
+.cuerpo path.mus.medido{fill:url(#gm);stroke:var(--brand)}
+.cuerpo path.mus.sutil{fill:color-mix(in srgb, var(--panel2) 80%, var(--line))}
+.cuerpo path.mus.sutil.medido{fill:url(#gp);stroke:var(--brand)}
+.cuerpo path.mus.gluteo{fill:color-mix(in srgb, var(--panel2) 86%, var(--line))}
+.cuerpo path.mus.gluteo.medido{fill:url(#gm);stroke:var(--brand)}
+.cuerpo .det{fill:none;stroke:color-mix(in srgb, var(--tx2) 62%, transparent);stroke-width:1.35;
+  stroke-linecap:round;stroke-linejoin:round;opacity:.8;pointer-events:none}
+.cuerpo .miembro path.mus{stroke-width:1.3}
+.cuerpo path.mus:hover{filter:brightness(1.3)}
+
 /* ---------- cuerpo interactivo ---------- */
 .cuerpo line.mus{stroke:var(--panel2);transition:stroke-width .45s cubic-bezier(.2,.8,.2,1),stroke .3s}
 .cuerpo line.mus.medido{stroke:color-mix(in srgb, var(--brand) 42%, var(--panel2))}
@@ -235,9 +249,14 @@ dialog::backdrop{background:rgba(0,0,0,.6)}
 .cuerpo .cabeza{fill:var(--panel2);stroke:var(--line);stroke-width:1.5}
 .cuerpo .mus:hover,.cuerpo .zona:hover{filter:brightness(1.35)}
 .cuerpo .zona{fill:transparent;stroke:transparent}
-.cuerpo .zona.medido{stroke:color-mix(in srgb, var(--brand) 60%, transparent);stroke-width:1.5;stroke-dasharray:4 5}
-.cuerpo .detalle{stroke:var(--line);stroke-width:1.4;fill:none;opacity:.85}
-.cuerpo .detalle-relleno{fill:var(--panel2);stroke:var(--line);stroke-width:1.2}
+.cuerpo .zona.medido{stroke:none}
+.cuerpo .detalle{stroke:color-mix(in srgb, var(--tx2) 55%, transparent);stroke-width:1.5;fill:none;
+  opacity:.75;stroke-linecap:round}
+.cuerpo .relleno,.cuerpo .detalle-relleno{fill:var(--panel2);stroke:var(--line);stroke-width:1.2}
+.cuerpo .gluteo{fill:var(--panel2);stroke:var(--line);stroke-width:1.4}
+.cuerpo .gluteo.medido{fill:url(#gp);stroke:var(--brand)}
+.cuerpo .brazo-lado{opacity:.9}
+.vistas button{min-width:84px}
 .cuerpo path.torso.medido + .detalle{opacity:1}
 
 /* ---------- pantalla de inicio de sesion ---------- */
@@ -1016,9 +1035,20 @@ function ok(res, msg){
    Al publicar una versión nueva: sube VERSION, pon la fecha y agrega
    su entrada arriba del todo en NOVEDADES.
    ===================================================================== */
-const VERSION = '2.2.0';
+const VERSION = '2.4.0';
 const FECHA_VERSION = '2026-08-29';
 const NOVEDADES = [
+  ['2.4.0', '2026-08-29', [
+    'El cuerpo ahora es una figura humana con musculatura dibujada, no un muñeco.',
+    'Se distinguen pectorales, abdominales, oblicuos, serrato, deltoides, cuádriceps y gemelos.',
+    'De espalda: trapecio, dorsales, lumbares, glúteos e isquios. De perfil: el arco real del pecho, el abdomen y el glúteo.'
+  ]],
+  ['2.3.0', '2026-08-29', [
+    'Cuerpo de hombre y de mujer: el torso, los hombros, la cintura y la cadera cambian según tu sexo.',
+    'Tres vistas: frente, perfil y espalda, con la musculatura dibujada — pectorales, abdominales, oblicuos, dorsales y glúteos.',
+    'Nuevas medidas: abdomen a la altura del ombligo, y glúteos y cadera.',
+    'De perfil se ve cómo cambia tu abdomen y tu glúteo con las medidas.'
+  ]],
   ['2.2.0', '2026-08-29', [
     'Meta de peso con plazo: dices cuánto quieres pesar y para cuándo, y el plan calcula las calorías de ese ritmo.',
     'Si el plazo es imposible, la app lo ajusta al máximo saludable y te da la fecha real, con el motivo.',
@@ -2136,22 +2166,23 @@ $('#btnSaveRank').onclick = async () => {
 /* =====================================================================
    MODULO CUERPO · perfil, plan de alimentación y medidas
    ===================================================================== */
-const C = { medidas:[], cargado:false, zona:null };
+const C = { medidas:[], cargado:false, zona:null, vista:'frente' };
 
 const ZONAS = [
-  {k:'cuello',          n:'Cuello',              ref:{hombre:38,  mujer:32},  px:26,  ayuda:'Debajo de la nuez, sin apretar.'},
-  {k:'hombros',         n:'Hombros',             ref:{hombre:118, mujer:100}, px:150, ayuda:'Por la parte más ancha, con los brazos relajados.'},
-  {k:'pecho',           n:'Pecho',               ref:{hombre:100, mujer:88},  px:118, ayuda:'A la altura de los pezones, al final de una espiración normal.'},
-  {k:'biceps_izq',      n:'Bíceps izquierdo',    ref:{hombre:33,  mujer:27},  px:30,  ayuda:'Brazo contraído, en la parte más gruesa.'},
-  {k:'biceps_der',      n:'Bíceps derecho',      ref:{hombre:33,  mujer:27},  px:30,  ayuda:'Brazo contraído, en la parte más gruesa.'},
-  {k:'antebrazo_izq',   n:'Antebrazo izquierdo', ref:{hombre:29,  mujer:24},  px:22,  ayuda:'Justo debajo del codo, en lo más ancho.'},
-  {k:'antebrazo_der',   n:'Antebrazo derecho',   ref:{hombre:29,  mujer:24},  px:22,  ayuda:'Justo debajo del codo, en lo más ancho.'},
-  {k:'cintura',         n:'Cintura',             ref:{hombre:85,  mujer:72},  px:92,  ayuda:'A la altura del ombligo, sin meter la barriga.'},
-  {k:'cadera',          n:'Cadera',              ref:{hombre:98,  mujer:98},  px:108, ayuda:'Por la parte más ancha de los glúteos.'},
-  {k:'muslo_izq',       n:'Muslo izquierdo',     ref:{hombre:57,  mujer:55},  px:46,  ayuda:'A la mitad entre la cadera y la rodilla.'},
-  {k:'muslo_der',       n:'Muslo derecho',       ref:{hombre:57,  mujer:55},  px:46,  ayuda:'A la mitad entre la cadera y la rodilla.'},
-  {k:'pantorrilla_izq', n:'Pantorrilla izquierda',ref:{hombre:38, mujer:35},  px:30,  ayuda:'En la parte más gruesa, de pie.'},
-  {k:'pantorrilla_der', n:'Pantorrilla derecha', ref:{hombre:38,  mujer:35},  px:30,  ayuda:'En la parte más gruesa, de pie.'}
+  {k:'cuello',          n:'Cuello',               ref:{hombre:38,  mujer:32},  px:{hombre:27, mujer:23},  ayuda:'Debajo de la nuez, sin apretar.'},
+  {k:'hombros',         n:'Hombros',              ref:{hombre:118, mujer:100}, px:{hombre:152,mujer:132}, ayuda:'Por la parte más ancha, con los brazos relajados.'},
+  {k:'pecho',           n:'Pecho',                ref:{hombre:100, mujer:88},  px:{hombre:120,mujer:106}, ayuda:'A la altura de los pezones, al final de una espiración normal.'},
+  {k:'biceps_izq',      n:'Bíceps izquierdo',     ref:{hombre:33,  mujer:27},  px:{hombre:30, mujer:25},  ayuda:'Brazo contraído, en la parte más gruesa.'},
+  {k:'biceps_der',      n:'Bíceps derecho',       ref:{hombre:33,  mujer:27},  px:{hombre:30, mujer:25},  ayuda:'Brazo contraído, en la parte más gruesa.'},
+  {k:'antebrazo_izq',   n:'Antebrazo izquierdo',  ref:{hombre:29,  mujer:24},  px:{hombre:22, mujer:19},  ayuda:'Justo debajo del codo, en lo más ancho.'},
+  {k:'antebrazo_der',   n:'Antebrazo derecho',    ref:{hombre:29,  mujer:24},  px:{hombre:22, mujer:19},  ayuda:'Justo debajo del codo, en lo más ancho.'},
+  {k:'cintura',         n:'Cintura',              ref:{hombre:85,  mujer:70},  px:{hombre:92, mujer:78},  ayuda:'En la parte más estrecha, encima del ombligo. Sin meter la barriga.'},
+  {k:'abdomen',         n:'Abdomen',              ref:{hombre:90,  mujer:80},  px:{hombre:96, mujer:88},  ayuda:'Justo a la altura del ombligo, relajado.'},
+  {k:'cadera',          n:'Glúteos y cadera',     ref:{hombre:98,  mujer:100}, px:{hombre:104,mujer:114}, ayuda:'Por la parte más ancha de los glúteos, de pie y con los pies juntos.'},
+  {k:'muslo_izq',       n:'Muslo izquierdo',      ref:{hombre:57,  mujer:55},  px:{hombre:46, mujer:46},  ayuda:'A la mitad entre la cadera y la rodilla.'},
+  {k:'muslo_der',       n:'Muslo derecho',        ref:{hombre:57,  mujer:55},  px:{hombre:46, mujer:46},  ayuda:'A la mitad entre la cadera y la rodilla.'},
+  {k:'pantorrilla_izq', n:'Pantorrilla izquierda',ref:{hombre:38,  mujer:35},  px:{hombre:30, mujer:28},  ayuda:'En la parte más gruesa, de pie.'},
+  {k:'pantorrilla_der', n:'Pantorrilla derecha',  ref:{hombre:38,  mujer:35},  px:{hombre:30, mujer:28},  ayuda:'En la parte más gruesa, de pie.'}
 ];
 const ZONA = Object.fromEntries(ZONAS.map(z => [z.k, z]));
 
@@ -2492,84 +2523,61 @@ async function sincronizarAgua(litros){
 /* ---------- cuerpo dibujado a partir de tus medidas ---------- */
 function anchoZona(k){
   const z = ZONA[k], p = S.perfil || {};
-  const sexo = p.sexo || 'hombre';
+  const sexo = p.sexo === 'mujer' ? 'mujer' : 'hombre';
+  const base = typeof z.px === 'object' ? z.px[sexo] : z.px;
   const m = ultimaMedida(k);
-  if (!m) return { px: z.px, medido:false, valor:null };
+  if (!m) return { px: base, medido:false, valor:null };
   const r = Number(m.valor) / z.ref[sexo];
   const f = Math.max(0.62, Math.min(1.55, Math.pow(r, 0.85)));
-  return { px: z.px * f, medido:true, valor: Number(m.valor) };
+  return { px: base * f, medido:true, valor: Number(m.valor) };
 }
 
 function dibujarCuerpo(){
-  const cont = $('#cuCuerpo'), g = (k) => anchoZona(k);
-  const cue=g('cuello'), hom=g('hombros'), pec=g('pecho'), cin=g('cintura'), cad=g('cadera'),
-        biI=g('biceps_izq'), biD=g('biceps_der'), anI=g('antebrazo_izq'), anD=g('antebrazo_der'),
-        muI=g('muslo_izq'), muD=g('muslo_der'), paI=g('pantorrilla_izq'), paD=g('pantorrilla_der');
-  const cx=160, W=320, H=560;
-  const yHom=110, yPec=156, yCin=226, yCad=274, yRod=382, yTob=474;
-  const hh=hom.px/2, hp=pec.px/2, hc=cin.px/2, hca=cad.px/2;
-
-  const torso = `M ${cx-hh} ${yHom}
-    C ${cx-hp-4} ${yPec-30} ${cx-hp} ${yPec-8} ${cx-hp} ${yPec+8}
-    C ${cx-hp} ${yCin-34} ${cx-hc} ${yCin-20} ${cx-hc} ${yCin}
-    C ${cx-hc} ${yCin+22} ${cx-hca} ${yCad-26} ${cx-hca} ${yCad}
-    Q ${cx} ${yCad+16} ${cx+hca} ${yCad}
-    C ${cx+hca} ${yCad-26} ${cx+hc} ${yCin+22} ${cx+hc} ${yCin}
-    C ${cx+hc} ${yCin-20} ${cx+hp} ${yCin-34} ${cx+hp} ${yPec+8}
-    C ${cx+hp} ${yPec-8} ${cx+hp+4} ${yPec-30} ${cx+hh} ${yHom}
-    Q ${cx} ${yHom-14} ${cx-hh} ${yHom} Z`;
-
-  const brazo = (lado, bi, an) => {
-    const s = lado==='izq' ? -1 : 1;
-    const x0=cx+s*(hh-7), y0=yHom+16, x1=cx+s*(hh+5), y1=yPec+62, x2=cx+s*(hh+9), y2=yCin+76;
-    return `<line class="mus" data-z="biceps_${lado}" x1="${x0}" y1="${y0}" x2="${x1}" y2="${y1}"
-              stroke-width="${bi.px}" stroke-linecap="round"/>
-            <line class="mus" data-z="antebrazo_${lado}" x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}"
-              stroke-width="${an.px}" stroke-linecap="round"/>
-            <circle class="detalle-relleno" cx="${x2 + s*2}" cy="${y2+13}" r="10"/>`;
+  const cont = $('#cuCuerpo');
+  const p = S.perfil || {}, sexo = p.sexo === 'mujer' ? 'mujer' : 'hombre';
+  const vista = C.vista || 'frente';
+  const g = (k) => anchoZona(k);
+  const M = {
+    cue:g('cuello'), hom:g('hombros'), pec:g('pecho'), cin:g('cintura'), abd:g('abdomen'), cad:g('cadera'),
+    biI:g('biceps_izq'), biD:g('biceps_der'), anI:g('antebrazo_izq'), anD:g('antebrazo_der'),
+    muI:g('muslo_izq'), muD:g('muslo_der'), paI:g('pantorrilla_izq'), paD:g('pantorrilla_der')
   };
-  const pierna = (lado, mu, pa) => {
-    const s = lado==='izq' ? -1 : 1;
-    const x0=cx+s*(hca*0.40), y0=yCad-8, x1=cx+s*(hca*0.46), y1=yRod, x2=cx+s*(hca*0.40), y2=yTob;
-    return `<line class="mus" data-z="muslo_${lado}" x1="${x0}" y1="${y0}" x2="${x1}" y2="${y1}"
-              stroke-width="${mu.px}" stroke-linecap="round"/>
-            <line class="mus" data-z="pantorrilla_${lado}" x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}"
-              stroke-width="${pa.px}" stroke-linecap="round"/>
-            <ellipse class="detalle-relleno" cx="${x2 + s*4}" cy="${y2+14}" rx="15" ry="8"/>`;
-  };
-  // zonas del torso que no son un trazo: se tocan con áreas invisibles
-  const area = (k, x, y, w, h) =>
-    `<rect class="zona" data-z="${k}" x="${x}" y="${y}" width="${w}" height="${h}" rx="10"/>`;
+  const cuerpo = vista === 'lado' ? cuerpoLado(M, sexo)
+               : vista === 'espalda' ? cuerpoEspalda(M, sexo)
+               : cuerpoFrente(M, sexo);
 
   cont.innerHTML = `
-  <svg viewBox="0 0 ${W} ${H}" width="300" style="max-width:100%">
-    <defs>
-      <linearGradient id="gm" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0%" stop-color="#00E676" stop-opacity=".38"/>
-        <stop offset="100%" stop-color="#00C833" stop-opacity=".14"/>
-      </linearGradient>
-    </defs>
-    <g class="cuerpo">
-      ${pierna('izq',muI,paI)}${pierna('der',muD,paD)}
-      ${brazo('izq',biI,anI)}${brazo('der',biD,anD)}
-      <line class="mus cuello" data-z="cuello" x1="${cx}" y1="${yHom-40}" x2="${cx}" y2="${yHom-4}"
-            stroke-width="${cue.px}" stroke-linecap="round"/>
-      <path class="mus torso" data-z="pecho" d="${torso}"/>
-      <path class="detalle" d="M ${cx} ${yPec-6} L ${cx} ${yCad-10}"/>
-      <path class="detalle" d="M ${cx-hp*0.62} ${yPec+6} Q ${cx} ${yPec+22} ${cx+hp*0.62} ${yPec+6}"/>
-      <path class="detalle" d="M ${cx-hc*0.52} ${yCin-16} L ${cx+hc*0.52} ${yCin-16}"/>
-      <path class="detalle" d="M ${cx-hc*0.48} ${yCin+4} L ${cx+hc*0.48} ${yCin+4}"/>
-      <circle class="cabeza" cx="${cx}" cy="${yHom-68}" r="26"/>
-      ${area('hombros', cx-hh, yHom-10, hh*2, 26)}
-      ${area('cintura', cx-hc, yCin-16, hc*2, 30)}
-      ${area('cadera',  cx-hca, yCad-24, hca*2, 30)}
-    </g>
-  </svg>`;
+  <div style="width:100%">
+    <div class="row vistas" style="justify-content:center;margin-bottom:4px">
+      ${['frente','lado','espalda'].map(v =>
+        '<button class="sm' + (v === vista ? ' pri' : '') + '" data-v="' + v + '">' +
+        ({frente:'Frente', lado:'Perfil', espalda:'Espalda'})[v] + '</button>').join('')}
+    </div>
+    <svg viewBox="0 0 340 620" width="300" style="max-width:100%;display:block;margin:0 auto">
+      <defs>
+        <linearGradient id="gm" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#00E676" stop-opacity=".42"/>
+          <stop offset="100%" stop-color="#00C833" stop-opacity=".16"/>
+        </linearGradient>
+        <linearGradient id="gp" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stop-color="#00E676" stop-opacity=".22"/>
+          <stop offset="100%" stop-color="#00C833" stop-opacity=".06"/>
+        </linearGradient>
+      </defs>
+      <g class="cuerpo">${cuerpo}</g>
+    </svg>
+    <div class="muted" style="text-align:center;margin-top:6px;font-size:12px">
+      ${vista === 'espalda' ? 'Toca los glúteos para medir cadera y glúteo'
+        : vista === 'lado' ? 'De perfil se ve mejor el abdomen y el glúteo'
+        : 'Cuerpo de ' + (sexo === 'mujer' ? 'mujer' : 'hombre') + ' · toca cualquier músculo'}
+    </div>
+  </div>`;
 
+  cont.querySelectorAll('[data-v]').forEach(b => b.onclick = () => { C.vista = b.dataset.v; dibujarCuerpo(); });
   cont.querySelectorAll('.mus,.zona').forEach(el => {
     const k = el.dataset.z, m = ultimaMedida(k);
     if (m) el.classList.add('medido');
-    el.style.cursor='pointer';
+    el.style.cursor = 'pointer';
     el.onclick = () => abrirMedida(k);
     const t = document.createElementNS('http://www.w3.org/2000/svg','title');
     t.textContent = ZONA[k].n + (m ? ': ' + Number(m.valor) + ' cm' : ' — sin medir');
@@ -2577,6 +2585,321 @@ function dibujarCuerpo(){
   });
   const ult = C.medidas.length ? C.medidas[C.medidas.length-1].fecha : null;
   $('#cuFechaMedidas').textContent = ult ? 'Última: ' + bonito(ult) : '';
+}
+
+/* ---------------- geometría común ---------------- */
+function figuraBase(M, sexo){
+  const muj = sexo === 'mujer';
+  return {
+    cx: 170, muj,
+    yCab: 52, rCab: 30,                 // cabeza
+    yCue: 84, yCueFin: 112,             // cuello
+    yHom: 126, yAxi: 176, yPec: 168,    // hombro, axila, pecho
+    yCin: 258, yAbd: 286, yCad: 322, yEnt: 350,
+    yRod: 452, yPan: 486, yTob: 556, ySue: 578,
+    hh: M.hom.px/2, hp: M.pec.px/2, hc: M.cin.px/2, ha: M.abd.px/2, hca: M.cad.px/2,
+    wc: M.cue.px/2
+  };
+}
+const mus = (k, d, cls) => `<path class="mus ${cls||''}" data-z="${k}" d="${d}"/>`;
+const det = (d, o) => `<path class="det" d="${d}"${o ? ' opacity="'+o+'"' : ''}/>`;
+const piel = (d, cls) => `<path class="piel ${cls||''}" d="${d}"/>`;
+
+/* ---------------- FRENTE ---------------- */
+function cuerpoFrente(M, sexo){
+  const B = figuraBase(M, sexo), {cx, muj} = B;
+  const {yCab,rCab,yCue,yCueFin,yHom,yAxi,yPec,yCin,yAbd,yCad,yEnt,yRod,yPan,yTob,ySue,hh,hp,hc,ha,hca,wc} = B;
+
+  // ---- contorno del torso (de cuello a entrepierna) ----
+  const torso = `M ${cx-wc} ${yCue+6}
+    C ${cx-wc-4} ${yCue+16} ${cx-hh*0.60} ${yHom-16} ${cx-hh*0.90} ${yHom-2}
+    C ${cx-hh} ${yHom+6} ${cx-hh-2} ${yHom+22} ${cx-hh*0.94} ${yAxi-16}
+    C ${cx-hp*1.02} ${yAxi} ${cx-hp} ${yPec+26} ${cx-hp*0.99} ${yPec+44}
+    C ${cx-hc*1.06} ${yCin-40} ${cx-hc} ${yCin-14} ${cx-hc} ${yCin+2}
+    C ${cx-ha*0.99} ${yAbd-16} ${cx-ha} ${yAbd-2} ${cx-ha*1.00} ${yAbd+8}
+    C ${cx-hca*0.98} ${yCad-26} ${cx-hca} ${yCad-8} ${cx-hca*0.98} ${yCad+8}
+    C ${cx-hca*0.92} ${yCad+26} ${cx-hca*0.60} ${yEnt-14} ${cx-hca*0.40} ${yEnt-2}
+    Q ${cx-hca*0.18} ${yEnt+10} ${cx} ${yEnt+2}
+    Q ${cx+hca*0.18} ${yEnt+10} ${cx+hca*0.40} ${yEnt-2}
+    C ${cx+hca*0.60} ${yEnt-14} ${cx+hca*0.92} ${yCad+26} ${cx+hca*0.98} ${yCad+8}
+    C ${cx+hca} ${yCad-8} ${cx+hca*0.98} ${yCad-26} ${cx+ha*1.00} ${yAbd+8}
+    C ${cx+ha} ${yAbd-2} ${cx+ha*0.99} ${yAbd-16} ${cx+hc} ${yCin+2}
+    C ${cx+hc} ${yCin-14} ${cx+hc*1.06} ${yCin-40} ${cx+hp*0.99} ${yPec+44}
+    C ${cx+hp} ${yPec+26} ${cx+hp*1.02} ${yAxi} ${cx+hh*0.94} ${yAxi-16}
+    C ${cx+hh+2} ${yHom+22} ${cx+hh} ${yHom+6} ${cx+hh*0.90} ${yHom-2}
+    C ${cx+hh*0.60} ${yHom-16} ${cx+wc+4} ${yCue+16} ${cx+wc} ${yCue+6} Z`;
+
+  // ---- brazos: hombro → codo → muñeca → mano ----
+  const brazo = (lado) => {
+    const s = lado === 'izq' ? -1 : 1;
+    const bi = (lado === 'izq' ? M.biI : M.biD).px, an = (lado === 'izq' ? M.anI : M.anD).px;
+    const xH = cx + s*(hh*0.86), xC = cx + s*(hh + bi*0.24), xM = cx + s*(hh + bi*0.30 + 6);
+    const yC = yAxi + 96, yM = yAxi + 178;
+    const cuerpoBrazo = `M ${xH - s*bi*0.34} ${yHom+2}
+      C ${xH + s*bi*0.42} ${yHom+10} ${xH + s*bi*0.50} ${yAxi-8} ${xC + s*bi*0.30} ${yC-16}
+      C ${xC + s*an*0.42} ${yC+16} ${xM + s*an*0.40} ${yM-30} ${xM + s*an*0.30} ${yM}
+      C ${xM + s*an*0.30} ${yM+16} ${xM - s*an*0.34} ${yM+18} ${xM - s*an*0.32} ${yM-4}
+      C ${xC - s*an*0.34} ${yC+20} ${xH - s*bi*0.30} ${yC-30} ${xH - s*bi*0.38} ${yAxi-6} Z`;
+    const mano = `M ${xM - s*an*0.30} ${yM-2}
+      C ${xM - s*an*0.36} ${yM+30} ${xM + s*an*0.30} ${yM+34} ${xM + s*an*0.28} ${yM+2} Z`;
+    return `<g class="miembro">
+      ${mus('biceps_'+lado, cuerpoBrazo)}
+      ${piel(mano)}
+      ${det(`M ${xH + s*bi*0.10} ${yHom+14} C ${xH + s*bi*0.30} ${yAxi+10} ${xC + s*bi*0.10} ${yC-52} ${xC + s*bi*0.06} ${yC-20}`)}
+      ${det(`M ${xH - s*bi*0.16} ${yAxi+6} C ${xH - s*bi*0.06} ${yC-70} ${xC - s*bi*0.12} ${yC-46} ${xC - s*bi*0.10} ${yC-18}`, .5)}
+      ${det(`M ${xC + s*an*0.16} ${yC+16} C ${xM + s*an*0.16} ${yM-64} ${xM + s*an*0.12} ${yM-36} ${xM + s*an*0.10} ${yM-14}`, .5)}
+    </g>`;
+  };
+
+  // ---- piernas ----
+  const pierna = (lado) => {
+    const s = lado === 'izq' ? -1 : 1;
+    const mu = (lado === 'izq' ? M.muI : M.muD).px, pa = (lado === 'izq' ? M.paI : M.paD).px;
+    const xCad = cx + s*(hca*0.52), xRod = cx + s*(hca*0.46), xTob = cx + s*(hca*0.38);
+    const muslo = `M ${xCad - s*mu*0.42} ${yCad+16}
+      C ${xCad + s*mu*0.50} ${yCad+10} ${xCad + s*mu*0.54} ${yCad+72} ${xRod + s*mu*0.30} ${yRod-14}
+      C ${xRod + s*pa*0.42} ${yRod+6} ${xRod + s*pa*0.62} ${yPan} ${xTob + s*pa*0.34} ${yTob-8}
+      C ${xTob + s*pa*0.30} ${yTob+6} ${xTob - s*pa*0.34} ${yTob+6} ${xTob - s*pa*0.32} ${yTob-10}
+      C ${xRod - s*pa*0.48} ${yPan-6} ${xRod - s*mu*0.34} ${yRod+4} ${xRod - s*mu*0.32} ${yRod-16}
+      C ${xCad - s*mu*0.44} ${yCad+96} ${xCad - s*mu*0.46} ${yCad+44} ${xCad - s*mu*0.42} ${yCad+16} Z`;
+    const pie = `M ${xTob - s*pa*0.30} ${yTob-4}
+      C ${xTob - s*pa*0.32} ${ySue-4} ${xTob + s*36} ${ySue+2} ${xTob + s*38} ${ySue-6}
+      C ${xTob + s*30} ${yTob+4} ${xTob + s*pa*0.30} ${yTob-6} ${xTob + s*pa*0.28} ${yTob-4} Z`;
+    return `<g class="miembro">
+      ${mus('muslo_'+lado, muslo)}
+      ${piel(pie)}
+      ${det(`M ${xCad + s*mu*0.30} ${yCad+34} C ${xCad + s*mu*0.34} ${yRod-90} ${xRod + s*mu*0.16} ${yRod-56} ${xRod + s*mu*0.12} ${yRod-24}`)}
+      ${det(`M ${xCad - s*mu*0.06} ${yCad+30} C ${xCad + s*mu*0.02} ${yRod-90} ${xRod - s*mu*0.04} ${yRod-52} ${xRod - s*mu*0.06} ${yRod-22}`, .55)}
+      ${det(`M ${xRod - s*mu*0.24} ${yRod-64} C ${xRod - s*mu*0.20} ${yRod-30} ${xRod - s*mu*0.16} ${yRod-24} ${xRod - s*mu*0.14} ${yRod-18}`, .45)}
+      ${det(`M ${xRod - s*8} ${yRod+2} q ${s*8} 4 ${s*15} 0`, .6)}
+      ${mus('pantorrilla_'+lado, `M ${xRod - s*pa*0.40} ${yRod+16}
+        C ${xRod - s*pa*0.56} ${yPan} ${xTob - s*pa*0.30} ${yPan+34} ${xTob - s*pa*0.26} ${yTob-16}
+        L ${xTob + s*pa*0.26} ${yTob-16}
+        C ${xTob + s*pa*0.32} ${yPan+30} ${xRod + s*pa*0.56} ${yPan-4} ${xRod + s*pa*0.40} ${yRod+16} Z`, 'sutil')}
+    </g>`;
+  };
+
+  // ---- musculatura del torso ----
+  let musc = '';
+  // trapecio
+  musc += det(`M ${cx-wc-2} ${yCue+10} C ${cx-hh*0.5} ${yHom-16} ${cx-hh*0.78} ${yHom-4} ${cx-hh*0.90} ${yHom+2}`);
+  musc += det(`M ${cx+wc+2} ${yCue+10} C ${cx+hh*0.5} ${yHom-16} ${cx+hh*0.78} ${yHom-4} ${cx+hh*0.90} ${yHom+2}`);
+  // esternocleidomastoideo
+  musc += det(`M ${cx-9} ${yCue-6} L ${cx-wc-2} ${yCue+16}`, .55) + det(`M ${cx+9} ${yCue-6} L ${cx+wc+2} ${yCue+16}`, .55);
+  // deltoides
+  musc += det(`M ${cx-hh*0.94} ${yHom-2} C ${cx-hh*0.99} ${yHom+26} ${cx-hh*0.80} ${yAxi-2} ${cx-hp*0.90} ${yAxi-6}`);
+  musc += det(`M ${cx+hh*0.94} ${yHom-2} C ${cx+hh*0.99} ${yHom+26} ${cx+hh*0.80} ${yAxi-2} ${cx+hp*0.90} ${yAxi-6}`);
+  // pectorales o pecho femenino
+  if (!muj){
+    musc += det(`M ${cx-2} ${yPec-24} C ${cx-hp*0.42} ${yPec-30} ${cx-hp*0.86} ${yPec-14} ${cx-hp*0.88} ${yPec+6}
+                 C ${cx-hp*0.70} ${yPec+34} ${cx-hp*0.24} ${yPec+38} ${cx-2} ${yPec+26} Z`);
+    musc += det(`M ${cx+2} ${yPec-24} C ${cx+hp*0.42} ${yPec-30} ${cx+hp*0.86} ${yPec-14} ${cx+hp*0.88} ${yPec+6}
+                 C ${cx+hp*0.70} ${yPec+34} ${cx+hp*0.24} ${yPec+38} ${cx+2} ${yPec+26} Z`);
+  } else {
+    musc += det(`M ${cx-hp*0.86} ${yPec-6} C ${cx-hp*0.90} ${yPec+30} ${cx-hp*0.30} ${yPec+40} ${cx-hp*0.16} ${yPec+8}`);
+    musc += det(`M ${cx+hp*0.86} ${yPec-6} C ${cx+hp*0.90} ${yPec+30} ${cx+hp*0.30} ${yPec+40} ${cx+hp*0.16} ${yPec+8}`);
+  }
+  // serrato
+  for (let i = 0; i < 3; i++){
+    const y = yPec + 40 + i*13;
+    musc += det(`M ${cx-hp*0.86} ${y} q ${hp*0.16} 6 ${hp*0.28} 2`, .45);
+    musc += det(`M ${cx+hp*0.86} ${y} q ${-hp*0.16} 6 ${-hp*0.28} 2`, .45);
+  }
+  // recto abdominal
+  const wAb = Math.min(ha*0.56, 40), y0 = yPec + (muj ? 54 : 44);
+  musc += det(`M ${cx} ${y0-6} L ${cx} ${yAbd+18}`);
+  for (let i = 0; i < 4; i++){
+    const y = y0 + i*16;
+    if (y > yAbd + 6) break;
+    musc += det(`M ${cx-wAb/2} ${y} q ${wAb*0.25} 4 ${wAb/2 - 2} 0`, .6);
+    musc += det(`M ${cx+wAb/2} ${y} q ${-wAb*0.25} 4 ${-(wAb/2 - 2)} 0`, .6);
+  }
+  // oblicuos
+  musc += det(`M ${cx-ha*0.92} ${yCin+6} C ${cx-ha*0.70} ${yAbd-4} ${cx-ha*0.44} ${yAbd+16} ${cx-ha*0.30} ${yCad-18}`, .55);
+  musc += det(`M ${cx+ha*0.92} ${yCin+6} C ${cx+ha*0.70} ${yAbd-4} ${cx+ha*0.44} ${yAbd+16} ${cx+ha*0.30} ${yCad-18}`, .55);
+  // ingle
+  musc += det(`M ${cx-hca*0.72} ${yCad+2} C ${cx-hca*0.40} ${yEnt-16} ${cx-hca*0.14} ${yEnt-10} ${cx-2} ${yEnt-2}`, .5);
+  musc += det(`M ${cx+hca*0.72} ${yCad+2} C ${cx+hca*0.40} ${yEnt-16} ${cx+hca*0.14} ${yEnt-10} ${cx+2} ${yEnt-2}`, .5);
+
+  const cabeza = `<ellipse class="piel cabeza" cx="${cx}" cy="${yCab}" rx="${muj?27:29}" ry="${rCab+2}"/>
+    ${det(`M ${cx-11} ${yCab-2} q 4 3 8 0`, .5)}${det(`M ${cx+11} ${yCab-2} q -4 3 -8 0`, .5)}
+    ${det(`M ${cx-7} ${yCab+18} q 7 4 14 0`, .5)}`;
+
+  const area = (k,x,y,w,h) => `<rect class="zona" data-z="${k}" x="${x}" y="${y}" width="${w}" height="${h}" rx="12"/>`;
+
+  return `
+    ${pierna('izq')}${pierna('der')}
+    ${mus('cuello', `M ${cx-wc} ${yCue-12} L ${cx+wc} ${yCue-12} L ${cx+wc+2} ${yCue+12} L ${cx-wc-2} ${yCue+12} Z`, 'sutil')}
+    ${mus('pecho', torso)}
+    ${musc}
+    ${brazo('izq')}${brazo('der')}
+    ${cabeza}
+    ${area('hombros', cx-hh, yHom-14, hh*2, 30)}
+    ${area('cintura', cx-hc, yCin-14, hc*2, 28)}
+    ${area('abdomen', cx-ha, yAbd-10, ha*2, 30)}
+    ${area('cadera',  cx-hca, yCad-16, hca*2, 34)}`;
+}
+
+/* ---------------- ESPALDA ---------------- */
+function cuerpoEspalda(M, sexo){
+  const B = figuraBase(M, sexo), {cx, muj} = B;
+  const {yCab,rCab,yCue,yHom,yAxi,yPec,yCin,yAbd,yCad,yEnt,yRod,yPan,yTob,ySue,hh,hp,hc,ha,hca,wc} = B;
+
+  const torso = `M ${cx-wc} ${yCue+6}
+    C ${cx-wc-4} ${yCue+16} ${cx-hh*0.60} ${yHom-16} ${cx-hh*0.90} ${yHom-2}
+    C ${cx-hh} ${yHom+6} ${cx-hh-2} ${yHom+22} ${cx-hh*0.94} ${yAxi-16}
+    C ${cx-hp*1.02} ${yAxi} ${cx-hp} ${yPec+26} ${cx-hp*0.99} ${yPec+44}
+    C ${cx-hc*1.06} ${yCin-40} ${cx-hc} ${yCin-14} ${cx-hc} ${yCin+2}
+    C ${cx-ha*0.99} ${yAbd-16} ${cx-ha} ${yAbd-2} ${cx-ha*1.00} ${yAbd+8}
+    C ${cx-hca*0.98} ${yCad-26} ${cx-hca} ${yCad-4} ${cx-hca*0.98} ${yCad+16}
+    C ${cx-hca*0.90} ${yCad+40} ${cx-hca*0.50} ${yEnt+6} ${cx} ${yEnt+8}
+    C ${cx+hca*0.50} ${yEnt+6} ${cx+hca*0.90} ${yCad+40} ${cx+hca*0.98} ${yCad+16}
+    C ${cx+hca} ${yCad-4} ${cx+hca*0.98} ${yCad-26} ${cx+ha*1.00} ${yAbd+8}
+    C ${cx+ha} ${yAbd-2} ${cx+ha*0.99} ${yAbd-16} ${cx+hc} ${yCin+2}
+    C ${cx+hc} ${yCin-14} ${cx+hc*1.06} ${yCin-40} ${cx+hp*0.99} ${yPec+44}
+    C ${cx+hp} ${yPec+26} ${cx+hp*1.02} ${yAxi} ${cx+hh*0.94} ${yAxi-16}
+    C ${cx+hh+2} ${yHom+22} ${cx+hh} ${yHom+6} ${cx+hh*0.90} ${yHom-2}
+    C ${cx+hh*0.60} ${yHom-16} ${cx+wc+4} ${yCue+16} ${cx+wc} ${yCue+6} Z`;
+
+  const brazo = (lado) => {
+    const s = lado === 'izq' ? -1 : 1;
+    const bi = (lado === 'izq' ? M.biI : M.biD).px, an = (lado === 'izq' ? M.anI : M.anD).px;
+    const xH = cx + s*(hh*0.86), xC = cx + s*(hh + bi*0.24), xM = cx + s*(hh + bi*0.30 + 6);
+    const yC = yAxi + 96, yM = yAxi + 178;
+    const cuerpoBrazo = `M ${xH - s*bi*0.34} ${yHom+2}
+      C ${xH + s*bi*0.42} ${yHom+10} ${xH + s*bi*0.50} ${yAxi-8} ${xC + s*bi*0.30} ${yC-16}
+      C ${xC + s*an*0.42} ${yC+16} ${xM + s*an*0.40} ${yM-30} ${xM + s*an*0.30} ${yM}
+      C ${xM + s*an*0.30} ${yM+16} ${xM - s*an*0.34} ${yM+18} ${xM - s*an*0.32} ${yM-4}
+      C ${xC - s*an*0.34} ${yC+20} ${xH - s*bi*0.30} ${yC-30} ${xH - s*bi*0.38} ${yAxi-6} Z`;
+    return `<g class="miembro">${mus('biceps_'+lado, cuerpoBrazo)}
+      ${det(`M ${xH} ${yHom+16} C ${xH + s*bi*0.16} ${yAxi+30} ${xC + s*bi*0.08} ${yC-48} ${xC + s*bi*0.04} ${yC-18}`, .55)}
+      ${piel(`M ${xM - s*an*0.30} ${yM-2} C ${xM - s*an*0.36} ${yM+30} ${xM + s*an*0.30} ${yM+34} ${xM + s*an*0.28} ${yM+2} Z`)}</g>`;
+  };
+
+  const pierna = (lado) => {
+    const s = lado === 'izq' ? -1 : 1;
+    const mu = (lado === 'izq' ? M.muI : M.muD).px, pa = (lado === 'izq' ? M.paI : M.paD).px;
+    const xCad = cx + s*(hca*0.52), xRod = cx + s*(hca*0.46), xTob = cx + s*(hca*0.38);
+    const muslo = `M ${xCad - s*mu*0.42} ${yCad+16}
+      C ${xCad + s*mu*0.50} ${yCad+10} ${xCad + s*mu*0.54} ${yCad+72} ${xRod + s*mu*0.30} ${yRod-14}
+      C ${xRod + s*pa*0.42} ${yRod+6} ${xRod + s*pa*0.62} ${yPan} ${xTob + s*pa*0.34} ${yTob-8}
+      C ${xTob + s*pa*0.30} ${yTob+6} ${xTob - s*pa*0.34} ${yTob+6} ${xTob - s*pa*0.32} ${yTob-10}
+      C ${xRod - s*pa*0.48} ${yPan-6} ${xRod - s*mu*0.34} ${yRod+4} ${xRod - s*mu*0.32} ${yRod-16}
+      C ${xCad - s*mu*0.44} ${yCad+96} ${xCad - s*mu*0.46} ${yCad+44} ${xCad - s*mu*0.42} ${yCad+16} Z`;
+    const pie = `M ${xTob - s*pa*0.30} ${yTob-4} C ${xTob - s*pa*0.32} ${ySue-4} ${xTob + s*26} ${ySue+2} ${xTob + s*28} ${ySue-6}
+      C ${xTob + s*22} ${yTob+4} ${xTob + s*pa*0.30} ${yTob-6} ${xTob + s*pa*0.28} ${yTob-4} Z`;
+    return `<g class="miembro">
+      ${mus('muslo_'+lado, muslo)}${piel(pie)}
+      ${det(`M ${xCad + s*mu*0.16} ${yCad+40} C ${xCad + s*mu*0.20} ${yRod-80} ${xRod + s*mu*0.10} ${yRod-50} ${xRod + s*mu*0.08} ${yRod-22}`)}
+      ${det(`M ${xCad - s*mu*0.18} ${yCad+40} C ${xCad - s*mu*0.14} ${yRod-80} ${xRod - s*mu*0.08} ${yRod-50} ${xRod - s*mu*0.06} ${yRod-22}`, .55)}
+      ${mus('pantorrilla_'+lado, `M ${xRod - s*pa*0.44} ${yRod+14}
+        C ${xRod - s*pa*0.58} ${yPan+6} ${xTob - s*pa*0.28} ${yPan+38} ${xTob - s*pa*0.24} ${yTob-16}
+        L ${xTob + s*pa*0.24} ${yTob-16}
+        C ${xTob + s*pa*0.30} ${yPan+34} ${xRod + s*pa*0.58} ${yPan+2} ${xRod + s*pa*0.44} ${yRod+14} Z`, 'sutil')}
+      ${det(`M ${xRod - s*pa*0.10} ${yRod+26} L ${xTob} ${yPan+42}`, .45)}
+    </g>`;
+  };
+
+  // glúteos
+  const gluteo = (lado) => {
+    const s = lado === 'izq' ? -1 : 1;
+    const rx = hca*0.48, ry = muj ? 40 : 33, gy = yCad + 4;
+    return mus('cadera', `M ${cx + s*2} ${gy - ry*0.75}
+      C ${cx + s*(rx*1.5)} ${gy - ry*0.95} ${cx + s*(rx*1.95)} ${gy + ry*0.35} ${cx + s*(rx*1.25)} ${gy + ry*0.95}
+      C ${cx + s*(rx*0.55)} ${gy + ry*1.25} ${cx + s*4} ${gy + ry*0.8} ${cx + s*2} ${gy - ry*0.75} Z`, 'gluteo');
+  };
+
+  const musc = `
+    ${det(`M ${cx-wc-2} ${yCue+12} L ${cx-hh*0.86} ${yHom+8} L ${cx-hp*0.36} ${yPec+42} L ${cx} ${yPec+58}
+           L ${cx+hp*0.36} ${yPec+42} L ${cx+hh*0.86} ${yHom+8} L ${cx+wc+2} ${yCue+12}`)}
+    ${det(`M ${cx-hp*0.98} ${yPec+6} C ${cx-hp*0.86} ${yCin-46} ${cx-hc*0.62} ${yCin-8} ${cx-hc*0.24} ${yCin+16}`)}
+    ${det(`M ${cx+hp*0.98} ${yPec+6} C ${cx+hp*0.86} ${yCin-46} ${cx+hc*0.62} ${yCin-8} ${cx+hc*0.24} ${yCin+16}`)}
+    ${det(`M ${cx} ${yPec+58} L ${cx} ${yAbd+14}`, .7)}
+    ${det(`M ${cx-13} ${yCin+16} q -4 20 1 34`, .5)}
+    ${det(`M ${cx+13} ${yCin+16} q 4 20 -1 34`, .5)}
+    ${det(`M ${cx-hh*0.94} ${yHom-2} C ${cx-hh*0.99} ${yHom+26} ${cx-hh*0.80} ${yAxi-2} ${cx-hp*0.90} ${yAxi-6}`)}
+    ${det(`M ${cx+hh*0.94} ${yHom-2} C ${cx+hh*0.99} ${yHom+26} ${cx+hh*0.80} ${yAxi-2} ${cx+hp*0.90} ${yAxi-6}`)}`;
+
+  const area = (k,x,y,w,h) => `<rect class="zona" data-z="${k}" x="${x}" y="${y}" width="${w}" height="${h}" rx="12"/>`;
+
+  return `
+    ${pierna('izq')}${pierna('der')}
+    ${mus('cuello', `M ${cx-wc} ${yCue-12} L ${cx+wc} ${yCue-12} L ${cx+wc+2} ${yCue+12} L ${cx-wc-2} ${yCue+12} Z`, 'sutil')}
+    ${mus('pecho', torso)}
+    ${gluteo('izq')}${gluteo('der')}
+    ${musc}
+    ${brazo('izq')}${brazo('der')}
+    <ellipse class="piel cabeza" cx="${cx}" cy="${yCab}" rx="${muj?27:29}" ry="${rCab+2}"/>
+    ${det(`M ${cx-14} ${yCab+6} q 14 10 28 0`, .45)}
+    ${area('hombros', cx-hh, yHom-14, hh*2, 30)}
+    ${area('cintura', cx-hc, yCin-14, hc*2, 28)}`;
+}
+
+/* ---------------- PERFIL ---------------- */
+function cuerpoLado(M, sexo){
+  const B = figuraBase(M, sexo), {cx, muj} = B;
+  const {yCab,rCab,yCue,yHom,yAxi,yPec,yCin,yAbd,yCad,yEnt,yRod,yPan,yTob,ySue} = B;
+  const d = (m, f) => (m.px/2)*f;
+  const dp = d(M.pec,0.60), dc = d(M.cin,0.54), da = d(M.abd,0.62), dg = d(M.cad,0.60), dh = d(M.hom,0.34);
+
+  const torso = `M ${cx + dh*0.42} ${yCue+8}
+    C ${cx + dp*1.02} ${yHom-2} ${cx + dp*1.26} ${yPec-22} ${cx + dp*1.16} ${yPec+22}
+    C ${cx + dc*1.10} ${yCin-44} ${cx + dc*0.94} ${yCin-14} ${cx + dc*0.92} ${yCin+6}
+    C ${cx + da*1.04} ${yCin+34} ${cx + da*1.18} ${yAbd-2} ${cx + da*1.02} ${yAbd+24}
+    C ${cx + da*0.72} ${yCad-20} ${cx + dg*0.46} ${yCad-2} ${cx + dg*0.34} ${yCad+22}
+    L ${cx - dg*0.34} ${yEnt-2}
+    C ${cx - dg*1.16} ${yCad+38} ${cx - dg*1.30} ${yAbd+18} ${cx - dc*0.92} ${yAbd-20}
+    C ${cx - dc*0.76} ${yCin-10} ${cx - dp*1.02} ${yCin-46} ${cx - dp*0.86} ${yPec+16}
+    C ${cx - dp*0.84} ${yPec-22} ${cx - dh*0.96} ${yHom-2} ${cx - dh*0.42} ${yCue+8} Z`;
+
+  const musc = `
+    ${det(`M ${cx + dp*0.10} ${yPec-24} C ${cx + dp*0.72} ${yPec-14} ${cx + dp*0.86} ${yPec+6} ${cx + dp*0.80} ${yPec+26}`)}
+    ${det(`M ${cx - dp*0.40} ${yPec+12} C ${cx - dp*0.16} ${yCin-52} ${cx - dc*0.30} ${yCin-16} ${cx - dc*0.20} ${yCin+10}`, .55)}
+    ${det(`M ${cx + da*0.22} ${yAbd-40} C ${cx + da*0.66} ${yAbd-22} ${cx + da*0.74} ${yAbd-2} ${cx + da*0.62} ${yAbd+18}`, .6)}
+    ${det(`M ${cx - dg*0.92} ${yCad-14} C ${cx - dg*1.02} ${yCad+8} ${cx - dg*0.72} ${yCad+26} ${cx - dg*0.38} ${yCad+24}`, .6)}
+    ${muj ? det(`M ${cx + dp*0.30} ${yPec-20} a 19 17 0 0 1 ${dp*0.66} 24`) : ''}`;
+
+  const brazo = `<g class="miembro">
+    ${mus('biceps_der', `M ${cx - dp*0.20} ${yHom+6}
+      C ${cx + dp*0.34} ${yHom+16} ${cx + dp*0.30} ${yAxi+40} ${cx + M.biD.px*0.06} ${yAxi+96}
+      C ${cx + M.anD.px*0.30} ${yAxi+150} ${cx + M.anD.px*0.26} ${yAxi+172} ${cx + 6} ${yAxi+186}
+      C ${cx - M.anD.px*0.42} ${yAxi+176} ${cx - M.anD.px*0.34} ${yAxi+120} ${cx - M.biD.px*0.44} ${yAxi+70}
+      C ${cx - dp*0.46} ${yAxi} ${cx - dp*0.40} ${yHom+18} ${cx - dp*0.20} ${yHom+6} Z`)}
+    ${piel(`M ${cx - 10} ${yAxi+184} C ${cx - 14} ${yAxi+212} ${cx + 14} ${yAxi+214} ${cx + 10} ${yAxi+182} Z`)}
+  </g>`;
+
+  const pierna = `<g class="miembro">
+    ${mus('muslo_der', `M ${cx - M.muD.px*0.46} ${yCad+16}
+      C ${cx + M.muD.px*0.50} ${yCad+8} ${cx + M.muD.px*0.44} ${yRod-70} ${cx + M.muD.px*0.24} ${yRod-10}
+      C ${cx + M.paD.px*0.42} ${yPan-30} ${cx + M.paD.px*0.30} ${yTob-30} ${cx + M.paD.px*0.20} ${yTob-6}
+      C ${cx + M.paD.px*0.10} ${yTob+8} ${cx - M.paD.px*0.36} ${yTob+6} ${cx - M.paD.px*0.34} ${yTob-14}
+      C ${cx - M.paD.px*0.62} ${yPan-10} ${cx - M.muD.px*0.36} ${yRod+6} ${cx - M.muD.px*0.34} ${yRod-24}
+      C ${cx - M.muD.px*0.44} ${yCad+90} ${cx - M.muD.px*0.48} ${yCad+50} ${cx - M.muD.px*0.46} ${yCad+16} Z`)}
+    ${det(`M ${cx + M.muD.px*0.24} ${yCad+44} C ${cx + M.muD.px*0.26} ${yRod-70} ${cx + M.muD.px*0.12} ${yRod-46} ${cx + M.muD.px*0.10} ${yRod-22}`, .55)}
+    ${mus('pantorrilla_der', `M ${cx - M.paD.px*0.52} ${yRod+18}
+      C ${cx - M.paD.px*0.72} ${yPan+4} ${cx - M.paD.px*0.34} ${yPan+40} ${cx - M.paD.px*0.30} ${yTob-18}
+      L ${cx + M.paD.px*0.10} ${yTob-18}
+      C ${cx + M.paD.px*0.16} ${yPan+30} ${cx + M.paD.px*0.10} ${yRod+22} ${cx - M.paD.px*0.52} ${yRod+18} Z`, 'sutil')}
+    ${piel(`M ${cx - M.paD.px*0.34} ${yTob-6} C ${cx - M.paD.px*0.36} ${ySue-2} ${cx + 42} ${ySue+2} ${cx + 44} ${ySue-8}
+      C ${cx + 30} ${yTob+2} ${cx + M.paD.px*0.18} ${yTob-8} ${cx + M.paD.px*0.16} ${yTob-6} Z`)}
+  </g>`;
+
+  const cabeza = `<ellipse class="piel cabeza" cx="${cx + 6}" cy="${yCab}" rx="${muj?26:28}" ry="${rCab+2}"/>
+    <path class="piel" d="M ${cx + 30} ${yCab-4} q 9 7 -2 13 z"/>
+    ${det(`M ${cx + 16} ${yCab-4} q 6 4 2 9`, .5)}`;
+
+  const area = (k,x,y,w,h) => `<rect class="zona" data-z="${k}" x="${x}" y="${y}" width="${w}" height="${h}" rx="12"/>`;
+
+  return `
+    ${pierna}
+    ${mus('cuello', `M ${cx - 12} ${yCue-14} L ${cx + 13} ${yCue-14} L ${cx + 12} ${yCue+12} L ${cx - 12} ${yCue+12} Z`, 'sutil')}
+    ${mus('abdomen', torso)}
+    ${musc}
+    ${brazo}
+    ${cabeza}
+    ${area('pecho',  cx - dp*0.7, yPec-24, dp*1.7, 40)}
+    ${area('cintura',cx - dc*0.9, yCin-14, dc*1.9, 26)}
+    ${area('cadera', cx - dg*1.1, yCad-18, dg*1.5, 40)}`;
 }
 
 function pintarListaMedidas(){
