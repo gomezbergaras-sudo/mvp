@@ -80,12 +80,18 @@ h1{font-size:20px;margin:0}
 h2{font-size:16px;margin:0 0 12px}
 .muted{color:var(--tx2);font-size:13px}
 .hidden{display:none !important}
-section{animation:entra .28s cubic-bezier(.2,.8,.2,1)}
-@keyframes entra{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+@keyframes entraCard{
+  from{opacity:0;transform:translateY(22px) translateX(calc(var(--dir,0) * 26px)) scale(.975)}
+  to{opacity:1;transform:none}
+}
+@keyframes latidoTag{0%{transform:scale(.86);opacity:0}60%{transform:scale(1.06)}100%{transform:scale(1);opacity:1}}
+nav{position:relative}
+nav button{transition:color .2s,background .25s,transform .18s}
+nav button.on{transform:translateY(-1px)}
 button:active{transform:translateY(1px)}
 .card{transition:border-color .2s}
 @media (prefers-reduced-motion: reduce){
-  section{animation:none}
+  .card,.grid,.stat{animation:none !important}
   .bar>i,.cuerpo line.mus{transition:none}
 }
 
@@ -165,6 +171,27 @@ pre.rep{white-space:pre-wrap;font-family:ui-monospace,Menlo,Consolas,monospace;f
 dialog{background:var(--panel);color:var(--tx);border:1px solid var(--line);border-radius:var(--r);
   padding:20px;max-width:520px;width:calc(100% - 32px)}
 dialog::backdrop{background:rgba(0,0,0,.6)}
+
+/* ---------- vaso de agua ---------- */
+.agua-fila{display:flex;gap:20px;align-items:center;flex-wrap:wrap}
+.vaso-caja{flex:0 0 auto}
+.vaso{display:block;overflow:visible}
+.vaso-cristal{fill:color-mix(in srgb, var(--panel2) 75%, var(--input));stroke:none}
+.vaso-borde{fill:none;stroke:var(--line);stroke-width:3;stroke-linejoin:round}
+.vaso-brillo{fill:#fff;opacity:.14}
+.vaso-pct{fill:var(--tx2);font-family:var(--f-titulo);font-weight:800;font-size:13px;letter-spacing:.08em}
+.agua-liq{transition:y .7s cubic-bezier(.2,.8,.2,1),height .7s cubic-bezier(.2,.8,.2,1)}
+.ola{fill:#00E676;opacity:.55;transition:d .7s}
+.ola1{animation:olaMueve 3.4s linear infinite}
+.ola2{opacity:.3;animation:olaMueve 5.2s linear infinite reverse}
+@keyframes olaMueve{from{transform:translateX(0)}to{transform:translateX(80px)}}
+.burb{fill:#fff;opacity:.5}
+.b1{animation:sube 3.2s ease-in infinite}
+.b2{animation:sube 4.1s ease-in .6s infinite}
+.b3{animation:sube 3.6s ease-in 1.2s infinite}
+@keyframes sube{0%{transform:translateY(0);opacity:0}20%{opacity:.55}100%{transform:translateY(-70px);opacity:0}}
+.agua-num{font-family:var(--f-titulo);font-weight:800;font-size:30px;line-height:1.1}
+@media (prefers-reduced-motion: reduce){.ola1,.ola2,.burb{animation:none}}
 
 /* ---------- carga ---------- */
 #cargando{position:fixed;inset:0;z-index:60;background:var(--bg);display:grid;place-items:center}
@@ -334,6 +361,8 @@ dialog::backdrop{background:rgba(0,0,0,.6)}
         <div class="stat"><div class="n" id="sPts">0</div><div class="l">Puntos totales</div></div>
         <div class="stat"><div class="n" id="sRacha">0</div><div class="l">Mejor racha activa</div></div>
       </div>
+      <div class="card hidden" id="aguaCard"></div>
+
       <div class="card">
         <div class="row" style="justify-content:space-between;margin-bottom:12px">
           <h2 style="margin:0" id="tituloHoy">Hoy</h2>
@@ -981,9 +1010,14 @@ function ok(res, msg){
    Al publicar una versión nueva: sube VERSION, pon la fecha y agrega
    su entrada arriba del todo en NOVEDADES.
    ===================================================================== */
-const VERSION = '2.0.0';
+const VERSION = '2.1.0';
 const FECHA_VERSION = '2026-08-29';
 const NOVEDADES = [
+  ['2.1.0', '2026-08-29', [
+    'Vaso de agua: se llena de verdad con cada vaso que registras, con oleaje y burbujas.',
+    'Avisos de hidratación por hora: si a media mañana, media tarde o al anochecer vas atrasado, te lo dice con el monto exacto que falta.',
+    'Cada pestaña entra con sus tarjetas escalonadas y en la dirección hacia la que te mueves.'
+  ]],
   ['2.0.0', '2026-08-29', [
     'Perfil completo: sexo, edad, estatura, peso, objetivo y nivel de actividad.',
     'Plan de alimentación calculado: calorías, proteína, carbohidratos, grasas, agua e IMC.',
@@ -1199,7 +1233,7 @@ function nivelDe(pts){ return NIVELES.find(x => pts >= x.min); }
 /* =====================================================================
    PINTADO
    ===================================================================== */
-function pintar(){ pintarHoy(); pintarHabitos(); pintarProgreso(); pintarMetas(); }
+function pintar(){ pintarHoy(); pintarAgua(); pintarHabitos(); pintarProgreso(); pintarMetas(); }
 
 function pintarHoy(){
   const f = S.fecha, lista = habitosDe(f);
@@ -1521,7 +1555,22 @@ $('#btnSaveMeta').onclick = async () => {
 };
 
 /* ---------- navegacion ---------- */
+const ORDEN_TABS = ['hoy','habitos','progreso','metas','gym','cuerpo','finanzas','reporte'];
+function animarSeccion(sec, dir){
+  if (!sec) return;
+  if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const hijos = Array.from(sec.children).filter(e => !e.classList.contains('hidden'));
+  hijos.forEach((el, i) => {
+    el.style.animation = 'none';
+    void el.offsetWidth;
+    el.style.setProperty('--dir', dir);
+    el.style.animation = 'entraCard .46s cubic-bezier(.2,.8,.2,1) ' + Math.min(i*60, 320) + 'ms both';
+  });
+}
+
 $$('nav button').forEach(b => b.onclick = () => {
+  const antes = ORDEN_TABS.indexOf(S.tab), ahora = ORDEN_TABS.indexOf(b.dataset.t);
+  const dir = antes < 0 || ahora < 0 ? 0 : (ahora > antes ? 1 : -1);
   $$('nav button').forEach(x => x.classList.remove('on')); b.classList.add('on');
   S.tab = b.dataset.t;
   ['hoy','habitos','progreso','metas','gym','cuerpo','finanzas','reporte'].forEach(t => {
@@ -1531,9 +1580,11 @@ $$('nav button').forEach(b => b.onclick = () => {
   if ((S.tab === 'finanzas' || S.tab === 'reporte') && !F.cargado) cargarFinanzas();
   if ((S.tab === 'cuerpo' || S.tab === 'reporte') && !C.cargado) cargarCuerpo();
   if (S.tab === 'reporte') setTimeout(() => pintarReporte(S.repTipo || 'diario'), 400);
+  animarSeccion($('#t' + S.tab.charAt(0).toUpperCase() + S.tab.slice(1)), dir);
+  b.animate([{transform:'scale(.94)'},{transform:'scale(1)'}], {duration:220, easing:'cubic-bezier(.2,.8,.2,1)'});
 });
-$('#btnAyer').onclick = () => { S.fecha = sumarDias(S.fecha, -1); pintarHoy(); };
-$('#btnHoyVolver').onclick = () => { S.fecha = hoyISO(); pintarHoy(); };
+$('#btnAyer').onclick = () => { S.fecha = sumarDias(S.fecha, -1); pintarHoy(); pintarAgua(); };
+$('#btnHoyVolver').onclick = () => { S.fecha = hoyISO(); pintarHoy(); pintarAgua(); };
 
 /* ---------- rutina sugerida ---------- */
 $('#btnSeed').onclick = async () => {
@@ -2947,6 +2998,7 @@ function textoRecordatorio(h, veces){
 
 function tick(){
   if (!S.user || (S.perfil && S.perfil.notificaciones === false)) return;
+  revisarAgua();
   const ahora = new Date(), f = hoyISO();
   const hora = ahora.getHours() + ahora.getMinutes()/60;
   habitosDe(f).forEach(h => {
@@ -3213,6 +3265,162 @@ function reporteMensual(){
     '', '-'.repeat(46),
     'Puntos acumulados: ' + S.puntos + ' (' + nivelDe(S.puntos).n + ')'
   ].filter(x => x !== null).join('\n');
+}
+
+/* =====================================================================
+   AGUA · vaso que se llena y avisos por hora
+   ===================================================================== */
+const AGUA_CHECKS = [   // hora, porcentaje mínimo esperado
+  [11.5, 0.25], [14.5, 0.45], [17.5, 0.65], [20.0, 0.85]
+];
+
+function habitoAgua(){
+  return S.habitos.find(h => /agua|hidrata/i.test(h.nombre)) ||
+         S.habitos.find(h => h.categoria === 'salud' && /litro|ml|vaso/i.test(h.unidad || ''));
+}
+
+function porcionAgua(h){
+  const u = (h.unidad || '').toLowerCase();
+  if (u.startsWith('l')) return [0.25, '1 vaso', 0.5, 'medio litro', 1, '1 litro'];
+  if (u === 'ml')        return [250, '1 vaso', 500, 'medio litro', 1000, '1 litro'];
+  return [1, '1 ' + (u || 'vez'), 2, '2', 3, '3'];
+}
+
+function textoAgua(h, v){
+  const u = (h.unidad || '').toLowerCase();
+  if (u.startsWith('l')) return (Math.round(v*100)/100) + ' L';
+  if (u === 'ml') return Math.round(v) + ' ml';
+  return (Math.round(v*10)/10) + ' ' + (h.unidad || '');
+}
+
+function pintarAgua(){
+  const c = $('#aguaCard'); if (!c) return;
+  const h = habitoAgua(), f = S.fecha;
+  if (!h || !tocaHoy(h, f)){ c.classList.add('hidden'); return; }
+  c.classList.remove('hidden');
+  const r = regDe(h.id, f);
+  const meta = Number(h.meta_diaria) || 1;
+  const hecho = r ? Number(r.cantidad) : 0;
+  const pct = Math.max(0, Math.min(1, hecho/meta));
+  const [p1,n1,p2,n2,p3,n3] = porcionAgua(h);
+  const lleno = pct >= 1;
+
+  c.innerHTML =
+    '<div class="agua-fila">' +
+      '<div class="vaso-caja">' + vasoSVG(pct) + '</div>' +
+      '<div style="flex:1;min-width:190px">' +
+        '<h2 style="margin:0 0 6px">' + h.nombre + '</h2>' +
+        '<div class="agua-num">' + textoAgua(h, hecho) + ' <span class="muted" style="font-size:16px">de ' + textoAgua(h, meta) + '</span></div>' +
+        '<div class="muted" style="margin-top:2px">' + (lleno ? '¡Meta cumplida! Tu cuerpo te lo agradece.'
+          : 'Te faltan ' + textoAgua(h, meta - hecho) + ' · ' + Math.round(pct*100) + '% del día') + '</div>' +
+        '<div class="row" style="margin-top:12px">' +
+          '<button class="pri sm" data-agua="' + p1 + '">+ ' + n1 + '</button>' +
+          '<button class="sm" data-agua="' + p2 + '">+ ' + n2 + '</button>' +
+          '<button class="sm" data-agua="' + p3 + '">+ ' + n3 + '</button>' +
+          (hecho > 0 ? '<button class="gh sm" id="btnAguaMenos">− quitar</button>' : '') +
+        '</div>' +
+      '</div>' +
+    '</div>';
+
+  c.querySelectorAll('[data-agua]').forEach(b =>
+    b.onclick = () => registrarAgua(Number(b.dataset.agua)));
+  const menos = $('#btnAguaMenos');
+  if (menos) menos.onclick = () => registrarAgua(-p1);
+}
+
+function vasoSVG(pct){
+  const y0 = 26, y1 = 176, alto = y1 - y0;
+  const nivel = y1 - alto*pct;
+  return `
+  <svg viewBox="0 0 120 200" class="vaso" width="120">
+    <defs>
+      <clipPath id="clipVaso"><path d="M28 26 L92 26 L84 176 Q60 186 36 176 Z"/></clipPath>
+      <linearGradient id="gAgua" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#00E676"/><stop offset="100%" stop-color="#00A85C"/>
+      </linearGradient>
+    </defs>
+    <path class="vaso-cristal" d="M28 26 L92 26 L84 176 Q60 186 36 176 Z"/>
+    <g clip-path="url(#clipVaso)">
+      <rect class="agua-liq" x="20" y="${nivel.toFixed(1)}" width="80" height="${(y1-nivel+14).toFixed(1)}" fill="url(#gAgua)"/>
+      <path class="ola ola1" d="M-40 ${nivel.toFixed(1)} q 20 -7 40 0 t 40 0 t 40 0 t 40 0 t 40 0 v 60 h -240 z"/>
+      <path class="ola ola2" d="M-40 ${(nivel+3).toFixed(1)} q 20 6 40 0 t 40 0 t 40 0 t 40 0 t 40 0 v 60 h -240 z"/>
+      ${pct > 0.06 ? `<circle class="burb b1" cx="48" cy="${(nivel+34).toFixed(1)}" r="3.5"/>
+        <circle class="burb b2" cx="68" cy="${(nivel+56).toFixed(1)}" r="2.6"/>
+        <circle class="burb b3" cx="58" cy="${(nivel+78).toFixed(1)}" r="2"/>` : ''}
+    </g>
+    <path class="vaso-borde" d="M28 26 L92 26 L84 176 Q60 186 36 176 Z"/>
+    <path class="vaso-brillo" d="M38 40 L44 40 L39 164 L34 162 Z"/>
+    <text x="60" y="16" text-anchor="middle" class="vaso-pct">${Math.round(pct*100)}%</text>
+  </svg>`;
+}
+
+async function registrarAgua(cant){
+  const h = habitoAgua(); if (!h) return;
+  const f = S.fecha, r = regDe(h.id, f), meta = Number(h.meta_diaria) || 1;
+  const antes = r ? Number(r.cantidad) : 0;
+  let nueva = Math.max(0, Math.round((antes + cant) * 100) / 100);
+  const cumplido = nueva >= meta;
+  const yaEstaba = !!(r && r.cumplido);
+
+  if (r){
+    if (nueva === 0){
+      if (!ok(await sb.from('registros').delete().eq('id', r.id))) return;
+      await sb.from('puntos_log').delete().eq('fecha', f).eq('concepto','habito').eq('detalle', h.id);
+    } else {
+      if (!ok(await sb.from('registros').update({ cantidad: nueva, cumplido }).eq('id', r.id))) return;
+    }
+  } else {
+    if (nueva <= 0) return;
+    if (!ok(await sb.from('registros').insert({ user_id:S.user.id, habito_id:h.id, fecha:f,
+        cantidad: nueva, cumplido }))) return;
+  }
+
+  if (cumplido && !yaEstaba){
+    await sumarPuntos('habito', h.id, h.puntos, f);
+    guardarLocal('agua_msg_' + f, '1');
+    felicitar('dia_perfecto', 'Completaste ' + textoAgua(h, meta) + ' de agua. +' + h.puntos + ' puntos.');
+  } else if (!cumplido && yaEstaba){
+    await sb.from('puntos_log').delete().eq('fecha', f).eq('concepto','habito').eq('detalle', h.id);
+  }
+  await cargarTodo();
+  await revisarLogros();
+  if (!cumplido && cant > 0) chapoteo();
+}
+
+function chapoteo(){
+  const v = document.querySelector('.vaso'); if (!v) return;
+  v.animate([{transform:'scale(1)'},{transform:'scale(1.06) rotate(-1.5deg)'},{transform:'scale(1)'}],
+            {duration:420, easing:'cubic-bezier(.2,.8,.2,1)'});
+}
+
+/* aviso por hora si el vaso va atrasado */
+function revisarAgua(){
+  const h = habitoAgua(); if (!h) return;
+  const f = hoyISO(); if (S.fecha !== f) return;
+  if (!tocaHoy(h, f)) return;
+  const r = regDe(h.id, f), meta = Number(h.meta_diaria) || 1;
+  const hecho = r ? Number(r.cantidad) : 0;
+  if (hecho >= meta) return;
+  const ahora = new Date(), hora = ahora.getHours() + ahora.getMinutes()/60;
+
+  for (let i = AGUA_CHECKS.length - 1; i >= 0; i--){
+    const [hCheck, esperado] = AGUA_CHECKS[i];
+    if (hora < hCheck) continue;
+    const clave = 'agua_check_' + f + '_' + i;
+    if (leerLocal(clave)) return;
+    guardarLocal(clave, '1');
+    if (hecho / meta >= esperado) return;
+    const falta = textoAgua(h, meta - hecho);
+    const textos = [
+      ['Vas seco', 'A esta hora deberías llevar ' + textoAgua(h, meta*esperado) + ' y llevas ' + textoAgua(h, hecho) + '. Sirve un vaso ahora.'],
+      ['El vaso sigue casi vacío', 'Te faltan ' + falta + ' y la tarde se va. Uno ahora, otro con la comida.'],
+      ['Quedan pocas horas de sed útil', 'Te faltan ' + falta + '. Si lo dejas para la noche, lo pagas durmiendo mal.'],
+      ['Última llamada del día', 'Te faltan ' + falta + ' para cerrar la meta de hoy.']
+    ][i];
+    notificar(textos[0], textos[1]);
+    toast(textos[0] + ' · ' + textos[1]);
+    return;
+  }
 }
 
 aplicarTema(leerLocal('stricto_tema') || 'noche');
