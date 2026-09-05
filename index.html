@@ -633,6 +633,48 @@ table.tab td.num{text-align:right;font-variant-numeric:tabular-nums;white-space:
   .fi-total{font-size:30px}
   .fi-acc button span{font-size:11px}
 }
+/* ===================== CUENTAS Y TASA ===================== */
+.fi-total-bs{font-size:15px;font-weight:650;color:var(--tx2);margin-top:1px;
+  font-variant-numeric:tabular-nums}
+.ta-caja{background:var(--panel2);border:1px solid var(--line);border-radius:12px;
+  padding:11px 13px;margin-bottom:12px}
+.ta-cab{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.ta-cab span{font-size:10.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--tx2);font-weight:750}
+.ta-cab button{padding:7px 13px;min-height:38px;font-size:12px}
+.ta-fila{display:flex;align-items:baseline;gap:9px;padding:4px 0;font-size:13px}
+.ta-fila .ta-par{color:var(--tx2);min-width:56px;font-weight:600}
+.ta-fila b{font-variant-numeric:tabular-nums;flex:1}
+.ta-fila span.listo{color:var(--ok);font-size:11.5px}
+.ta-fila span.cerca{color:var(--oro-tx);font-size:11.5px;font-weight:650}
+.ta-fila span.vence{color:var(--bad);font-size:11.5px;font-weight:650}
+.cu-total{display:flex;justify-content:space-between;align-items:baseline;gap:10px;
+  padding:12px 13px;border:1px solid var(--line);border-radius:12px;background:var(--panel2);
+  font-size:13px;color:var(--tx2);line-height:1.4;margin-bottom:4px}
+.cu-total b{display:block;font-size:19px;font-weight:750;color:var(--tx);
+  font-variant-numeric:tabular-nums;white-space:nowrap}
+.cu-bs{display:block;font-size:12px;color:var(--tx2);font-variant-numeric:tabular-nums;white-space:nowrap}
+.cu{display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid var(--line);
+  width:100%;text-align:left;background:transparent;border-radius:0;color:var(--tx);
+  border-left:0;border-right:0;border-top:0;min-height:60px}
+.cu:last-child{border-bottom:0}
+.cu:hover{background:transparent}
+.cu .ic{flex:0 0 38px;width:38px;height:38px;border-radius:11px;background:var(--panel2);
+  border:1px solid var(--line);display:grid;place-items:center;color:var(--brand-tx)}
+.cu .ic svg{width:19px;height:19px}
+.cu .tx{flex:1;min-width:0}
+.cu .tx b{display:block;font-size:14.5px;font-weight:620;line-height:1.3;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cu .tx span{font-size:11.5px;color:var(--tx2)}
+.cu .mo{text-align:right;flex:0 0 auto}
+.cu .mo b{display:block;font-size:14.5px;font-weight:700;font-variant-numeric:tabular-nums;white-space:nowrap}
+.cu .mo span{font-size:11px;color:var(--tx2);white-space:nowrap}
+.cu-saldo{background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:10px 12px}
+.cu-saldo b{display:block;font-size:19px;font-weight:750;font-variant-numeric:tabular-nums}
+.cu-saldo span{display:block;font-size:12px;margin-top:3px}
+@media (max-width:620px){
+  .cu-total b{font-size:17px}
+  .cu .mo b,.cu .tx b{font-size:13.5px}
+}
 </style>
 </head>
 <body>
@@ -991,8 +1033,9 @@ table.tab td.num{text-align:right;font-variant-numeric:tabular-nums;white-space:
           <span id="fiMes">Mes</span>
           <button class="sm" id="fiSig" aria-label="Mes siguiente">&#9654;</button>
         </div>
-        <div class="fi-lbl">Ahorro acumulado</div>
+        <div class="fi-lbl" id="fiLbl">Ahorro acumulado</div>
         <div class="fi-total" id="fiTotal">0</div>
+        <div class="fi-total-bs hidden" id="fiTotalBs"></div>
         <div class="fi-sub" id="fiSub"></div>
         <div class="fi-acc">
           <button data-a="anadir"><i id="icAnadir"></i><span>Añadir</span></button>
@@ -1000,6 +1043,18 @@ table.tab td.num{text-align:right;font-variant-numeric:tabular-nums;white-space:
           <button data-a="limite"><i id="icLimite"></i><span>Límite</span></button>
           <button data-a="mas"><i id="icMas"></i><span>Más</span></button>
         </div>
+      </div>
+
+      <!-- ============ CUENTAS ============ -->
+      <div class="card">
+        <div class="row" style="justify-content:space-between;align-items:center;margin-bottom:12px">
+          <h2 style="margin:0">Cuentas</h2>
+          <div class="row" style="gap:6px">
+            <button class="sm" id="btnTraspaso">Traspasar</button>
+            <button class="sm" id="btnNuevaCuenta">+ Cuenta</button>
+          </div>
+        </div>
+        <div id="fiCuentas"></div>
       </div>
 
       <!-- ============ PRÓXIMOS PAGOS ============ -->
@@ -1065,6 +1120,7 @@ table.tab td.num{text-align:right;font-variant-numeric:tabular-nums;white-space:
             <div><label>Fecha</label><input id="fiFecha" type="date"></div>
           </div>
           <div class="grid g2" style="margin-top:10px">
+            <div id="fiCuentaBox"><label>De qué cuenta sale</label><select id="fiCuenta"></select></div>
             <div><label>Descripción (opcional)</label><input id="fiDesc" placeholder="Mercado del sábado"></div>
             <div id="fiFijoBox" style="display:flex;align-items:flex-end;gap:8px;padding-bottom:9px">
               <input type="checkbox" id="fiFijo" style="width:18px;height:18px">
@@ -1187,7 +1243,10 @@ table.tab td.num{text-align:right;font-variant-numeric:tabular-nums;white-space:
 <dialog id="dlgMoneda">
   <h2>Moneda</h2>
   <div class="grid">
-    <div><label>Símbolo que quieres ver</label><input id="mnSimbolo" placeholder="$" maxlength="6"></div>
+    <div><label>Moneda en la que quieres ver los totales</label><select id="mnRef"></select>
+      <div class="muted" style="font-size:12px;margin-top:6px">Tus cuentas siguen cada una en su moneda.
+        Esto solo cambia en qué moneda se suman los totales, el balance del mes y el análisis.</div>
+      <div class="muted" id="mnAviso" style="font-size:12px;margin-top:8px"></div></div>
     <div class="row" style="justify-content:flex-end">
       <button class="gh" id="btnCancelMoneda">Cancelar</button>
       <button class="pri" id="btnSaveMoneda">Guardar</button>
@@ -1340,7 +1399,7 @@ table.tab td.num{text-align:right;font-variant-numeric:tabular-nums;white-space:
       <button class="sm" id="hgIngreso">Ingreso</button>
     </div>
     <div class="grid g2">
-      <div><label>Monto</label><input id="hgMonto" type="number" step="0.01" min="0" inputmode="decimal" placeholder="0.00"></div>
+      <div><label>Monto <i id="hgMoneda" style="font-style:normal;opacity:.7"></i></label><input id="hgMonto" type="number" step="0.01" min="0" inputmode="decimal" placeholder="0.00"></div>
       <div><label>Categoría</label><input id="hgCat" list="listaCats" placeholder="Alimentación"></div>
     </div>
     <div class="grid g2" style="margin-top:10px">
@@ -1351,18 +1410,76 @@ table.tab td.num{text-align:right;font-variant-numeric:tabular-nums;white-space:
       </select></div>
       <div><label>Fecha</label><input id="hgFecha" type="date"></div>
     </div>
+    <div style="margin-top:10px" id="hgCuentaBox"><label>De qué cuenta sale</label><select id="hgCuenta"></select></div>
     <div style="margin-top:10px"><label>Descripción (opcional)</label><input id="hgDesc" placeholder="Mercado del sábado"></div>
     <button class="pri" id="hgGuardar" style="width:100%;margin-top:14px">Registrar</button>
     <button class="gh" id="hgCancelar">Cancelar</button>
   </div>
 </div>
 
+<!-- ============ DIÁLOGO: cuenta ============ -->
+<dialog id="dlgCuenta">
+  <h3 id="cuTitulo">Nueva cuenta</h3>
+  <div class="grid g2">
+    <div><label>Nombre</label><input id="cuNombre" placeholder="Banco de Venezuela"></div>
+    <div><label>Tipo</label><select id="cuTipo">
+      <option value="banco">Banco</option>
+      <option value="digital">Billetera digital</option>
+      <option value="cripto">Cripto</option>
+      <option value="efectivo">Efectivo</option>
+      <option value="otro">Otra</option>
+    </select></div>
+  </div>
+  <div style="margin-top:10px"><label>Moneda</label><select id="cuMoneda"></select></div>
+  <div id="cuSaldoBox" style="margin-top:10px"></div>
+  <div style="margin-top:10px"><label>Nota (opcional)</label><input id="cuNota" placeholder="Cuenta de nómina"></div>
+  <div class="row" style="margin-top:16px;justify-content:space-between">
+    <button class="gh sm" id="cuBorrar">Eliminar</button>
+    <div class="row">
+      <button class="sm" id="cuCancelar">Cancelar</button>
+      <button class="pri" id="cuGuardar">Guardar</button>
+    </div>
+  </div>
+</dialog>
+
+<!-- ============ DIÁLOGO: tasa del día ============ -->
+<dialog id="dlgTasa">
+  <h3>Tasa del día</h3>
+  <p class="muted" style="margin:0 0 14px">Escribe a cuántos bolívares está cada moneda hoy. Se guarda con
+    la fecha, así los movimientos viejos se quedan con la tasa que tenían y tu historial no cambia solo.</p>
+  <div><label>Fecha</label><input id="taFecha" type="date"></div>
+  <div id="taCuerpo" style="margin-top:14px"></div>
+  <div class="row" style="margin-top:12px;justify-content:flex-end">
+    <button class="sm" id="taCancelar">Cancelar</button>
+    <button class="pri" id="taGuardar">Guardar</button>
+  </div>
+</dialog>
+
+<!-- ============ DIÁLOGO: traspaso ============ -->
+<dialog id="dlgTraspaso">
+  <h3>Traspaso entre cuentas</h3>
+  <div><label>Sale de</label><select id="trOrigen"></select></div>
+  <div style="margin-top:10px"><label>Entra en</label><select id="trDestino"></select></div>
+  <div class="grid g2" style="margin-top:10px">
+    <div><label>Sale <i id="trMonedaO" style="font-style:normal;opacity:.7"></i></label>
+      <input id="trMonto" type="number" step="0.01" inputmode="decimal" placeholder="0.00"></div>
+    <div><label>Llega <i id="trMonedaD" style="font-style:normal;opacity:.7"></i></label>
+      <input id="trLlega" type="number" step="0.01" inputmode="decimal" placeholder="0.00"></div>
+  </div>
+  <div style="margin-top:10px"><label>Fecha</label><input id="trFecha" type="date"></div>
+  <div class="muted" id="trAviso" style="font-size:12px;margin-top:8px"></div>
+  <div class="row" style="margin-top:16px;justify-content:flex-end">
+    <button class="sm" id="trCancelar">Cancelar</button>
+    <button class="pri" id="trGuardar">Registrar</button>
+  </div>
+</dialog>
+
 <!-- ============ DIÁLOGO: pago fijo ============ -->
 <dialog id="dlgPago">
   <h3 id="pgfTitulo">Nuevo pago fijo</h3>
   <div class="grid g2">
     <div><label>Nombre</label><input id="pgfNombre" placeholder="Alquiler"></div>
-    <div><label>Monto</label><input id="pgfMonto" type="number" step="0.01" min="0" inputmode="decimal" placeholder="0.00"></div>
+    <div><label>Monto <i id="pgfMoneda" style="font-style:normal;opacity:.7"></i></label><input id="pgfMonto" type="number" step="0.01" min="0" inputmode="decimal" placeholder="0.00"></div>
   </div>
   <div class="grid g2" style="margin-top:10px">
     <div><label>Categoría</label><input id="pgfCat" list="listaCats" placeholder="Vivienda"></div>
@@ -1387,6 +1504,7 @@ table.tab td.num{text-align:right;font-variant-numeric:tabular-nums;white-space:
     <div><label>Mes de referencia</label><select id="pgfMesAnual"></select></div>
     <div></div>
   </div>
+  <div style="margin-top:10px" id="pgfCuentaBox"><label>De qué cuenta sale</label><select id="pgfCuenta"></select></div>
   <div style="margin-top:12px;display:flex;align-items:center;gap:9px">
     <input type="checkbox" id="pgfAuto" checked style="width:18px;height:18px">
     <label for="pgfAuto" style="margin:0;text-transform:none;font-size:14px;color:var(--tx)">
@@ -1696,9 +1814,19 @@ function ok(res, msg){
    Al publicar una versión nueva: sube VERSION, pon la fecha y agrega
    su entrada arriba del todo en NOVEDADES.
    ===================================================================== */
-const VERSION = '4.1.0';
+const VERSION = '4.2.0';
 const FECHA_VERSION = '2026-09-05';
 const NOVEDADES = [
+  ['4.2.0', '2026-09-05', [
+    'Cuentas: Banco de Venezuela, Banesco, Banesco Panamá, Binance, AirTM, efectivo… cada una con su propia moneda y su propio saldo.',
+    'Tasa del día que pones tú a mano. Se guarda con la fecha, así un gasto de hace tres meses no se recalcula solo cuando el dólar se mueve.',
+    'Cada cuenta muestra su saldo en su moneda y el equivalente al lado: los bolívares en dólares y los dólares en bolívares.',
+    'El total de arriba ya es la suma de todas tus cuentas, en tu moneda de referencia y en bolívares.',
+    'Al registrar un gasto eliges de qué cuenta sale y el saldo baja ahí. Lo mismo con los pagos fijos automáticos.',
+    'Traspasos entre cuentas: pones cuánto sale y cuánto llegó de verdad, que al cambiar de moneda casi nunca es lo mismo.',
+    'Puedes cambiar en qué moneda ves los totales sin tocar tus cuentas. Los movimientos viejos quedan marcados en la moneda que tenían.',
+    'El botón flotante ahora también registra un gasto o un ingreso desde cualquier pantalla.'
+  ]],
   ['4.1.0', '2026-09-05', [
     'Dinero rehecha: arriba tu ahorro acumulado y el balance del mes, y cuatro accesos directos — Añadir, Ahorro, Límite y Más.',
     'Próximos pagos: tus gastos fijos con su icono, agrupados por categoría y ordenados por cuál cae primero. Te dice si vence hoy, en 7 días o si ya venció.',
@@ -6663,11 +6791,14 @@ const CLASE_SUGERIDA = {
 };
 const MESES = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
 
-const F = { mov:[], presup:[], metas:[], pagos:[], mes:hoyISO().slice(0,7), tipo:'gasto',
-            hgTipo:'gasto', pagoEdit:null, faltaPagos:false, cargado:false };
+const F = { mov:[], presup:[], metas:[], pagos:[], cuentas:[], tasas:[], mes:hoyISO().slice(0,7),
+            tipo:'gasto', hgTipo:'gasto', pagoEdit:null, cuentaEdit:null,
+            faltaPagos:false, faltaCuentas:false, cargado:false };
 
-const money = (n) => (S.perfil && S.perfil.moneda || '$') + ' ' +
-  Math.round(Number(n) || 0).toLocaleString('es');
+/* todo lo que se suma y se compara va en tu moneda de referencia */
+const money = (n) => (typeof plata === 'function')
+  ? plata(n, (S.perfil && S.perfil.moneda_ref) || 'USD')
+  : ((S.perfil && S.perfil.moneda || '$') + ' ' + Math.round(Number(n) || 0).toLocaleString('es'));
 const mesNombre = (m) => MESES[Number(m.slice(5,7)) - 1] + ' ' + m.slice(0,4);
 function mesSumar(m, n){
   let a = Number(m.slice(0,4)), b = Number(m.slice(5,7)) - 1 + n;
@@ -6675,7 +6806,9 @@ function mesSumar(m, n){
   return a + '-' + String(b+1).padStart(2,'0');
 }
 const delMes = (m) => F.mov.filter(x => x.fecha.slice(0,7) === m);
-const suma = (lista) => lista.reduce((a,x) => a + Number(x.monto), 0);
+/* cada movimiento se convierte a tu moneda de referencia con la tasa del día
+   en que ocurrió, no con la de hoy */
+const suma = (lista) => lista.reduce((a,x) => a + montoRef(x), 0);
 
 async function cargarFinanzas(){
   const desde = mesSumar(hoyISO().slice(0,7), -13) + '-01';
@@ -6697,6 +6830,14 @@ async function cargarFinanzas(){
     sb.from('metas_ahorro').select('*').eq('activa', true)
   ]);
   F.presup = pr.data || []; F.metas = me.data || [];
+
+  const [cu, ta] = await Promise.all([
+    sb.from('cuentas').select('*').order('orden'),
+    sb.from('tasas').select('*').order('fecha')
+  ]);
+  if (cu.error){ F.cuentas = []; F.faltaCuentas = faltaTabla(cu.error); }
+  else { F.cuentas = cu.data || []; F.faltaCuentas = false; }
+  F.tasas = ta.error ? [] : (ta.data || []);
 
   const pg = await sb.from('pagos_fijos').select('*').order('dia_mes');
   if (pg.error){
@@ -6729,9 +6870,10 @@ function porCategoria(mes, tipo){
   const m = {};
   delMes(mes).filter(x => x.tipo === tipo).forEach(x => {
     m[x.categoria] = m[x.categoria] || { categoria:x.categoria, monto:0, fijo:0, clase:{} };
-    m[x.categoria].monto += Number(x.monto);
-    if (x.fijo) m[x.categoria].fijo += Number(x.monto);
-    if (x.clase) m[x.categoria].clase[x.clase] = (m[x.categoria].clase[x.clase] || 0) + Number(x.monto);
+    const v = montoRef(x);
+    m[x.categoria].monto += v;
+    if (x.fijo) m[x.categoria].fijo += v;
+    if (x.clase) m[x.categoria].clase[x.clase] = (m[x.categoria].clase[x.clase] || 0) + v;
   });
   return Object.values(m).sort((a,b) => b.monto - a.monto);
 }
@@ -6774,7 +6916,8 @@ function pintarFinanzas(){
     $('#listaCats').dataset.listo = '1';
     $('#fiFecha').value = hoyISO();
   }
-  pintarHero(); pintarPagos();
+  ponerCuentas('#fiCuenta', null);
+  pintarHero(); pintarCuentas(); pintarPagos();
   pintarCategorias(r); pintarReglas(r); pintarMeses(); pintarRecorte(r);
   pintarConsejos(r); pintarMetasAhorro(r); pintarMovimientos();
 }
@@ -7047,10 +7190,13 @@ function pintarMovimientos(){
     '<th>Fecha</th><th>Categoría</th><th>Detalle</th><th>Monto</th><th></th></tr>' +
     mv.map(m => '<tr data-id="' + m.id + '">' +
       '<td class="muted">' + m.fecha.slice(8,10) + '/' + m.fecha.slice(5,7) + '</td>' +
-      '<td>' + m.categoria + (m.fijo ? ' <span class="tag">fijo</span>' : '') + '</td>' +
+      '<td>' + m.categoria + (m.fijo ? ' <span class="tag">fijo</span>' : '') +
+        (m.cuenta_id && cuentaDe(m.cuenta_id) ? '<br><span class="muted" style="font-size:11px">' +
+          esc(cuentaDe(m.cuenta_id).nombre) + '</span>' : '') + '</td>' +
       '<td class="muted">' + (m.descripcion || '—') + '</td>' +
-      '<td class="' + (m.tipo === 'ingreso' ? 'sube' : '') + '">' +
-        (m.tipo === 'ingreso' ? '+' : '−') + ' ' + money(m.monto) + '</td>' +
+      '<td class="' + (m.tipo === 'ingreso' ? 'sube' : m.tipo === 'traspaso' ? 'muted' : '') + '">' +
+        (m.tipo === 'ingreso' ? '+' : m.tipo === 'traspaso' ? '' : '−') + ' ' +
+        plata(m.monto, m.moneda || monedaRef()) + '</td>' +
       '<td><button class="sm bo">✕</button></td></tr>').join('') + '</table></div>';
   c.querySelectorAll('.bo').forEach(b => b.onclick = async () => {
     const id = b.closest('tr').dataset.id;
@@ -7080,11 +7226,13 @@ $('#btnMov').onclick = async () => {
   const cat = $('#fiCat').value.trim();
   if (!(monto > 0)) return toast('Escribe un monto mayor que cero');
   if (!cat) return toast('Ponle categoría');
-  const fila = {
-    user_id: S.user.id, fecha: $('#fiFecha').value || hoyISO(), tipo: F.tipo,
+  const fecha0 = $('#fiFecha').value || hoyISO();
+  const fila = Object.assign({
+    user_id: S.user.id, fecha: fecha0, tipo: F.tipo,
     categoria: cat, descripcion: $('#fiDesc').value.trim() || null, monto,
     fijo: F.tipo === 'gasto' ? $('#fiFijo').checked : false,
-    clase: F.tipo === 'gasto' ? $('#fiClase').value : null };
+    clase: F.tipo === 'gasto' ? $('#fiClase').value : null },
+    datosCuenta($('#fiCuenta') ? $('#fiCuenta').value : '', fecha0));
   if (!ok(await sb.from('movimientos').insert(fila))) return;
   $('#fiMonto').value = ''; $('#fiDesc').value = ''; $('#fiFijo').checked = false;
   F.mes = fila.fecha.slice(0,7);
@@ -7160,14 +7308,37 @@ $('#btnSaveMetaAhorro').onclick = async () => {
 
 /* moneda */
 $('#btnMoneda').onclick = () => {
-  $('#mnSimbolo').value = (S.perfil && S.perfil.moneda) || '$';
+  const sel = $('#mnRef');
+  if (sel && !sel.dataset.listo){
+    sel.innerHTML = MONEDAS.map(m => '<option value="' + m.c + '">' + m.n + ' (' + m.c + ')</option>').join('');
+    sel.dataset.listo = '1';
+  }
+  if (sel) sel.value = monedaRef();
+  const viejos = (F.mov || []).filter(m => !m.moneda).length;
+  const av = $('#mnAviso');
+  if (av) av.textContent = viejos
+    ? 'Tienes ' + viejos + ' movimientos registrados antes de las cuentas. Al cambiar, se marcan como ' +
+      monedaRef() + ' para que su valor no cambie solo.'
+    : '';
   $('#dlgMoneda').showModal();
 };
 $('#btnCancelMoneda').onclick = () => $('#dlgMoneda').close();
 $('#btnSaveMoneda').onclick = async () => {
-  const v = $('#mnSimbolo').value.trim() || '$';
-  if (!ok(await sb.from('perfiles').update({ moneda:v }).eq('id', S.user.id))) return;
-  $('#dlgMoneda').close(); await cargarTodo(); pintarFinanzas();
+  const v = $('#mnRef') ? $('#mnRef').value : 'USD';
+  const antes = monedaRef();
+  if (v === antes){ $('#dlgMoneda').close(); return; }
+  // los movimientos de antes de las cuentas no tienen moneda y se venían leyendo
+  // en la de referencia. Antes de cambiarla se congelan en la vieja, para que su
+  // valor no se multiplique por 245 de un día para otro.
+  const viejos = (F.mov || []).filter(m => !m.moneda).length;
+  if (viejos){
+    const u = await sb.from('movimientos').update({ moneda:antes }).is('moneda', null).eq('user_id', S.user.id);
+    if (u && u.error) console.warn('marcar moneda:', u.error.message);
+  }
+  const r = await sb.from('perfiles').update({ moneda_ref:v, moneda:simboloDe(v) }).eq('id', S.user.id);
+  if (faltaTabla(r.error)) return toast('Falta correr esquema_v6 en Supabase');
+  if (!ok(r, 'Ahora ves todo en ' + v + (viejos ? ' · ' + viejos + ' movimientos quedaron en ' + antes : ''))) return;
+  $('#dlgMoneda').close(); await cargarTodo(); await cargarFinanzas();
 };
 ponerTipo('gasto');
 
@@ -7305,6 +7476,10 @@ function accionesRapidas(){
            f: () => { mostrarTab('gym'); setTimeout(() => { const el = $('#gyPeso'); if (el) el.focus(); }, 500); } });
   a.push({ e:'&#9878;', t:'Anotar mi peso', d:'Es lo que alimenta la tendencia',
            f: () => { mostrarTab('cuerpo'); setTimeout(() => abrirMedida('peso'), 300); } });
+  a.push({ e:'&#128181;', t:'Añadir un gasto', d:'Monto, categoría y de qué cuenta sale',
+           f: () => { mostrarTab('finanzas'); setTimeout(() => abrirHojaGasto('gasto'), 300); } });
+  a.push({ e:'&#128176;', t:'Añadir un ingreso', d:'Sueldo, venta o cualquier entrada',
+           f: () => { mostrarTab('finanzas'); setTimeout(() => abrirHojaGasto('ingreso'), 300); } });
   a.push({ e:'&#128564;', t:'Cómo amanecí', d:'Sueño, estrés y energía',
            f: () => { mostrarTab('plan'); setTimeout(abrirRecup, 300); } });
   return a;
@@ -7338,7 +7513,7 @@ function actualizarRapido(){
 
 $('#fab').onclick = abrirRapido;
 $('#cerrarHoja').onclick = cerrarRapido;
-$('.hoja-fondo').onclick = cerrarRapido;
+$('#hojaRapida .hoja-fondo').onclick = cerrarRapido;
 
 /* =====================================================================
    GUÍA DE PRIMERA VEZ
@@ -9208,8 +9383,9 @@ async function registrarPagosVencidos(){
       if (f > hoy || f < creado) return;
       if (pagoRegistrado(p, f)) return;
       if (nuevos.some(n => n.pago_fijo_id === p.id && n.fecha === f)) return;
-      nuevos.push({ user_id:S.user.id, fecha:f, tipo:'gasto', categoria:p.categoria,
-                    monto:p.monto, fijo:true, clase:p.clase, descripcion:p.nombre, pago_fijo_id:p.id });
+      nuevos.push(Object.assign({ user_id:S.user.id, fecha:f, tipo:'gasto', categoria:p.categoria,
+                    monto:p.monto, fijo:true, clase:p.clase, descripcion:p.nombre, pago_fijo_id:p.id },
+                    datosCuenta(p.cuenta_id, f)));
     });
   });
   if (!nuevos.length) return 0;
@@ -9230,12 +9406,22 @@ function ahorroAcumulado(){
 }
 
 function pintarHero(){
-  const r = resumen(F.mes), a = ahorroAcumulado();
-  $('#fiTotal').textContent = money(a.total);
+  const r = resumen(F.mes), a = ahorroAcumulado(), ref = monedaRef();
+  const T = totalCuentas();
+  const hayCuentas = T.n > 0;
+  $('#fiLbl').textContent = hayCuentas ? 'Total en tus cuentas' : 'Ahorro acumulado';
+  $('#fiTotal').textContent = hayCuentas ? plata(T.ref, ref) : money(a.total);
+  const bs = $('#fiTotalBs');
+  if (hayCuentas && ref !== 'VES'){
+    bs.classList.remove('hidden');
+    bs.textContent = plata(T.bs, 'VES') + (T.incompleto ? '  · falta alguna tasa' : '');
+  } else bs.classList.add('hidden');
   const signo = r.balance > 0 ? '+' : '';
   $('#fiSub').innerHTML = 'Balance de ' + esc(mesNombre(F.mes).toLowerCase()) + ': ' +
     '<b class="' + (r.balance < 0 ? 'baja' : r.balance > 0 ? 'sube' : '') + '">' +
-    signo + esc(money(r.balance)) + '</b> · <span class="muted">' + esc(a.fuente) + '</span>';
+    signo + esc(money(r.balance)) + '</b>' +
+    (hayCuentas ? ' · <span class="muted">Ahorro ' + esc(money(a.total)) + '</span>'
+                : ' · <span class="muted">' + esc(a.fuente) + '</span>');
   $('#icAnadir').innerHTML = svgIco('mas');
   $('#icAhorro').innerHTML = svgIco('hucha');
   $('#icLimite').innerHTML = svgIco('limite');
@@ -9273,11 +9459,16 @@ function pintarPagos(){
              mostrarPagado: pagadoVenc && venc && venc >= mesSumar(hoy.slice(0,7), 0) + '-01' };
   }).filter(x => x.f).sort((a, b) => a.f.localeCompare(b.f));
 
-  // lo que falta por pagar de aquí a fin de mes
+  // cada pago vive en la moneda de su cuenta: para sumarlos hay que convertirlos
+  const monedaPago = (p) => { const c = cuentaDe(p.cuenta_id); return c ? c.moneda : monedaRef(); };
+  const enRef = (p) => {
+    const v = convertir(Number(p.monto), monedaPago(p), monedaRef(), hoyISO());
+    return v == null ? 0 : v;
+  };
   const finMes = F.mes + '-' + ultimoDiaMes(Number(F.mes.slice(0,4)), Number(F.mes.slice(5,7)));
   const pend = filas.filter(x => !x.mostrarPagado && x.f <= finMes)
-                    .reduce((a, x) => a + Number(x.p.monto), 0);
-  const alMes = act.reduce((a, p) => a + Number(p.monto) *
+                    .reduce((a, x) => a + enRef(x.p), 0);
+  const alMes = act.reduce((a, p) => a + enRef(p) *
                   (p.frecuencia === 'quincenal' ? 2 : 1 / (PASO_MESES[p.frecuencia] || 1)), 0);
 
   let html = '<div class="pg-total"><span>Falta por pagar este mes<br>' +
@@ -9297,7 +9488,8 @@ function pintarPagos(){
     html += '<button class="pg' + estado + '" data-p="' + p.id + '">' +
       '<span class="ic">' + svgIco(icoDeCat(p.categoria)) + '</span>' +
       '<span class="tx"><b>' + esc(p.nombre) + '</b><span class="' + cls + '">' + esc(txt) + '</span></span>' +
-      '<span class="mo"><b>' + esc(money(p.monto)) + '</b><span>' + (FREC_N[p.frecuencia] || 'Mensual') + '</span></span>' +
+      '<span class="mo"><b>' + esc(plata(p.monto, monedaPago(p))) + '</b><span>' +
+        (FREC_N[p.frecuencia] || 'Mensual') + '</span></span>' +
       '</button>';
   });
 
@@ -9322,6 +9514,7 @@ function abrirPago(id){
     $('#pgfMesAnual').dataset.listo = '1';
   }
   $('#pgfMesAnual').value = p && p.mes_anual ? p.mes_anual : (new Date().getMonth() + 1);
+  ponerCuentas('#pgfCuenta', '#pgfMoneda', p ? p.cuenta_id : null);
   pfMostrarMes();
   $('#pgfBorrar').classList.toggle('hidden', !p);
 
@@ -9362,6 +9555,7 @@ $('#pgfGuardar').onclick = async () => {
   const frec = $('#pgfFrec').value;
   const fila = { user_id:S.user.id, nombre:nombre, categoria:cat, monto:monto, dia_mes:dia,
                  frecuencia:frec, clase:$('#pgfClase').value, auto:$('#pgfAuto').checked, activo:true,
+                 cuenta_id: $('#pgfCuenta').value || null,
                  mes_anual: (frec === 'mensual' || frec === 'quincenal') ? null : Number($('#pgfMesAnual').value) };
   const r = F.pagoEdit
     ? await sb.from('pagos_fijos').update(fila).eq('id', F.pagoEdit)
@@ -9379,9 +9573,9 @@ $('#pgfBorrar').onclick = async () => {
 };
 
 async function marcarPagado(p, f){
-  const r = await sb.from('movimientos').insert({
+  const r = await sb.from('movimientos').insert(Object.assign({
     user_id:S.user.id, fecha:f, tipo:'gasto', categoria:p.categoria, monto:p.monto,
-    fijo:true, clase:p.clase, descripcion:p.nombre, pago_fijo_id:p.id });
+    fijo:true, clase:p.clase, descripcion:p.nombre, pago_fijo_id:p.id }, datosCuenta(p.cuenta_id, f)));
   if (!ok(r, p.nombre + ' registrado')) return;
   $('#dlgPago').close(); await cargarFinanzas();
 }
@@ -9403,6 +9597,7 @@ function abrirHojaGasto(tipo){
   $('#hgCat').value = F.hgTipo === 'gasto' ? '' : 'Sueldo';
   $('#hgFecha').value = hoyISO();
   $('#hgBanco').classList.add('hidden'); $('#hgTexto').value = ''; $('#hgAviso').textContent = '';
+  ponerCuentas('#hgCuenta', '#hgMoneda');
   $('#hojaGasto').classList.remove('hidden');
   setTimeout(() => $('#hgMonto').focus(), 120);
 }
@@ -9418,12 +9613,15 @@ $('#hgCat').oninput = () => {
 $('#hgGuardar').onclick = async () => {
   const monto = Number(String($('#hgMonto').value).replace(',', '.'));
   if (!(monto > 0)) return toast('Escribe un monto válido');
-  const fila = { user_id:S.user.id, fecha:$('#hgFecha').value || hoyISO(), tipo:F.hgTipo,
+  const fecha0 = $('#hgFecha').value || hoyISO();
+  const fila = Object.assign({ user_id:S.user.id, fecha:fecha0, tipo:F.hgTipo,
                  categoria:($('#hgCat').value.trim() || (F.hgTipo === 'gasto' ? 'Otros' : 'Extra')),
                  monto:monto, fijo:false,
                  clase: F.hgTipo === 'gasto' ? $('#hgClase').value : null,
-                 descripcion:$('#hgDesc').value.trim() || null };
+                 descripcion:$('#hgDesc').value.trim() || null },
+                 datosCuenta($('#hgCuenta').value, fecha0));
   if (!ok(await sb.from('movimientos').insert(fila), 'Registrado')) return;
+  F.ultimaCuenta = fila.cuenta_id || F.ultimaCuenta;
   cerrarHojaGasto(); await cargarFinanzas();
 };
 
@@ -9589,6 +9787,371 @@ $$('.fi-acc button').forEach(b => b.onclick = () => {
     if (!abierto) setTimeout(() => an.scrollIntoView({ behavior:'smooth', block:'start' }), 60);
   }
 });
+
+
+/* =====================================================================
+   CUENTAS, MONEDAS Y TASA DEL DÍA
+   Cada cuenta vive en su moneda. Nada se mezcla: los saldos se llevan
+   en la moneda de la cuenta y solo se convierten para mostrar totales.
+   La tasa se guarda por día, así un gasto de hace tres meses no se
+   recalcula solo cuando el dólar se mueve.
+   ===================================================================== */
+const MONEDAS = [
+  { c:'VES',  n:'Bolívares',         s:'Bs' },
+  { c:'USD',  n:'Dólares',           s:'$'  },
+  { c:'USDT', n:'USDT (Tether)',     s:'USDT' },
+  { c:'USDC', n:'USDC',              s:'USDC' },
+  { c:'EUR',  n:'Euros',             s:'€'  },
+  { c:'COP',  n:'Pesos colombianos', s:'COP' },
+  { c:'BRL',  n:'Reales',            s:'R$' }
+];
+const MON = Object.fromEntries(MONEDAS.map(m => [m.c, m]));
+const simboloDe = (c) => (MON[c] && MON[c].s) || c || '$';
+const monedaRef = () => (S.perfil && S.perfil.moneda_ref) || 'USD';
+
+const TIPO_CUENTA = { banco:'Banco', digital:'Billetera digital', cripto:'Cripto',
+                      efectivo:'Efectivo', otro:'Otra' };
+const ICO_CUENTA  = { banco:'banco', digital:'movil', cripto:'rayo', efectivo:'carrito', otro:'punto' };
+
+/* formatea en la moneda que le digas, con los decimales que tocan */
+function plata(n, moneda, corto){
+  const v = Number(n) || 0, m = moneda || monedaRef();
+  const dec = (m === 'VES' || m === 'COP') ? (Math.abs(v) >= 1000 ? 0 : 2) : 2;
+  const txt = v.toLocaleString('es-VE', { minimumFractionDigits:dec, maximumFractionDigits:dec });
+  const s = simboloDe(m);
+  return (m === 'VES' || m === 'COP' || m === 'BRL') ? txt + ' ' + s
+       : (corto ? s + txt : s + ' ' + txt);
+}
+
+/* ---------- tasas ---------- */
+/* cuántos bolívares vale una unidad de esa moneda en esa fecha */
+function tasaDe(moneda, fecha){
+  if (!moneda || moneda === 'VES') return 1;
+  const f = fecha || hoyISO();
+  const l = (F.tasas || []).filter(t => t.moneda === moneda && t.fecha <= f)
+                           .sort((a, b) => a.fecha.localeCompare(b.fecha));
+  if (l.length) return Number(l[l.length - 1].valor);
+  // sin tasa anterior: uso la más vieja que tenga, y si no hay ninguna, aviso
+  const todas = (F.tasas || []).filter(t => t.moneda === moneda)
+                               .sort((a, b) => a.fecha.localeCompare(b.fecha));
+  return todas.length ? Number(todas[0].valor) : null;
+}
+function tasaHoy(moneda){ return tasaDe(moneda, hoyISO()); }
+function fechaTasa(moneda){
+  const l = (F.tasas || []).filter(t => t.moneda === moneda).sort((a, b) => a.fecha.localeCompare(b.fecha));
+  return l.length ? l[l.length - 1].fecha : null;
+}
+/* monedas que de verdad usas: las de tus cuentas más la de referencia */
+function monedasEnUso(){
+  const s = new Set((F.cuentas || []).map(c => c.moneda));
+  s.add(monedaRef());
+  s.delete('VES');
+  return Array.from(s);
+}
+/* faltan tasas para convertir */
+function tasasFaltantes(){ return monedasEnUso().filter(m => tasaHoy(m) == null); }
+
+/* convierte cualquier monto a bolívares y de ahí a lo que quieras */
+function aBs(monto, moneda, fecha){
+  const t = tasaDe(moneda, fecha);
+  return t == null ? null : Number(monto) * t;
+}
+function convertir(monto, desde, hasta, fecha){
+  if (desde === hasta) return Number(monto);
+  const bs = aBs(monto, desde, fecha);
+  if (bs == null) return null;
+  const th = tasaDe(hasta, fecha);
+  return th == null ? null : bs / th;
+}
+/* un movimiento, expresado en la moneda de referencia */
+function montoRef(m){
+  const v = Number(m.monto) || 0;
+  if (!m.moneda) return v;                       // movimientos de antes de las cuentas
+  const ref = monedaRef();
+  if (m.moneda === ref) return v;
+  const bs = m.tasa != null ? v * Number(m.tasa) : aBs(v, m.moneda, m.fecha);
+  if (bs == null) return 0;
+  const tr = tasaDe(ref, m.fecha);
+  return tr == null ? 0 : bs / tr;
+}
+
+/* ---------- saldos ---------- */
+function saldoCuenta(c){
+  let s = Number(c.saldo_inicial || 0);
+  (F.mov || []).forEach(m => {
+    const v = Number(m.monto) || 0;
+    if (m.cuenta_id === c.id){
+      if (m.tipo === 'ingreso') s += v; else s -= v;   // gasto y traspaso que sale
+    }
+    if (m.tipo === 'traspaso' && m.cuenta_destino_id === c.id) s += Number(m.monto_destino) || 0;
+  });
+  return s;
+}
+function totalCuentas(){
+  const ref = monedaRef();
+  let ref_ = 0, bs = 0, incompleto = false;
+  (F.cuentas || []).filter(c => c.activa).forEach(c => {
+    const s = saldoCuenta(c);
+    const enBs = aBs(s, c.moneda, hoyISO());
+    if (enBs == null){ incompleto = true; return; }
+    bs += enBs;
+    const enRef = convertir(s, c.moneda, ref, hoyISO());
+    if (enRef == null) incompleto = true; else ref_ += enRef;
+  });
+  return { ref:ref_, bs:bs, incompleto:incompleto, n:(F.cuentas || []).filter(c => c.activa).length };
+}
+const cuentaDe = (id) => (F.cuentas || []).find(c => c.id === id) || null;
+
+/* ---------- pintado ---------- */
+function pintarCuentas(){
+  const c = $('#fiCuentas'); if (!c) return;
+  const act = (F.cuentas || []).filter(x => x.activa);
+  const ref = monedaRef();
+
+  // fila de la tasa: solo si hay cuentas que convertir
+  const usadas = act.length ? monedasEnUso() : [];
+  let tasaHTML = '';
+  if (usadas.length){
+    const filas = usadas.map(m => {
+      const t = tasaHoy(m), f = fechaTasa(m);
+      const dias = f ? Math.round((deISO(hoyISO()) - deISO(f)) / 86400000) : null;
+      const alerta = t == null ? 'vence' : dias > 2 ? 'cerca' : 'listo';
+      return '<div class="ta-fila"><span class="ta-par">1 ' + esc(m) + '</span>' +
+        '<b>' + (t == null ? 'sin tasa' : plata(t, 'VES')) + '</b>' +
+        '<span class="' + alerta + '">' + (t == null ? 'ponla tú'
+          : dias === 0 ? 'hoy' : dias === 1 ? 'ayer' : 'hace ' + dias + ' días') + '</span></div>';
+    }).join('');
+    tasaHTML = '<div class="ta-caja"><div class="ta-cab"><span>Tasa del día</span>' +
+      '<button class="sm" id="btnTasa">Actualizar</button></div>' + filas + '</div>';
+  }
+
+  if (!act.length){
+    c.innerHTML = tasaHTML + '<p class="muted" style="margin:12px 0 0">Todavía no tienes cuentas. ' +
+      'Agrega tu Banco de Venezuela, tu Banesco, tu Binance o tu AirTM con el saldo que tengan hoy, ' +
+      'y a partir de ahí cada gasto se descuenta de la cuenta que elijas.</p>' +
+      (F.faltaCuentas ? '<p class="muted" style="margin-top:10px">Antes tienes que correr <b>esquema_v6.txt</b> en Supabase.</p>' : '');
+    const bt = $('#btnTasa'); if (bt) bt.onclick = abrirTasa;
+    return;
+  }
+
+  const T = totalCuentas();
+  let html = tasaHTML +
+    '<div class="cu-total"><span>Total en tus cuentas<br>' +
+      '<span class="muted" style="font-size:11.5px">' + act.length +
+      (act.length === 1 ? ' cuenta' : ' cuentas') + (T.incompleto ? ' · falta alguna tasa' : '') + '</span></span>' +
+    '<span style="text-align:right"><b>' + esc(plata(T.ref, ref)) + '</b>' +
+      (ref !== 'VES' ? '<span class="cu-bs">' + esc(plata(T.bs, 'VES')) + '</span>' : '') + '</span></div>';
+
+  html += act.map(x => {
+    const s = saldoCuenta(x);
+    const otra = x.moneda === 'VES'
+      ? convertir(s, 'VES', ref, hoyISO())
+      : aBs(s, x.moneda, hoyISO());
+    const otraM = x.moneda === 'VES' ? ref : 'VES';
+    return '<button class="cu" data-c="' + x.id + '">' +
+      '<span class="ic">' + svgIco(ICO_CUENTA[x.tipo] || 'banco') + '</span>' +
+      '<span class="tx"><b>' + esc(x.nombre) + '</b>' +
+        '<span>' + esc(TIPO_CUENTA[x.tipo] || 'Cuenta') + ' · ' + esc(MON[x.moneda] ? MON[x.moneda].n : x.moneda) + '</span></span>' +
+      '<span class="mo"><b class="' + (s < 0 ? 'baja' : '') + '">' + esc(plata(s, x.moneda)) + '</b>' +
+        '<span>' + (otra == null ? 'sin tasa' : '≈ ' + esc(plata(otra, otraM))) + '</span></span>' +
+      '</button>';
+  }).join('');
+
+  c.innerHTML = html;
+  const bt = $('#btnTasa'); if (bt) bt.onclick = abrirTasa;
+  c.querySelectorAll('[data-c]').forEach(b => b.onclick = () => abrirCuenta(b.dataset.c));
+}
+
+/* opciones de cuenta para los selectores */
+function opcionesCuenta(sel){
+  const act = (F.cuentas || []).filter(x => x.activa);
+  if (!act.length) return '<option value="">— sin cuentas —</option>';
+  return act.map(x => '<option value="' + x.id + '"' + (x.id === sel ? ' selected' : '') + '>' +
+    esc(x.nombre) + ' · ' + esc(plata(saldoCuenta(x), x.moneda)) + '</option>').join('');
+}
+
+/* ---------- diálogo de cuenta ---------- */
+function abrirCuenta(id){
+  const c = cuentaDe(id);
+  F.cuentaEdit = c ? c.id : null;
+  $('#cuTitulo').textContent = c ? c.nombre : 'Nueva cuenta';
+  $('#cuNombre').value = c ? c.nombre : '';
+  $('#cuTipo').value   = c ? c.tipo : 'banco';
+  if (!$('#cuMoneda').dataset.listo){
+    $('#cuMoneda').innerHTML = MONEDAS.map(m =>
+      '<option value="' + m.c + '">' + m.n + ' (' + m.c + ')</option>').join('');
+    $('#cuMoneda').dataset.listo = '1';
+  }
+  $('#cuMoneda').value = c ? c.moneda : 'VES';
+  $('#cuNota').value   = c ? (c.nota || '') : '';
+  $('#cuBorrar').classList.toggle('hidden', !c);
+  const box = $('#cuSaldoBox');
+  if (c){
+    const s = saldoCuenta(c);
+    box.innerHTML = '<label>Saldo actual</label>' +
+      '<div class="cu-saldo"><b>' + esc(plata(s, c.moneda)) + '</b>' +
+      '<span class="muted">Inicial ' + esc(plata(c.saldo_inicial, c.moneda)) +
+      ' y lo que has registrado desde entonces</span></div>' +
+      '<label style="margin-top:10px">Corregir el saldo a</label>' +
+      '<input id="cuAjuste" type="number" step="0.01" inputmode="decimal" placeholder="' +
+      Number(s).toFixed(2) + '">' +
+      '<div class="muted" style="font-size:12px;margin-top:5px">Si el banco dice otra cosa, escribe aquí ' +
+      'lo que dice y se ajusta el saldo inicial. No inventa movimientos.</div>';
+  } else {
+    box.innerHTML = '<label>Saldo que tiene hoy</label>' +
+      '<input id="cuInicial" type="number" step="0.01" inputmode="decimal" placeholder="0.00">' +
+      '<div class="muted" style="font-size:12px;margin-top:5px">Es el punto de partida. ' +
+      'A partir de ahí sube con los ingresos y baja con los gastos que registres.</div>';
+  }
+  $('#dlgCuenta').showModal();
+}
+$('#cuCancelar').onclick = () => $('#dlgCuenta').close();
+$('#btnNuevaCuenta').onclick = () => abrirCuenta(null);
+
+$('#cuGuardar').onclick = async () => {
+  const nombre = $('#cuNombre').value.trim();
+  if (!nombre) return toast('Ponle nombre a la cuenta');
+  const base = { user_id:S.user.id, nombre:nombre, tipo:$('#cuTipo').value,
+                 moneda:$('#cuMoneda').value, nota:$('#cuNota').value.trim() || null, activa:true };
+  let r;
+  if (F.cuentaEdit){
+    const c = cuentaDe(F.cuentaEdit);
+    const aj = $('#cuAjuste') ? String($('#cuAjuste').value).replace(',', '.') : '';
+    if (aj !== ''){
+      const quiere = Number(aj);
+      if (!isFinite(quiere)) return toast('El saldo no es un número');
+      // el saldo inicial se mueve lo que haga falta para que el saldo actual cuadre
+      base.saldo_inicial = Number(c.saldo_inicial || 0) + (quiere - saldoCuenta(c));
+    }
+    base.orden = c.orden;
+    r = await sb.from('cuentas').update(base).eq('id', F.cuentaEdit);
+  } else {
+    base.saldo_inicial = Number(String($('#cuInicial').value).replace(',', '.')) || 0;
+    base.orden = (F.cuentas || []).length + 1;
+    r = await sb.from('cuentas').insert(base);
+  }
+  if (faltaTabla(r.error)) return toast('Falta correr esquema_v6 en Supabase');
+  if (!ok(r, F.cuentaEdit ? 'Cuenta actualizada' : 'Cuenta creada')) return;
+  $('#dlgCuenta').close(); await cargarFinanzas();
+};
+
+$('#cuBorrar').onclick = async () => {
+  if (!F.cuentaEdit) return;
+  const c = cuentaDe(F.cuentaEdit);
+  const usada = (F.mov || []).some(m => m.cuenta_id === c.id || m.cuenta_destino_id === c.id);
+  const r = await sb.from('cuentas').update({ activa:false }).eq('id', F.cuentaEdit);
+  if (!ok(r, usada ? 'Cuenta archivada · sus movimientos se conservan' : 'Cuenta eliminada')) return;
+  $('#dlgCuenta').close(); await cargarFinanzas();
+};
+
+/* ---------- diálogo de tasa ---------- */
+function abrirTasa(){
+  const hoy = hoyISO();
+  $('#taFecha').value = hoy;
+  const usadas = monedasEnUso();
+  $('#taCuerpo').innerHTML = usadas.length
+    ? usadas.map(m => {
+        const t = tasaDe(m, hoy), f = fechaTasa(m);
+        return '<div style="margin-bottom:12px"><label>1 ' + esc(m) + ' equivale a (bolívares)</label>' +
+          '<input class="ta-in" data-m="' + esc(m) + '" type="number" step="0.0001" inputmode="decimal" ' +
+          'value="' + (t != null ? t : '') + '" placeholder="0,00">' +
+          '<div class="muted" style="font-size:12px;margin-top:4px">' +
+          (f ? 'Última que pusiste: ' + esc(plata(tasaDe(m, hoy), 'VES')) + ' el ' + esc(fechaCorta(f))
+             : 'Todavía no has puesto ninguna.') + '</div></div>';
+      }).join('')
+    : '<p class="muted">Cuando tengas una cuenta en dólares, USDT o euros, aquí pones su tasa.</p>';
+  $('#dlgTasa').showModal();
+}
+$('#taCancelar').onclick = () => $('#dlgTasa').close();
+$('#taGuardar').onclick = async () => {
+  const fecha = $('#taFecha').value || hoyISO();
+  const filas = [];
+  $$('#taCuerpo .ta-in').forEach(i => {
+    const v = Number(String(i.value).replace(',', '.'));
+    if (v > 0) filas.push({ user_id:S.user.id, fecha:fecha, moneda:i.dataset.m, valor:v });
+  });
+  if (!filas.length) return toast('Escribe al menos una tasa');
+  const r = await sb.from('tasas').upsert(filas, { onConflict:'user_id,fecha,moneda' });
+  if (faltaTabla(r.error)) return toast('Falta correr esquema_v6 en Supabase');
+  if (!ok(r, filas.length === 1 ? 'Tasa guardada' : 'Tasas guardadas')) return;
+  $('#dlgTasa').close(); await cargarFinanzas();
+};
+
+/* ---------- traspaso entre cuentas ---------- */
+function abrirTraspaso(){
+  const act = (F.cuentas || []).filter(c => c.activa);
+  if (act.length < 2) return toast('Necesitas al menos dos cuentas para traspasar');
+  $('#trOrigen').innerHTML  = opcionesCuenta(act[0].id);
+  $('#trDestino').innerHTML = opcionesCuenta(act[1].id);
+  $('#trFecha').value = hoyISO();
+  $('#trMonto').value = ''; $('#trLlega').value = '';
+  trPintar();
+  $('#dlgTraspaso').showModal();
+}
+function trPintar(){
+  const o = cuentaDe($('#trOrigen').value), d = cuentaDe($('#trDestino').value);
+  $('#trMonedaO').textContent = o ? simboloDe(o.moneda) : '';
+  $('#trMonedaD').textContent = d ? simboloDe(d.moneda) : '';
+  $('#trAviso').textContent = (o && d && o.id === d.id)
+    ? 'Elige dos cuentas distintas.'
+    : (o && d && o.moneda !== d.moneda
+        ? 'Cambias de ' + o.moneda + ' a ' + d.moneda + ': revisa lo que de verdad te llegó.'
+        : '');
+}
+function trCalcular(){
+  const o = cuentaDe($('#trOrigen').value), d = cuentaDe($('#trDestino').value);
+  const v = Number(String($('#trMonto').value).replace(',', '.'));
+  if (!o || !d || !(v > 0)) return;
+  if (o.moneda === d.moneda){ $('#trLlega').value = v; return; }
+  const c = convertir(v, o.moneda, d.moneda, $('#trFecha').value || hoyISO());
+  if (c != null) $('#trLlega').value = Number(c.toFixed(2));
+}
+$('#trOrigen').onchange  = () => { trPintar(); trCalcular(); };
+$('#trDestino').onchange = () => { trPintar(); trCalcular(); };
+$('#trMonto').oninput    = trCalcular;
+$('#trCancelar').onclick = () => $('#dlgTraspaso').close();
+$('#trGuardar').onclick = async () => {
+  const o = cuentaDe($('#trOrigen').value), d = cuentaDe($('#trDestino').value);
+  if (!o || !d) return toast('Elige las dos cuentas');
+  if (o.id === d.id) return toast('No puedes traspasar a la misma cuenta');
+  const sale  = Number(String($('#trMonto').value).replace(',', '.'));
+  const llega = Number(String($('#trLlega').value).replace(',', '.'));
+  if (!(sale > 0)) return toast('Escribe cuánto sale');
+  if (!(llega > 0)) return toast('Escribe cuánto llega');
+  const fecha = $('#trFecha').value || hoyISO();
+  const r = await sb.from('movimientos').insert({
+    user_id:S.user.id, fecha:fecha, tipo:'traspaso', categoria:'Traspaso',
+    descripcion: o.nombre + ' → ' + d.nombre, monto:sale, fijo:false, clase:null,
+    cuenta_id:o.id, cuenta_destino_id:d.id, monto_destino:llega,
+    moneda:o.moneda, tasa:tasaDe(o.moneda, fecha) });
+  if (!ok(r, 'Traspaso registrado')) return;
+  $('#dlgTraspaso').close(); await cargarFinanzas();
+};
+
+/* datos de moneda que acompañan a cada movimiento */
+function datosCuenta(cuentaId, fecha){
+  const c = cuentaDe(cuentaId);
+  if (!c) return { cuenta_id:null, moneda:null, tasa:null };
+  return { cuenta_id:c.id, moneda:c.moneda, tasa:tasaDe(c.moneda, fecha || hoyISO()) };
+}
+/* rellena un selector de cuentas y ajusta el símbolo del monto */
+function ponerCuentas(selId, monedaId, valor){
+  const sel = $(selId); if (!sel) return;
+  const act = (F.cuentas || []).filter(x => x.activa);
+  const caja = sel.closest('div');
+  if (caja) caja.classList.toggle('hidden', act.length === 0);
+  const previa = valor || F.ultimaCuenta || (act[0] && act[0].id) || '';
+  sel.innerHTML = opcionesCuenta(previa);
+  const refrescar = () => {
+    const c = cuentaDe(sel.value);
+    const e = monedaId ? $(monedaId) : null;
+    if (e) e.textContent = c ? '· ' + simboloDe(c.moneda) : '';
+  };
+  sel.onchange = refrescar; refrescar();
+}
+$('#btnTraspaso').onclick = abrirTraspaso;
+
+/* mover un pago fijo o un gasto sin cuenta no rompe nada: queda sin cuenta */
 
 </script>
 </body>
