@@ -241,6 +241,44 @@ dialog::backdrop{background:rgba(0,0,0,.6)}
 .cuerpo .pulso{animation:pulsoMus .7s cubic-bezier(.2,.8,.2,1)}
 @keyframes pulsoMus{0%{filter:brightness(1)}45%{filter:brightness(1.28) url(#brillo)}100%{filter:brightness(1)}}
 
+
+/* ---------- PLAN · el entrenador ---------- */
+#plSecc button{font-size:12px;padding:7px 13px}
+#plCuerpo .card{margin-top:12px}
+.card.buena{border-left:3px solid var(--ok)}
+.card.mala{border-left:3px solid var(--bad)}
+.et{font-family:var(--f-titulo);font-weight:700;text-transform:uppercase;letter-spacing:.16em;
+    font-size:10.5px;color:var(--tx2)}
+.pill{display:inline-block;background:var(--panel2);border:1px solid var(--linea);border-radius:999px;
+      padding:3px 10px;font-size:11.5px;color:var(--tx2);white-space:nowrap}
+.pill.libre{white-space:normal;border-radius:10px;text-align:left;line-height:1.4}
+.pill.ok{border-color:var(--ok);color:var(--ok)}
+.pill.bad{border-color:var(--bad);color:var(--bad)}
+.pill.warn{border-color:var(--oro);color:var(--oro)}
+.lista{margin:0;padding-left:18px}
+.lista li{margin-bottom:6px}
+.lista li::marker{color:var(--brand)}
+.fila2{display:flex;justify-content:space-between;gap:14px;align-items:flex-start;
+       padding:9px 0;border-bottom:1px solid var(--linea)}
+.fila2:last-child{border-bottom:none}
+.fila2 b{white-space:nowrap}
+.fila2 .muted{text-align:right;font-size:13px}
+.mini{background:var(--panel2);border:1px solid var(--linea);border-radius:10px;padding:10px 12px}
+.mini .v{font-size:20px;font-weight:700;margin-top:2px}
+.bloque{border:1px solid var(--linea);border-radius:12px;padding:12px 14px;margin-bottom:10px}
+.bloque.activo{border-color:var(--brand);background:var(--panel2)}
+.bloque.hecho{opacity:.55}
+.obst{display:grid;grid-template-columns:30px 1fr;gap:12px;padding:12px 0;border-bottom:1px solid var(--linea)}
+.obst:last-child{border-bottom:none}
+.obst .n{font-family:var(--f-titulo);font-weight:800;font-size:20px;color:var(--brand);line-height:1}
+.tablaWrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+table.tab{width:100%;border-collapse:collapse;font-size:13px;min-width:340px}
+table.tab th{text-align:left;font-family:var(--f-titulo);font-weight:700;text-transform:uppercase;
+  letter-spacing:.08em;font-size:10px;color:var(--tx2);padding:8px 10px;border-bottom:1px solid var(--linea);white-space:nowrap}
+table.tab td{padding:9px 10px;border-bottom:1px solid var(--linea);vertical-align:top}
+table.tab tr:last-child td{border-bottom:none}
+table.tab td.num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+
 /* ---------- zonas tocables ---------- */
 .cuerpo .zona{fill:transparent;stroke:transparent;cursor:pointer}
 .cuerpo .zona:hover{fill:#fff;fill-opacity:.06}
@@ -352,6 +390,7 @@ dialog::backdrop{background:rgba(0,0,0,.6)}
       <button data-t="metas">Metas semanales</button>
       <button data-t="gym">Gym</button>
       <button data-t="cuerpo">Cuerpo</button>
+      <button data-t="plan">Plan</button>
       <button data-t="finanzas">Finanzas</button>
       <button data-t="reporte">Reporte</button>
     </nav>
@@ -533,6 +572,30 @@ dialog::backdrop{background:rgba(0,0,0,.6)}
     </section>
 
     <!-- FINANZAS -->
+
+    <!-- ============ PLAN · EL ENTRENADOR ============ -->
+    <section id="tPlan" class="hidden">
+      <div class="card">
+        <div class="row" style="justify-content:space-between;align-items:flex-start">
+          <div>
+            <h2 style="margin:0">Tu entrenador</h2>
+            <p class="muted" style="margin:4px 0 0">Todo lo de aquí sale de tus datos. Si registras poco, te dirá que registres más antes que inventarse nada.</p>
+          </div>
+          <button class="sm" id="btnDatosCoach">Mis datos</button>
+        </div>
+        <div class="row" id="plSecc" style="margin-top:14px;flex-wrap:wrap;gap:6px">
+          <button class="sm on" data-p="plan">180 días</button>
+          <button class="sm" data-p="rutina">Rutina</button>
+          <button class="sm" data-p="comida">Alimentación</button>
+          <button class="sm" data-p="metas">Objetivos</button>
+          <button class="sm" data-p="debiles">Puntos débiles</button>
+          <button class="sm" data-p="recup">Recuperación</button>
+          <button class="sm" data-p="revision">Revisión semanal</button>
+        </div>
+      </div>
+      <div id="plCuerpo"></div>
+    </section>
+
     <section id="tFinanzas" class="hidden">
       <div class="card">
         <div class="row" style="justify-content:space-between">
@@ -786,6 +849,35 @@ dialog::backdrop{background:rgba(0,0,0,.6)}
       </select></div>
       <div><label>Días de gym por semana</label><input id="pfDiasGym" type="number" min="0" max="7" value="4"></div>
     </div>
+    <div class="grid g2">
+      <div><label>Experiencia entrenando</label><select id="pfExperiencia">
+        <option value="principiante">Principiante (menos de 1 año)</option>
+        <option value="intermedio">Intermedio (1 a 3 años)</option>
+        <option value="avanzado">Avanzado (más de 3 años)</option>
+      </select></div>
+      <div><label>Equipo que tienes</label><select id="pfEquipo">
+        <option value="gimnasio">Gimnasio completo</option>
+        <option value="casa_completa">Casa con mancuernas y banco</option>
+        <option value="casa_basica">Casa básica (mancuernas o bandas)</option>
+        <option value="peso_corporal">Solo mi peso corporal</option>
+      </select></div>
+    </div>
+    <div class="grid g2">
+      <div><label>Cómo comes</label><select id="pfDieta">
+        <option value="sin_restriccion">Sin restricciones</option>
+        <option value="vegetariano">Vegetariano</option>
+        <option value="vegano">Vegano</option>
+        <option value="pescetariano">Pescetariano</option>
+        <option value="sin_lactosa">Sin lactosa</option>
+        <option value="sin_gluten">Sin gluten</option>
+      </select></div>
+      <div><label>Presupuesto de comida</label><select id="pfPresupuesto">
+        <option value="bajo">Ajustado</option>
+        <option value="medio" selected>Normal</option>
+        <option value="alto">Holgado</option>
+      </select></div>
+    </div>
+    <div><label>País (para la lista de compra)</label><input id="pfPais" maxlength="60" placeholder="Venezuela"></div>
     <div class="row" style="gap:8px;align-items:center">
       <input type="checkbox" id="pfNotif" style="width:18px;height:18px" checked>
       <label for="pfNotif" style="margin:0;text-transform:none;font-size:14px;color:var(--tx)">Quiero recordatorios y avisos</label>
@@ -794,6 +886,35 @@ dialog::backdrop{background:rgba(0,0,0,.6)}
       <button class="gh" id="btnCancelPerfil">Cancelar</button>
       <button class="pri" id="btnSavePerfil">Guardar</button>
     </div>
+  </div>
+</dialog>
+
+
+<!-- DIALOGO RECUPERACION -->
+<dialog id="dlgRecup">
+  <h2>Cómo amaneciste</h2>
+  <p class="muted" style="margin-top:0">Treinta segundos al día. Sin esto, cualquier consejo de recuperación sería adivinar.</p>
+  <div class="grid g2">
+    <div><label>Horas que dormiste</label><input id="rcSueno" type="number" step="0.5" min="0" max="16" placeholder="7.5"></div>
+    <div><label>Pasos de ayer</label><input id="rcPasos" type="number" min="0" max="100000" placeholder="8000"></div>
+  </div>
+  <div class="grid g2">
+    <div><label>Estrés (1 tranquilo · 5 al límite)</label><select id="rcEstres">
+      <option value="">—</option><option value="1">1 · tranquilo</option><option value="2">2</option>
+      <option value="3">3 · normal</option><option value="4">4</option><option value="5">5 · al límite</option>
+    </select></div>
+    <div><label>Energía (1 arrastrando · 5 pleno)</label><select id="rcEnergia">
+      <option value="">—</option><option value="1">1 · arrastrando</option><option value="2">2</option>
+      <option value="3">3 · normal</option><option value="4">4</option><option value="5">5 · pleno</option>
+    </select></div>
+  </div>
+  <div><label>Agujetas (opcional)</label><select id="rcAgujetas">
+    <option value="">—</option><option value="1">1 · ninguna</option><option value="2">2</option>
+    <option value="3">3 · notorias</option><option value="4">4</option><option value="5">5 · no puedo entrenar</option>
+  </select></div>
+  <div class="row" style="justify-content:flex-end">
+    <button class="gh" id="btnCancelRecup">Cancelar</button>
+    <button class="pri" id="btnSaveRecup">Guardar</button>
   </div>
 </dialog>
 
@@ -996,6 +1117,14 @@ function lunesDe(iso){ return sumarDias(iso, -(isodow(iso)-1)); }
 function bonito(iso){
   return deISO(iso).toLocaleDateString('es-VE',{weekday:'long', day:'numeric', month:'long'});
 }
+function fechaCorta(iso){
+  return deISO(iso).toLocaleDateString('es-VE',{day:'numeric', month:'short'});
+}
+function esc(t){
+  return String(t == null ? '' : t)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
 function toast(msg){
   const t = document.createElement('div');
   t.className = 'toast'; t.textContent = msg;
@@ -1022,9 +1151,19 @@ function ok(res, msg){
    Al publicar una versión nueva: sube VERSION, pon la fecha y agrega
    su entrada arriba del todo en NOVEDADES.
    ===================================================================== */
-const VERSION = '2.5.0';
-const FECHA_VERSION = '2026-08-29';
+const VERSION = '3.0.0';
+const FECHA_VERSION = '2026-09-05';
 const NOVEDADES = [
+  ['3.0.0', '2026-09-05', [
+    'Pestaña Plan: tu entrenador dentro de la app, con siete secciones que salen de tus propios datos.',
+    'Plan de 180 días en seis bloques mensuales, con metas de peso y de fuerza para cada uno.',
+    'Rutina generada para tus días, tu equipo y tu experiencia: series, repeticiones, RIR, descansos, calentamiento, progresión, sustituciones y semanas de descarga.',
+    'Sistema de alimentación con rango de calorías, comidas repetibles según tu dieta y tu presupuesto, porciones con la mano y lista de compra.',
+    'Objetivos por tendencia: decide con el promedio de 7 días y con 2 a 4 semanas de datos, nunca con el peso de un día.',
+    'Detección de grupos rezagados y asimetrías, con un bloque de especialización que tiene fecha de caducidad.',
+    'Registro diario de sueño, estrés, energía y pasos, y un sistema de recuperación ordenado por impacto.',
+    'Revisión semanal que compara con la semana anterior y propone un solo cambio, el que los datos justifiquen.'
+  ]],
   ['2.5.0', '2026-08-29', [
     'Modelo muscular real: el cuerpo se dibuja como una lámina de anatomía, con el músculo a la vista y las fibras marcadas.',
     'De frente: esternocleidomastoideo, trapecio, deltoides, pectoral mayor, serrato anterior, recto abdominal con sus inscripciones, oblicuos, bíceps, flexores del antebrazo, vasto externo, recto femoral, vasto interno, tibial anterior y gemelos.',
@@ -1591,7 +1730,7 @@ $('#btnSaveMeta').onclick = async () => {
 };
 
 /* ---------- navegacion ---------- */
-const ORDEN_TABS = ['hoy','habitos','progreso','metas','gym','cuerpo','finanzas','reporte'];
+const ORDEN_TABS = ['hoy','habitos','progreso','metas','gym','cuerpo','plan','finanzas','reporte'];
 function animarSeccion(sec, dir){
   if (!sec) return;
   if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
@@ -1609,12 +1748,14 @@ $$('nav button').forEach(b => b.onclick = () => {
   const dir = antes < 0 || ahora < 0 ? 0 : (ahora > antes ? 1 : -1);
   $$('nav button').forEach(x => x.classList.remove('on')); b.classList.add('on');
   S.tab = b.dataset.t;
-  ['hoy','habitos','progreso','metas','gym','cuerpo','finanzas','reporte'].forEach(t => {
+  ['hoy','habitos','progreso','metas','gym','cuerpo','plan','finanzas','reporte'].forEach(t => {
     $('#t' + t.charAt(0).toUpperCase() + t.slice(1)).classList.toggle('hidden', t !== S.tab);
   });
   if ((S.tab === 'gym' || S.tab === 'reporte') && !G.cargado) cargarGym();
   if ((S.tab === 'finanzas' || S.tab === 'reporte') && !F.cargado) cargarFinanzas();
   if ((S.tab === 'cuerpo' || S.tab === 'reporte') && !C.cargado) cargarCuerpo();
+  if (S.tab === 'plan'){ if (!C.cargado) cargarCuerpo(); if (!G.cargado) cargarGym();
+                         if (!COACH.cargado) cargarPlan(); else pintarPlan180(); }
   if (S.tab === 'reporte') setTimeout(() => pintarReporte(S.repTipo || 'diario'), 400);
   animarSeccion($('#t' + S.tab.charAt(0).toUpperCase() + S.tab.slice(1)), dir);
   b.animate([{transform:'scale(.94)'},{transform:'scale(1)'}], {duration:220, easing:'cubic-bezier(.2,.8,.2,1)'});
@@ -2514,6 +2655,1168 @@ async function sincronizarAgua(litros){
   toast('Tu meta de agua quedó en ' + litros + ' L');
 }
 
+/* =====================================================================
+   EL ENTRENADOR · motor del plan
+   Todo se calcula aquí con tus propios datos. Sin promesas de físico:
+   objetivos de proceso, revisables con lo que registres.
+   ===================================================================== */
+
+const COACH = { rutina:[], recup:[], checkins:[], espec:null, cargado:false, secc:'plan' };
+
+const EXPERIENCIA = {
+  principiante:{ n:'Principiante', meses:'menos de 1 año', prog:0.025, seriesAjuste:-1, rirBase:3,
+                 nota:'Puedes progresar casi cada semana. Aprovéchalo, pero prioriza la técnica.' },
+  intermedio:  { n:'Intermedio',   meses:'1 a 3 años',     prog:0.010, seriesAjuste:0,  rirBase:2,
+                 nota:'La progresión ya no es automática: toca planificarla.' },
+  avanzado:    { n:'Avanzado',     meses:'más de 3 años',  prog:0.005, seriesAjuste:1,  rirBase:1,
+                 nota:'Ganancias lentas. El volumen y la recuperación mandan.' }
+};
+
+const EQUIPO = {
+  gimnasio:      { n:'Gimnasio completo', permite:['barra','mancuerna','maquina','polea','peso_corporal','banda','kettlebell'] },
+  casa_completa: { n:'Casa con mancuernas y banco', permite:['mancuerna','peso_corporal','banda','kettlebell'] },
+  casa_basica:   { n:'Casa básica', permite:['mancuerna','peso_corporal','banda'] },
+  peso_corporal: { n:'Solo peso corporal', permite:['peso_corporal','banda'] }
+};
+
+const GRUPO_N = { pecho:'Pecho', espalda:'Espalda', pierna:'Pierna', hombro:'Hombro',
+  biceps:'Bíceps', triceps:'Tríceps', gluteo:'Glúteo', pantorrilla:'Pantorrilla',
+  abdomen:'Abdomen', trapecio:'Trapecio', antebrazo:'Antebrazo', cardio:'Cardio' };
+
+/* ---------- utilidades ---------- */
+function perfilCompleto(p){
+  return !!(p && p.sexo && p.peso_kg && p.estatura_cm && p.fecha_nacimiento && p.objetivo);
+}
+function faltaParaPlan(p){
+  const f = [];
+  if (!p || !p.sexo) f.push('sexo');
+  if (!p || !p.fecha_nacimiento) f.push('fecha de nacimiento');
+  if (!p || !p.estatura_cm) f.push('estatura');
+  if (!p || !p.peso_kg) f.push('peso');
+  if (!p || !p.objetivo) f.push('objetivo');
+  if (!p || !p.experiencia) f.push('experiencia entrenando');
+  if (!p || !p.equipo) f.push('equipo disponible');
+  return f;
+}
+function mesesEs(iso){
+  const M = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto',
+             'septiembre','octubre','noviembre','diciembre'];
+  const d = deISO(iso); return M[d.getMonth()] + ' ' + d.getFullYear();
+}
+
+/* =====================================================================
+   1 · PLAN DE 180 DÍAS
+   ===================================================================== */
+const FASES = {
+  bajar_grasa: [
+    ['Arranque','Fijar el hábito y aprender la técnica. Todavía no aprietes.',
+     'Come en tu mantenimiento la primera semana; el déficit entra en la dos.'],
+    ['Déficit estable','Sube el peso en los básicos con las mismas repeticiones.',
+     'Aquí es donde se pierde grasa de verdad. Sin saltarse comidas.'],
+    ['Primer ajuste','Mantén la fuerza aunque el peso baje: es la señal de que pierdes grasa y no músculo.',
+     'Si la tendencia se frenó dos semanas, recorta 150 kcal. Solo entonces.'],
+    ['Empuje','Añade una serie a los grupos que se quedaron atrás.',
+     'Sube la proteína si el hambre te está ganando.'],
+    ['Consolidar','Semana de descarga al inicio del bloque; recuperas y vuelves más fuerte.',
+     'Es normal estancarse aquí. No recortes más de lo que ya recortaste.'],
+    ['Aterrizaje','Vuelve a repeticiones más bajas y peso más alto.',
+     'Sube 100 kcal por semana hasta el mantenimiento. Bajar y quedarse ahí es otra habilidad.']
+  ],
+  ganar_musculo: [
+    ['Base técnica','Rango completo y control. El peso llega después.',
+     'Superávit pequeño. Ganar rápido es ganar grasa.'],
+    ['Volumen','Sube series antes que peso.','Come lo mismo todos los días; el cuerpo agradece la rutina.'],
+    ['Sobrecarga','Ahora sí, más peso con las mismas repeticiones.','Si el peso no sube en 3 semanas, sube 100 kcal.'],
+    ['Pico','Menos repeticiones, más carga en los básicos.','Vigila la cintura: si crece más rápido que el brazo, sobra comida.'],
+    ['Descarga y recarga','Una semana suave y vuelves con todo.','Mantén la proteína aunque bajes calorías esa semana.'],
+    ['Consolidar','Repeticiones medias, técnica impecable.','Estabiliza el peso 2 semanas antes de decidir el siguiente ciclo.']
+  ],
+  generico: [
+    ['Arranque','Construir el hábito por encima de todo.','Come regular y suficiente.'],
+    ['Constancia','Sube algo cada semana, aunque sea poco.','Ordena las comidas alrededor del entrenamiento.'],
+    ['Ajuste','Revisa qué se quedó atrás y dale más atención.','Corrige según lo que muestren los datos.'],
+    ['Empuje','Sube la exigencia manteniendo la técnica.','Sostén la proteína.'],
+    ['Consolidar','Descarga y vuelta.','Sin cambios bruscos.'],
+    ['Cierre','Consolida lo ganado.','Prepara el ciclo siguiente.']
+  ]
+};
+
+function plan180(p, pl){
+  if (!perfilCompleto(p) || !pl) return null;
+  const inicio = p.plan_inicio || hoyISO();
+  const fin = sumarDias(inicio, 180);
+  const diaActual = Math.round((deISO(hoyISO()) - deISO(inicio)) / 86400000);
+  const semanaActual = Math.max(1, Math.min(26, Math.floor(diaActual/7) + 1));
+  const fases = FASES[p.objetivo] || FASES.generico;
+  const exp = EXPERIENCIA[p.experiencia] || EXPERIENCIA.principiante;
+
+  const peso = Number(p.peso_kg);
+  const ritmo = pl.ritmoAplicado || (pl.bajando ? peso*0.006 : pl.subiendo ? peso*0.003 : 0);
+  const signo = pl.bajando ? -1 : pl.subiendo ? 1 : 0;
+
+  const bloques = fases.map((f, i) => {
+    const d0 = sumarDias(inicio, i*30), d1 = sumarDias(inicio, (i+1)*30 - 1);
+    const pesoFin = signo === 0 ? peso
+      : Math.round((peso + signo * ritmo * ((i+1)*30/7)) * 10) / 10;
+    // la fuerza no crece lineal: el avance se frena con los meses
+    const factorMes = [1, 0.85, 0.72, 0.6, 0.5, 0.42][i];
+    const subeFuerza = Math.round(exp.prog * 100 * 4.3 * factorMes * 10) / 10;
+    return {
+      n: i+1, titulo: f[0], entreno: f[1], comida: f[2],
+      desde: d0, hasta: d1, mes: mesesEs(d0),
+      pesoMeta: signo === 0 ? null : pesoFin,
+      fuerzaMeta: subeFuerza,
+      actual: diaActual >= i*30 && diaActual < (i+1)*30,
+      pasado: diaActual >= (i+1)*30
+    };
+  });
+
+  const prioridades = [];
+  if (p.objetivo === 'bajar_grasa'){
+    prioridades.push('Sostener la proteína en ' + pl.prot + ' g al día: es lo que protege el músculo mientras bajas.');
+    prioridades.push('No perder fuerza en los básicos. Si baja, el déficit es demasiado agresivo.');
+    prioridades.push('Caminar. Es la palanca de gasto más grande que no te quita recuperación.');
+  } else if (p.objetivo === 'ganar_musculo'){
+    prioridades.push('Sobrecarga progresiva: cada semana, más peso o más repeticiones que la anterior.');
+    prioridades.push('Comer también los días que no entrenas. Ahí es donde se construye.');
+    prioridades.push('Dormir 7 horas o más. Sin eso, el superávit se va a grasa.');
+  } else {
+    prioridades.push('Constancia por encima de intensidad: 3 sesiones cumplidas ganan a 5 planeadas.');
+    prioridades.push('Sostener la proteína en ' + pl.prot + ' g al día.');
+    prioridades.push('Dormir 7 horas o más.');
+  }
+
+  const riesgos = [];
+  if ((p.dias_entreno_semana || 3) >= 5 && p.experiencia === 'principiante')
+    riesgos.push('Empezar con ' + p.dias_entreno_semana + ' días siendo principiante es la receta clásica del abandono en la semana tres. Considera bajar a 3 o 4.');
+  if (pl.demasiadoRapido)
+    riesgos.push('El plazo que pusiste exige un ritmo que no es sostenible; el plan lo ajustó al máximo saludable.');
+  if (pl.bajoMinimo)
+    riesgos.push('Tus calorías tocaron el suelo de seguridad. Bajar más no acelera nada, solo te deja sin energía.');
+  if (p.objetivo === 'bajar_grasa' && (p.experiencia === 'principiante'))
+    riesgos.push('Siendo principiante puedes ganar músculo mientras bajas grasa. No te asustes si la balanza se queda quieta y la ropa te queda mejor.');
+  riesgos.push('El mes 3 y el mes 5 son donde la gente deja. Ya lo sabes: cuando llegues, es el guion, no tú.');
+
+  return { inicio, fin, semanaActual, diaActual, bloques, prioridades, riesgos,
+           kcal: pl.kcal, prot: pl.prot, ritmo: Math.round(ritmo*100)/100, signo, exp };
+}
+/* =====================================================================
+   2 · RUTINA EXACTA
+   ===================================================================== */
+
+/* Los repartos. Cada día: lista de [grupo, cuántos ejercicios, rol dominante] */
+const SPLITS = {
+  3: { n:'Cuerpo completo, 3 días',
+       dias:[
+         {t:'Día A · Cuerpo completo (empuje)', g:[['pierna',2],['pecho',2],['hombro',1],['triceps',1],['abdomen',1]]},
+         {t:'Día B · Cuerpo completo (tirón)',  g:[['espalda',2],['pierna',2],['biceps',1],['trapecio',1],['abdomen',1]]},
+         {t:'Día C · Cuerpo completo (mixto)',  g:[['pierna',2],['pecho',1],['espalda',2],['hombro',1],['pantorrilla',1]]}
+       ]},
+  4: { n:'Torso y pierna, 4 días',
+       dias:[
+         {t:'Día 1 · Torso (fuerza)',   g:[['pecho',2],['espalda',2],['hombro',1],['triceps',1],['biceps',1]]},
+         {t:'Día 2 · Pierna (fuerza)',  g:[['pierna',3],['gluteo',1],['pantorrilla',1],['abdomen',1]]},
+         {t:'Día 3 · Torso (volumen)',  g:[['espalda',2],['pecho',2],['hombro',2],['biceps',1],['triceps',1]]},
+         {t:'Día 4 · Pierna (volumen)', g:[['pierna',3],['gluteo',1],['pantorrilla',1],['abdomen',1]]}
+       ]},
+  5: { n:'Empuje, tirón, pierna + torso y pierna',
+       dias:[
+         {t:'Día 1 · Empuje', g:[['pecho',3],['hombro',2],['triceps',2]]},
+         {t:'Día 2 · Tirón',  g:[['espalda',3],['biceps',2],['trapecio',1],['antebrazo',1]]},
+         {t:'Día 3 · Pierna', g:[['pierna',3],['gluteo',1],['pantorrilla',1],['abdomen',1]]},
+         {t:'Día 4 · Torso',  g:[['pecho',2],['espalda',2],['hombro',1],['biceps',1],['triceps',1]]},
+         {t:'Día 5 · Pierna y glúteo', g:[['pierna',2],['gluteo',2],['pantorrilla',1],['abdomen',1]]}
+       ]},
+  6: { n:'Empuje, tirón, pierna · dos vueltas',
+       dias:[
+         {t:'Día 1 · Empuje (fuerza)',  g:[['pecho',3],['hombro',2],['triceps',2]]},
+         {t:'Día 2 · Tirón (fuerza)',   g:[['espalda',3],['biceps',2],['trapecio',1]]},
+         {t:'Día 3 · Pierna (fuerza)',  g:[['pierna',3],['gluteo',1],['pantorrilla',1]]},
+         {t:'Día 4 · Empuje (volumen)', g:[['hombro',2],['pecho',3],['triceps',2]]},
+         {t:'Día 5 · Tirón (volumen)',  g:[['espalda',3],['biceps',2],['antebrazo',1]]},
+         {t:'Día 6 · Pierna (volumen)', g:[['pierna',2],['gluteo',2],['pantorrilla',1],['abdomen',1]]}
+       ]}
+};
+
+/* series, repeticiones, esfuerzo y descanso según objetivo y rol */
+function receta(objetivo, rol, exp){
+  const fuerza = objetivo === 'ganar_musculo' || objetivo === 'rendimiento';
+  const base = {
+    principal:  fuerza ? {s:4, r:[5,8],   d:180} : {s:4, r:[6,10],  d:150},
+    secundario: fuerza ? {s:3, r:[8,12],  d:120} : {s:3, r:[8,12],  d:105},
+    accesorio:  fuerza ? {s:3, r:[10,15], d:75}  : {s:3, r:[12,15], d:60}
+  }[rol];
+  const s = Math.max(2, base.s + (rol === 'principal' ? 0 : (EXPERIENCIA[exp] || EXPERIENCIA.principiante).seriesAjuste));
+  const rir = rol === 'principal' ? (EXPERIENCIA[exp] || EXPERIENCIA.principiante).rirBase
+            : rol === 'accesorio' ? 1 : 2;
+  return { series:s, reps_min:base.r[0], reps_max:base.r[1], descanso_s:base.d, rir, rol };
+}
+
+/* elige ejercicios reales del catálogo, sin repetir, respetando el equipo */
+function elegirEjercicios(ejercicios, grupo, cuantos, permite, usados){
+  const dispo = ejercicios.filter(e => e.grupo === grupo && e.activo !== false
+                                    && permite.indexOf(e.equipo) >= 0 && !usados.has(e.id));
+  const comp = dispo.filter(e => e.tipo === 'compuesto');
+  const ais  = dispo.filter(e => e.tipo !== 'compuesto');
+  const out = [];
+  // primero un compuesto, luego aislamiento
+  for (let i = 0; i < cuantos; i++){
+    const fuente = (i === 0 && comp.length) ? comp : (ais.length ? ais : comp);
+    const e = fuente.shift();
+    if (!e) break;
+    usados.add(e.id); out.push(e);
+  }
+  return out;
+}
+
+/* si un grupo no tiene ejercicios para tu equipo, se completa con estos */
+const VECINOS = {
+  pecho:['triceps','hombro'], espalda:['biceps','trapecio'], hombro:['pecho','trapecio'],
+  pierna:['gluteo','pantorrilla'], gluteo:['pierna'], biceps:['espalda','antebrazo'],
+  triceps:['pecho'], pantorrilla:['pierna'], abdomen:['gluteo'], trapecio:['hombro','espalda'],
+  antebrazo:['biceps']
+};
+const MIN_POR_DIA = 4;
+
+function generarRutina(p, ejercicios){
+  const dias = Math.min(6, Math.max(3, Number(p.dias_entreno_semana) || 3));
+  const split = SPLITS[dias];
+  const permite = (EQUIPO[p.equipo] || EQUIPO.gimnasio).permite;
+  const exp = p.experiencia || 'principiante';
+  const filas = [];
+
+  split.dias.forEach((d, iDia) => {
+    const usados = new Set();
+    const delDia = [];
+    d.g.forEach((par, iGrupo) => {
+      const [grupo, cuantos] = par;
+      elegirEjercicios(ejercicios, grupo, cuantos, permite, usados).forEach((e, i) => {
+        delDia.push({ e, rol: (iGrupo === 0 && i === 0) ? 'principal'
+                             : (i === 0 || iGrupo <= 1) ? 'secundario' : 'accesorio' });
+      });
+    });
+
+    // si el equipo es limitado, el día puede quedar corto: se rellena con grupos vecinos
+    if (delDia.length < MIN_POR_DIA){
+      const candidatos = [];
+      d.g.forEach(par => {
+        candidatos.push(par[0]);
+        (VECINOS[par[0]] || []).forEach(v => candidatos.push(v));
+      });
+      candidatos.push('abdomen', 'gluteo');
+      for (let i = 0; i < candidatos.length && delDia.length < MIN_POR_DIA; i++){
+        elegirEjercicios(ejercicios, candidatos[i], 1, permite, usados)
+          .forEach(e => delDia.push({ e, rol:'accesorio' }));
+      }
+    }
+
+    delDia.forEach((x, i) => {
+      const r = receta(p.objetivo, x.rol, exp);
+      filas.push(Object.assign({ dia: iDia+1, orden: i+1, ejercicio_id: x.e.id,
+                                 _nombre: x.e.nombre, _grupo: x.e.grupo, _equipo: x.e.equipo }, r));
+    });
+  });
+  return { dias, nombre: split.n, titulos: split.dias.map(d => d.t), filas };
+}
+
+/* calentamiento, progresión, sustituciones y descarga */
+function guiaRutina(p){
+  const exp = EXPERIENCIA[p.experiencia] || EXPERIENCIA.principiante;
+  const cada = p.experiencia === 'avanzado' ? 5 : p.experiencia === 'intermedio' ? 6 : 8;
+  return {
+    calentamiento: [
+      '5 minutos de caminata o bicicleta suave, hasta sudar un poco.',
+      'Movilidad de la articulación que toca: hombro y cadera son las que más lo agradecen.',
+      'Del primer ejercicio: una serie con la barra sola, otra al 50% y otra al 75%. Esas no cuentan.',
+      'Del resto: una serie de aproximación y directo al trabajo.'
+    ],
+    progresion: [
+      'Trabajas en un rango, por ejemplo 6 a 10 repeticiones.',
+      'Cuando logres el tope del rango en todas las series con el esfuerzo previsto, sube el peso.',
+      'Sube ' + (p.equipo === 'gimnasio' ? '2,5 kg en tren superior y 5 kg en pierna' : 'al siguiente par de mancuernas') + '.',
+      'Al subir el peso vuelves al piso del rango. Es normal y es el ciclo.',
+      exp.nota
+    ],
+    esfuerzo: [
+      'RIR es cuántas repeticiones te sobran al terminar la serie.',
+      'RIR 2 significa que podías hacer 2 más. Ese es el punto para casi todo.',
+      'RIR 0 solo en la última serie de un accesorio, y no siempre.',
+      'Si terminas una serie sin saber cuántas te sobraban, te pasaste.'
+    ],
+    descarga: [
+      'Cada ' + cada + ' semanas haces una semana de descarga.',
+      'Misma rutina, mismos ejercicios: mitad de las series y el 60% del peso.',
+      'No es opcional ni es perder el tiempo: es donde el cuerpo termina de adaptarse.',
+      'Sales de la descarga y en dos sesiones estás más fuerte que antes.'
+    ],
+    estancado: [
+      'Dos semanas sin subir peso ni repeticiones en un ejercicio no es estancarse. Tres, sí.',
+      'Primero revisa lo de afuera: sueño, comida y estrés explican la mayoría de los estancamientos.',
+      'Si eso está bien, haz la descarga aunque no toque.',
+      'Si sigue igual, cambia ese ejercicio por su sustituto durante 4 semanas.',
+      'Lo último que se toca es el volumen. Añadir series a un cuerpo que no recupera empeora las cosas.'
+    ]
+  };
+}
+
+/* sustituto: mismo grupo, distinto equipo o distinto patrón */
+function sustitutos(ej, ejercicios, permite){
+  if (!ej) return [];
+  return ejercicios
+    .filter(e => e.grupo === ej.grupo && e.id !== ej.ejercicio_id && e.id !== ej.id
+              && permite.indexOf(e.equipo) >= 0)
+    .slice(0, 3);
+}
+/* =====================================================================
+   3 · SISTEMA DE ALIMENTACIÓN
+   Comidas que puedas repetir. Nada de menús de 30 días que nadie sigue.
+   ===================================================================== */
+
+/* etiquetas: v=sirve vegetariano, g=vegano, sl=sin lactosa, sg=sin gluten, pz=lleva pescado
+   costo: 1 barato, 2 medio, 3 caro */
+const COMIDAS = {
+  desayuno: [
+    {n:'Huevos revueltos con avena', d:'3 huevos + 60 g de avena con agua o leche', p:28, costo:1, t:['v','sl','sg']},
+    {n:'Yogur griego con fruta y avena', d:'250 g de yogur griego + fruta + 40 g de avena', p:26, costo:2, t:['v','sg']},
+    {n:'Arepa o pan con huevo y queso', d:'2 huevos + arepa mediana + 40 g de queso blanco', p:26, costo:1, t:['v']},
+    {n:'Batido de avena y proteína', d:'50 g de avena + 1 scoop + plátano + leche', p:32, costo:2, t:['v']},
+    {n:'Tofu revuelto con pan integral', d:'200 g de tofu + 2 rebanadas de pan integral', p:24, costo:2, t:['v','g','sl']}
+  ],
+  almuerzo: [
+    {n:'Pollo, arroz y ensalada', d:'150 g de pollo + 200 g de arroz cocido + ensalada libre', p:40, costo:1, t:['sl','sg']},
+    {n:'Carne molida con pasta', d:'150 g de carne molida magra + 200 g de pasta + tomate', p:42, costo:2, t:['sl']},
+    {n:'Atún con papa y verduras', d:'2 latas de atún + 250 g de papa + verduras', p:44, costo:1, t:['sl','sg','pz']},
+    {n:'Lentejas con arroz y huevo', d:'200 g de lentejas cocidas + 150 g de arroz + 1 huevo', p:30, costo:1, t:['v','sl','sg']},
+    {n:'Pescado con arroz y verduras', d:'180 g de pescado blanco + 200 g de arroz + verduras', p:42, costo:2, t:['sl','sg','pz']},
+    {n:'Garbanzos guisados con arroz', d:'250 g de garbanzos + 150 g de arroz + verduras', p:28, costo:1, t:['v','g','sl','sg']}
+  ],
+  cena: [
+    {n:'Pollo a la plancha con verduras', d:'150 g de pollo + verduras salteadas + 1 cda de aceite', p:38, costo:1, t:['sl','sg']},
+    {n:'Tortilla de huevos con ensalada', d:'3 huevos + ensalada grande + aguacate', p:24, costo:1, t:['v','sl','sg']},
+    {n:'Pescado al horno con papa', d:'180 g de pescado + 200 g de papa asada', p:40, costo:2, t:['sl','sg','pz']},
+    {n:'Requesón con fruta y nueces', d:'250 g de requesón + fruta + 20 g de nueces', p:32, costo:2, t:['v','sg']},
+    {n:'Salteado de tofu y verduras', d:'200 g de tofu + verduras + salsa de soya', p:24, costo:2, t:['v','g','sl']}
+  ],
+  snack: [
+    {n:'Yogur griego solo', d:'200 g', p:20, costo:2, t:['v','sg']},
+    {n:'Batido de proteína', d:'1 scoop en agua', p:24, costo:2, t:['v','sg']},
+    {n:'Huevos duros', d:'3 unidades', p:18, costo:1, t:['v','sl','sg']},
+    {n:'Puñado de maní y fruta', d:'30 g de maní + 1 fruta', p:8, costo:1, t:['v','g','sl','sg']},
+    {n:'Requesón con canela', d:'200 g', p:26, costo:2, t:['v','sg']}
+  ]
+};
+
+const DIETA_FILTRO = {
+  sin_restriccion: null,
+  vegetariano: 'v',
+  vegano: 'g',
+  sin_lactosa: 'sl',
+  sin_gluten: 'sg',
+  pescetariano: null   // se filtra aparte: vegetariano o con pescado
+};
+
+function comidasPara(p){
+  const dieta = p.dieta_pref || 'sin_restriccion';
+  const tope = { bajo:1, medio:2, alto:3 }[p.presupuesto || 'medio'];
+  const et = DIETA_FILTRO[dieta];
+  const sirve = (c) => {
+    if (c.costo > tope) return false;
+    if (dieta === 'pescetariano') return c.t.indexOf('v') >= 0 || c.t.indexOf('pz') >= 0;
+    if (!et) return true;
+    return c.t.indexOf(et) >= 0;
+  };
+  const out = {};
+  Object.keys(COMIDAS).forEach(k => {
+    out[k] = COMIDAS[k].filter(sirve);
+    if (!out[k].length) out[k] = COMIDAS[k].filter(c => c.costo <= tope).slice(0,2);
+  });
+  return out;
+}
+
+function sistemaComida(p, pl){
+  if (!pl) return null;
+  const comidas = comidasPara(p);
+  const nComidas = pl.kcal >= 2600 ? 4 : pl.kcal >= 1900 ? 4 : 3;
+
+  // rango, no un número exacto: nadie acierta las calorías al gramo
+  const rango = [pl.kcal - 100, pl.kcal + 100];
+  // ciclado suave: más el día que entrenas, menos el día que descansas
+  const dias = Number(p.dias_entreno_semana) || 3;
+  const entreno = Math.round(pl.kcal + 150);
+  const descanso = Math.round(pl.kcal - Math.round(150 * dias / Math.max(1, 7 - dias)));
+
+  const protPorComida = Math.round(pl.prot / nComidas);
+
+  const porciones = [
+    ['Proteína', 'Una palma de tu mano por comida, del grosor de tu palma. Son unos 25 a 30 g de proteína.'],
+    ['Verduras',  'Un puño cerrado por comida, mínimo. Aquí no hay que medir: llena el plato.'],
+    ['Carbohidratos', 'Una mano ahuecada por comida' + (p.objetivo === 'bajar_grasa' ? '. Dos el día que entrenas.' : '. Dos en las comidas alrededor del entrenamiento.')],
+    ['Grasas', 'Un pulgar por comida. El aceite de cocinar cuenta y es donde todo el mundo se pasa.']
+  ];
+
+  const compra = [
+    ['Proteína', p.dieta_pref === 'vegano' ? 'Tofu, tempeh, lentejas, garbanzos, proteína vegetal'
+       : p.dieta_pref === 'vegetariano' ? 'Huevos, yogur griego, requesón, lentejas, garbanzos'
+       : 'Pollo, huevos, atún, carne molida magra, yogur griego'],
+    ['Carbohidratos', 'Arroz, avena, papa, pasta, pan integral' + (p.pais ? ' y lo que sea barato en ' + p.pais : '')],
+    ['Verduras', 'Lo que esté de temporada y barato. Congeladas también sirven y duran.'],
+    ['Grasas', 'Aceite de oliva, maní, aguacate, huevos enteros'],
+    ['Para el antojo', 'Fruta, yogur, gelatina sin azúcar. Ten algo a mano o te comerás otra cosa.']
+  ];
+
+  const ajustes = [
+    ['Tienes hambre todo el día', 'Sube las verduras y la proteína en cada comida antes de tocar las calorías. El volumen de comida sacia más que las calorías.'],
+    ['No te entra la comida', 'Pasa calorías a líquido: un batido con avena, plátano y leche resuelve 500 kcal sin esfuerzo.'],
+    ['Te da hambre de noche', 'Mueve la comida más grande del día hacia la cena. El reparto no cambia el resultado, pero sí si aguantas.'],
+    ['Un día se te fue de las manos', 'No compenses al día siguiente. Vuelve al plan y ya. Un día no arruina una semana; compensar sí arruina el hábito.'],
+    ['Comes fuera seguido', 'Pide proteína a la plancha y verduras, y controla la salsa y el aceite. Ahí está casi toda la diferencia.']
+  ];
+
+  return { rango, entreno, descanso, nComidas, protPorComida, comidas, porciones, compra, ajustes,
+           kcal: pl.kcal, prot: pl.prot, carb: pl.carb, gras: pl.gras, agua: pl.agua,
+           dieta: (p.dieta_pref || 'sin_restriccion'), presupuesto: (p.presupuesto || 'medio') };
+}
+/* =====================================================================
+   4 · OBJETIVOS DE PROGRESO Y SISTEMA DE TENDENCIA
+   La regla de oro: se decide con promedios de 2 a 4 semanas,
+   nunca con el peso de un día.
+   ===================================================================== */
+
+function pesosOrdenados(medidas){
+  return medidas.filter(m => m.zona === 'peso')
+                .map(m => ({ fecha: m.fecha, v: Number(m.valor) }))
+                .sort((a,b) => a.fecha < b.fecha ? -1 : 1);
+}
+
+/* media móvil de 7 días, igual que la vista de SQL */
+function tendenciaPeso(medidas){
+  const ps = pesosOrdenados(medidas);
+  const out = [];
+  ps.forEach((x, i) => {
+    const desde = sumarDias(x.fecha, -6);
+    const v = ps.filter((y, j) => j <= i && y.fecha >= desde);
+    out.push({ fecha:x.fecha, peso:x.v, dias:v.length,
+               tend: Math.round(v.reduce((a,b)=>a+b.v,0) / v.length * 100) / 100 });
+  });
+  return out;
+}
+
+/* ritmo real semanal comparando la tendencia de hoy con la de hace N días */
+function ritmoReal(tend, dias){
+  if (tend.length < 2) return null;
+  const hoy = tend[tend.length-1];
+  const objetivo = sumarDias(hoy.fecha, -dias);
+  let ref = null;
+  for (let i = tend.length-1; i >= 0; i--){ if (tend[i].fecha <= objetivo){ ref = tend[i]; break; } }
+  if (!ref) return null;
+  const d = (deISO(hoy.fecha) - deISO(ref.fecha)) / 86400000;
+  if (d < 7) return null;
+  return { kgSemana: Math.round((hoy.tend - ref.tend) / d * 7 * 100) / 100,
+           dias: Math.round(d), desde: ref.tend, hasta: hoy.tend };
+}
+
+function objetivosProgreso(p, pl, medidas, series, ejercicios){
+  if (!pl) return null;
+  const tend = tendenciaPeso(medidas);
+  const r14 = ritmoReal(tend, 14);
+  const r28 = ritmoReal(tend, 28);
+  const meta = pl.ritmoAplicado ? (pl.bajando ? -pl.ritmoAplicado : pl.ritmoAplicado) : 0;
+
+  /* --- decisión de calorías: solo con datos suficientes --- */
+  let decision = { clave:'esperar', titulo:'Todavía no hay con qué decidir', texto:'', color:'muted' };
+  const usable = r14 && r14.dias >= 14 && tend[tend.length-1].dias >= 4;
+  if (!tend.length){
+    decision.texto = 'No has registrado ningún peso. Pésate en ayunas, siempre a la misma hora, y en dos semanas hablamos.';
+  } else if (!usable){
+    const faltan = Math.max(0, 14 - (r14 ? r14.dias : (tend.length ? 1 : 0)));
+    decision.texto = 'Necesito al menos 14 días de pesajes para leer una tendencia. Te faltan unos ' + faltan + ' días. Mientras tanto no cambies nada.';
+  } else if (meta === 0){
+    decision = { clave:'mantener', titulo:'Sostén lo que estás haciendo', color:'ok',
+      texto:'Tu objetivo no es cambiar de peso. La tendencia se movió ' + r14.kgSemana + ' kg por semana, que es ruido normal.' };
+  } else {
+    const prop = r14.kgSemana / meta;          // 1 = justo lo planeado
+    if (prop >= 0.6 && prop <= 1.5){
+      decision = { clave:'mantener', titulo:'Vas en ritmo. No toques nada.', color:'ok',
+        texto:'Tendencia: ' + r14.kgSemana + ' kg por semana contra un objetivo de ' + Math.round(meta*100)/100 + '. Estás dentro. Cambiar calorías ahora solo añadiría ruido.' };
+    } else if (prop < 0.6 && prop > -0.5){
+      const dosSem = r28 && Math.abs(r28.kgSemana) < Math.abs(meta) * 0.6;
+      decision = { clave: dosSem ? (pl.bajando ? 'bajar_kcal':'subir_kcal') : 'esperar',
+        titulo: dosSem ? (pl.bajando ? 'Toca recortar 150 kcal' : 'Toca sumar 150 kcal')
+                       : 'Una semana lenta no es un estancamiento',
+        color: dosSem ? 'warn' : 'muted',
+        texto: dosSem
+          ? 'Llevas cerca de cuatro semanas por debajo del ritmo planeado (' + r14.kgSemana + ' contra ' + Math.round(meta*100)/100 + ' kg por semana). Ajusta ' + (pl.bajando ? '150 kcal menos' : '150 kcal más') + ' y vuelve a mirar en dos semanas. Un solo cambio.'
+          : 'La tendencia va lenta (' + r14.kgSemana + ' kg por semana), pero con dos semanas no alcanza para decidir. Espera a la cuarta antes de tocar las calorías.' };
+    } else if (prop > 1.5){
+      decision = { clave: pl.bajando ? 'subir_kcal' : 'bajar_kcal', color:'warn',
+        titulo: pl.bajando ? 'Estás bajando demasiado rápido' : 'Estás subiendo demasiado rápido',
+        texto: pl.bajando
+          ? 'Bajaste ' + Math.abs(r14.kgSemana) + ' kg por semana contra un objetivo de ' + Math.abs(Math.round(meta*100)/100) + '. A ese ritmo se pierde músculo. Sube 150 kcal.'
+          : 'Subiste ' + r14.kgSemana + ' kg por semana contra un objetivo de ' + Math.round(meta*100)/100 + '. Ese exceso se va a grasa. Baja 150 kcal.' };
+    } else {
+      decision = { clave: pl.bajando ? 'bajar_kcal':'subir_kcal', color:'bad',
+        titulo:'Vas en dirección contraria',
+        texto:'La tendencia se movió ' + r14.kgSemana + ' kg por semana, al revés de tu objetivo. Antes de tocar calorías, revisa que estés pesando y registrando todo: casi siempre es eso.' };
+    }
+  }
+
+  /* --- metas de fuerza sobre tus propios levantamientos --- */
+  const exp = EXPERIENCIA[p.experiencia] || EXPERIENCIA.principiante;
+  const porEj = {};
+  series.forEach(s => {
+    const e = ejercicios.find(x => x.id === s.ejercicio_id);
+    if (!e || e.tipo !== 'compuesto') return;
+    const pesoS = Number(s.peso) || 0;
+    if (!porEj[s.ejercicio_id] || pesoS > porEj[s.ejercicio_id].peso)
+      porEj[s.ejercicio_id] = { nombre:e.nombre, peso:pesoS, grupo:e.grupo };
+  });
+  const fuerza = Object.values(porEj).sort((a,b)=>b.peso-a.peso).slice(0,4).map(x => ({
+    nombre: x.nombre, actual: x.peso,
+    semana: Math.round(x.peso * (1 + exp.prog) * 2) / 2,
+    mes: Math.round(x.peso * (1 + exp.prog*4.3) * 2) / 2
+  }));
+
+  /* --- metas de medidas --- */
+  const ult = (z) => { const l = medidas.filter(m=>m.zona===z).sort((a,b)=>a.fecha<b.fecha?-1:1); return l.length ? Number(l[l.length-1].valor) : null; };
+  const cintura = ult('cintura');
+  const medidasMeta = [];
+  if (cintura && pl.bajando) medidasMeta.push(['Cintura', cintura + ' cm', Math.round((cintura - 1)*10)/10 + ' cm al mes', 'Es la medida que mejor sigue la grasa. Si baja, vas bien aunque la balanza dude.']);
+  if (cintura && pl.subiendo) medidasMeta.push(['Cintura', cintura + ' cm', 'que no suba más de 1 cm al mes', 'Si crece más rápido que el brazo, estás comiendo de más.']);
+  const bi = ult('biceps_der'); if (bi) medidasMeta.push(['Bíceps derecho', bi + ' cm', pl.subiendo ? '+0,3 cm al mes' : 'mantenerlo', 'Crece lento. Medir cada 2 semanas es suficiente.']);
+  const mu = ult('muslo_der'); if (mu) medidasMeta.push(['Muslo derecho', mu + ' cm', pl.subiendo ? '+0,5 cm al mes' : 'mantenerlo', 'El que más rápido responde al entrenamiento de pierna.']);
+
+  const semanal = [
+    ['Pesarte', '4 veces por semana o más, en ayunas, después del baño, misma hora', 'Sin eso no hay tendencia que leer.'],
+    ['Medirte', 'Cintura una vez por semana; el resto cada 2 semanas', 'Siempre el mismo día y a la misma hora.'],
+    ['Entrenar', (p.dias_entreno_semana || 3) + ' sesiones registradas', 'Una sesión sin registrar es una sesión que no ocurrió.'],
+    ['Fotos', 'Una vez cada 4 semanas, misma luz y misma postura', 'Es lo único que capta cambios que ni la balanza ni la cinta ven.']
+  ];
+
+  return { tend, r14, r28, meta, decision, fuerza, medidasMeta, semanal,
+           ultimo: tend.length ? tend[tend.length-1] : null };
+}
+/* =====================================================================
+   5 · PUNTOS DÉBILES Y ESPECIALIZACIÓN
+   Se detectan con tu volumen de entrenamiento y tus medidas.
+   Nada de diagnosticar por fotos: eso no se hace.
+   ===================================================================== */
+
+/* series semanales recomendadas por grupo, rango de trabajo habitual */
+const SERIES_META = { pecho:[10,20], espalda:[10,22], pierna:[10,20], hombro:[8,20],
+  biceps:[6,16], triceps:[6,16], gluteo:[6,16], pantorrilla:[6,16],
+  abdomen:[4,12], trapecio:[4,12], antebrazo:[2,8] };
+
+function puntosDebiles(p, series, ejercicios, medidas){
+  const desde = sumarDias(hoyISO(), -27);
+  const recientes = series.filter(s => s.fecha >= desde);
+  const semanas = 4;
+
+  /* --- volumen y series por grupo --- */
+  const porGrupo = {};
+  recientes.forEach(s => {
+    const e = ejercicios.find(x => x.id === s.ejercicio_id);
+    if (!e || !SERIES_META[e.grupo]) return;
+    if (!porGrupo[e.grupo]) porGrupo[e.grupo] = { series:0, volumen:0, dias:new Set() };
+    porGrupo[e.grupo].series++;
+    porGrupo[e.grupo].volumen += (Number(s.peso)||0) * (Number(s.repeticiones)||0);
+    porGrupo[e.grupo].dias.add(s.fecha);
+  });
+
+  const hallazgos = [];
+  Object.keys(SERIES_META).forEach(g => {
+    const d = porGrupo[g];
+    const porSem = d ? Math.round(d.series / semanas * 10) / 10 : 0;
+    const [min, max] = SERIES_META[g];
+    if (!d){
+      if (['pecho','espalda','pierna','hombro'].indexOf(g) >= 0)
+        hallazgos.push({ grupo:g, sev:2, porSem:0,
+          que:'No entrenaste ' + GRUPO_N[g].toLowerCase() + ' en cuatro semanas.',
+          por:'Es un grupo grande. Dejarlo fuera desequilibra todo lo demás.' });
+    } else if (porSem < min){
+      hallazgos.push({ grupo:g, sev: porSem < min/2 ? 2 : 1, porSem,
+        que: GRUPO_N[g] + ': ' + porSem + ' series por semana, por debajo de las ' + min + ' de referencia.',
+        por: 'Con menos de ' + min + ' series semanales cuesta que crezca.' });
+    } else if (porSem > max){
+      hallazgos.push({ grupo:g, sev:1, porSem, exceso:true,
+        que: GRUPO_N[g] + ': ' + porSem + ' series por semana, por encima de las ' + max + ' que sueles poder recuperar.',
+        por: 'Más volumen del que recuperas no construye nada; le quita recursos al resto.' });
+    }
+  });
+
+  /* --- asimetrías entre lado y lado --- */
+  const ult = (z) => { const l = medidas.filter(m=>m.zona===z).sort((a,b)=>a.fecha<b.fecha?-1:1); return l.length ? Number(l[l.length-1].valor) : null; };
+  const asim = [];
+  [['biceps_izq','biceps_der','Bíceps'], ['antebrazo_izq','antebrazo_der','Antebrazo'],
+   ['muslo_izq','muslo_der','Muslo'], ['pantorrilla_izq','pantorrilla_der','Pantorrilla']].forEach(par => {
+    const a = ult(par[0]), b = ult(par[1]);
+    if (a && b){
+      const dif = Math.abs(a-b), pct = dif / Math.max(a,b) * 100;
+      if (pct >= 4) asim.push({ zona:par[2], izq:a, der:b, dif: Math.round(dif*10)/10,
+        pct: Math.round(pct*10)/10, lado: a < b ? 'izquierdo' : 'derecho' });
+    }
+  });
+
+  /* --- proporciones --- */
+  const prop = [];
+  const hom = ult('hombros'), cin = ult('cintura'), pec = ult('pecho'), bic = ult('biceps_der'), mus = ult('muslo_der');
+  if (hom && cin){
+    const r = hom/cin;
+    if (r < 1.35) prop.push({ t:'Hombros y cintura', v: Math.round(r*100)/100,
+      txt:'La relación hombro-cintura está en ' + Math.round(r*100)/100 + '. Trabajar deltoide lateral es lo que más cambia esa silueta.' });
+  }
+  if (mus && bic){
+    const r = mus/bic;
+    if (r > 1.95) prop.push({ t:'Pierna y brazo', v: Math.round(r*100)/100,
+      txt:'El muslo va bastante por delante del brazo. No es un problema de salud, pero si te importa la proporción, ahí está.' });
+  }
+
+  hallazgos.sort((a,b) => b.sev - a.sev || a.porSem - b.porSem);
+  const candidato = hallazgos.find(h => !h.exceso);
+
+  /* --- el bloque de especialización --- */
+  let bloque = null;
+  if (candidato){
+    const g = candidato.grupo;
+    const [min, max] = SERIES_META[g];
+    const actual = candidato.porSem;
+    const sube = Math.min(max, Math.max(min, Math.round(actual + 4)));
+    bloque = {
+      grupo: g, nombre: GRUPO_N[g], semanas: 6,
+      seriesActual: actual, seriesNuevo: sube,
+      pasos: [
+        'Sube ' + GRUPO_N[g].toLowerCase() + ' de ' + actual + ' a ' + sube + ' series por semana, repartidas en 2 o 3 sesiones.',
+        'Ponlo primero en la sesión, cuando estás fresco. Lo que va al final se hace mal.',
+        'Baja 2 o 3 series semanales a un grupo que vaya bien. El volumen total tiene que caber en lo que recuperas.',
+        'Trabaja en 8 a 15 repeticiones con RIR 1 o 2, con rango completo. En especialización manda la calidad, no la carga.',
+        'Sostenlo 6 semanas y vuelve a medir. Menos de 4 no da tiempo a nada; más de 8 le quita a lo demás.'
+      ],
+      revision: 'A las 6 semanas: mide de nuevo y compara el volumen. Si no se movió nada, el problema no era el volumen — mira la técnica y la recuperación.'
+    };
+  }
+
+  return { hallazgos, asim, prop, bloque, hayDatos: recientes.length > 0, sesiones: new Set(recientes.map(s=>s.fecha)).size };
+}
+
+/* =====================================================================
+   6 · RECUPERACIÓN Y RENDIMIENTO
+   Ordenado por impacto: primero lo que más te está costando.
+   ===================================================================== */
+function sistemaRecuperacion(p, recup, series, habitos, registros){
+  const desde = sumarDias(hoyISO(), -13);
+  const rs = recup.filter(r => r.fecha >= desde);
+  const prom = (k) => { const v = rs.map(r=>r[k]).filter(x=>x!=null&&x!==''); return v.length ? Math.round(v.reduce((a,b)=>a+Number(b),0)/v.length*10)/10 : null; };
+  const sueno = prom('sueno_h'), estres = prom('estres'), energia = prom('energia'), pasos = prom('pasos');
+
+  const dias14 = new Set(series.filter(s => s.fecha >= desde).map(s => s.fecha));
+  const sesionesSem = Math.round(dias14.size / 2 * 10) / 10;
+  const previstas = Number(p.dias_entreno_semana) || 3;
+
+  const obst = [];
+  if (sueno != null && sueno < 6.5) obst.push({ imp:3, t:'El sueño',
+    d:'Duermes ' + sueno + ' horas de media. Por debajo de 7 se te cae la fuerza, sube el hambre y el músculo no se repara.',
+    a:'Adelanta la hora de acostarte 20 minutos por semana hasta llegar a 7 y media. Es el cambio de mayor impacto que puedes hacer, por encima de cualquier suplemento.' });
+  else if (sueno != null && sueno < 7) obst.push({ imp:2, t:'El sueño',
+    d:'Vas por ' + sueno + ' horas. Estás cerca, pero corto.',
+    a:'Media hora más y notarás la diferencia en la segunda mitad de la sesión.' });
+
+  if (estres != null && estres >= 4) obst.push({ imp:3, t:'El estrés',
+    d:'Lo estás puntuando en ' + estres + ' sobre 5. El estrés compite con el entrenamiento por la misma capacidad de recuperación.',
+    a:'Las semanas de mucho estrés, quita una serie a cada ejercicio en vez de faltar. Entrenar menos es mejor que no entrenar.' });
+
+  if (sesionesSem > previstas + 0.8) obst.push({ imp:2, t:'La frecuencia',
+    d:'Estás entrenando ' + sesionesSem + ' veces por semana cuando el plan dice ' + previstas + '.',
+    a:'Más sesiones no es más resultado si no aumenta lo que recuperas. Respeta los días de descanso: ahí es donde se construye.' });
+
+  if (pasos != null && pasos < 6000) obst.push({ imp:2, t:'El movimiento diario',
+    d:'Promedias ' + pasos + ' pasos al día.',
+    a:'Subir a 8.000 gasta más que casi cualquier cardio y no te quita recuperación para el gimnasio.' });
+
+  if (energia != null && energia <= 2) obst.push({ imp:3, t:'La energía',
+    d:'Te sientes en ' + energia + ' sobre 5. Eso no es falta de ganas, es una señal.',
+    a:'Si además duermes poco o estás en déficit, haz una semana de descarga ya. No esperes a que toque.' });
+
+  const hAgua = habitos.find(h => /agua/i.test(h.nombre || ''));
+  if (hAgua){
+    const ult7 = registros.filter(r => r.habito_id === hAgua.id && r.fecha >= sumarDias(hoyISO(),-6) && r.cumplido).length;
+    if (ult7 <= 3) obst.push({ imp:1, t:'La hidratación',
+      d:'Cumpliste la meta de agua ' + ult7 + ' de los últimos 7 días.',
+      a:'La deshidratación baja el rendimiento antes de que sientas sed. Deja la botella a la vista.' });
+  }
+
+  if (!rs.length) obst.push({ imp:3, t:'No hay datos',
+    d:'No has registrado sueño, estrés ni pasos.',
+    a:'Registra una semana. Sin eso, cualquier consejo de recuperación que te dé sería adivinar.' });
+
+  obst.sort((a,b) => b.imp - a.imp);
+
+  const rutinas = [
+    ['Antes de entrenar', 'Come algo con carbohidratos 1 o 2 horas antes. Entrenar en ayunas no quema más grasa; solo entrenas peor.'],
+    ['Después de entrenar', 'Proteína dentro de las 2 horas siguientes. La ventana no es de 30 minutos, esa historia ya se cayó.'],
+    ['Los días de descanso', 'Camina. Descanso no es sofá: el movimiento suave acelera la recuperación.'],
+    ['La última hora del día', 'Pantallas fuera y luz baja. Es lo que más barato te sale para dormir mejor.'],
+    ['Cuando arrastras la sesión', 'Baja el peso un 10% y termina la rutina. Mejor una sesión al 80% que una falta.']
+  ];
+
+  return { sueno, estres, energia, pasos, sesionesSem, previstas, obst, rutinas,
+           dias: rs.length, registrosHoy: recup.find(r => r.fecha === hoyISO()) || null };
+}
+/* =====================================================================
+   7 · REVISIÓN SEMANAL
+   Compara la semana contra la anterior y cambia UNA cosa.
+   Nunca dos a la vez: si cambias dos, no sabrás cuál funcionó.
+   ===================================================================== */
+function revisionSemanal(p, pl, medidas, series, ejercicios, recup, registros, habitos){
+  const finSem  = lunesDe(hoyISO());              // lunes de esta semana
+  const iniAct  = sumarDias(finSem, -7);          // semana que acaba de cerrar
+  const iniPrev = sumarDias(finSem, -14);
+
+  const enRango = (f, a, b) => f >= a && f < b;
+
+  const promZona = (zona, a, b) => {
+    const v = medidas.filter(m => m.zona === zona && enRango(m.fecha, a, b)).map(m => Number(m.valor));
+    return v.length ? Math.round(v.reduce((x,y)=>x+y,0)/v.length * 100)/100 : null;
+  };
+  const pesoAct = promZona('peso', iniAct, finSem), pesoPrev = promZona('peso', iniPrev, iniAct);
+  const cintAct = promZona('cintura', iniAct, finSem), cintPrev = promZona('cintura', iniPrev, iniAct);
+
+  const sesionesDe = (a,b) => new Set(series.filter(s => enRango(s.fecha,a,b)).map(s=>s.fecha)).size;
+  const volumenDe  = (a,b) => Math.round(series.filter(s => enRango(s.fecha,a,b))
+                        .reduce((t,s)=> t + (Number(s.peso)||0)*(Number(s.repeticiones)||0), 0));
+  const sesAct = sesionesDe(iniAct, finSem), sesPrev = sesionesDe(iniPrev, iniAct);
+  const volAct = volumenDe(iniAct, finSem),  volPrev = volumenDe(iniPrev, iniAct);
+
+  const suenoDe = (a,b) => { const v = recup.filter(r=>enRango(r.fecha,a,b) && r.sueno_h!=null).map(r=>Number(r.sueno_h));
+    return v.length ? Math.round(v.reduce((x,y)=>x+y,0)/v.length*10)/10 : null; };
+  const suenoAct = suenoDe(iniAct, finSem), suenoPrev = suenoDe(iniPrev, iniAct);
+
+  const dif = (a,b) => (a==null||b==null) ? null : Math.round((a-b)*100)/100;
+  const dPeso = dif(pesoAct, pesoPrev), dCint = dif(cintAct, cintPrev);
+  const dVol = (volPrev > 0 && volAct != null) ? Math.round((volAct-volPrev)/volPrev*1000)/10 : null;
+
+  /* --- qué está funcionando y qué se atascó --- */
+  const bien = [], mal = [];
+  const meta = pl && pl.ritmoAplicado ? (pl.bajando ? -pl.ritmoAplicado : pl.ritmoAplicado) : 0;
+
+  if (dPeso != null){
+    if (meta === 0) (Math.abs(dPeso) < 0.6 ? bien : mal).push('El peso se movió ' + dPeso + ' kg. ' + (Math.abs(dPeso)<0.6 ? 'Estable, que es lo que buscas.' : 'Más movimiento del esperado para mantenimiento.'));
+    else if ((meta < 0 && dPeso < -0.05) || (meta > 0 && dPeso > 0.05)) bien.push('El peso promedio se movió ' + dPeso + ' kg en la dirección correcta.');
+    else mal.push('El peso promedio se movió ' + dPeso + ' kg, y no es la dirección que buscas.');
+  }
+  if (dCint != null){
+    if (pl && pl.bajando && dCint < 0) bien.push('La cintura bajó ' + Math.abs(dCint) + ' cm. Es la mejor señal de que pierdes grasa.');
+    else if (pl && pl.subiendo && dCint > 0.8) mal.push('La cintura subió ' + dCint + ' cm en una semana. Vigila el superávit.');
+  }
+  if (sesAct >= (p.dias_entreno_semana||3)) bien.push('Cumpliste las ' + sesAct + ' sesiones previstas.');
+  else if (sesAct > 0) mal.push('Hiciste ' + sesAct + ' de ' + (p.dias_entreno_semana||3) + ' sesiones.');
+  else mal.push('No registraste ninguna sesión esta semana.');
+
+  if (dVol != null){
+    if (dVol > 2) bien.push('El volumen de entrenamiento subió ' + dVol + '% contra la semana anterior.');
+    else if (dVol < -10) mal.push('El volumen cayó ' + Math.abs(dVol) + '%. Si no fue semana de descarga, algo se atascó.');
+  }
+  if (suenoAct != null){
+    if (suenoAct >= 7) bien.push('Dormiste ' + suenoAct + ' horas de media.');
+    else mal.push('Dormiste ' + suenoAct + ' horas de media. Es el techo de todo lo demás.');
+  }
+
+  /* --- la decisión: una sola, y la más importante --- */
+  let decision;
+  if (sesAct === 0){
+    decision = { t:'Volver a entrenar', c:'bad',
+      d:'No hay nada que ajustar en calorías ni en volumen mientras no haya sesiones. Esta semana solo importa una cosa: aparecer. Baja la meta a dos sesiones si hace falta.' };
+  } else if (suenoAct != null && suenoAct < 6.5){
+    decision = { t:'Arreglar el sueño antes que nada', c:'warn',
+      d:'Con ' + suenoAct + ' horas de media, ajustar calorías o volumen es mover piezas sobre un cimiento flojo. Media hora más de sueño rinde más que cualquier cambio en la dieta.' };
+  } else if (sesAct < (p.dias_entreno_semana||3)){
+    decision = { t:'Cerrar las sesiones que faltan', c:'warn',
+      d:'Antes de tocar la dieta, cumple el plan de entrenamiento. La constancia explica más resultado que la precisión de las calorías.' };
+  } else if (dVol != null && dVol < -10){
+    decision = { t:'Revisar la recuperación, no el plan', c:'warn',
+      d:'Perdiste ' + Math.abs(dVol) + '% de volumen. Suele ser sueño, comida o estrés antes que la rutina. Si se repite otra semana, haz la descarga.' };
+  } else {
+    decision = { t:'Sostener y no tocar nada', c:'ok',
+      d:'Lo que estás haciendo está funcionando o lleva muy poco para saberlo. Cambiar ahora solo añade ruido: repite la semana igual.' };
+  }
+
+  /* --- prioridades de la próxima semana, una por área --- */
+  const prio = [
+    ['Entrenamiento', sesAct < (p.dias_entreno_semana||3)
+        ? 'Cumplir las ' + (p.dias_entreno_semana||3) + ' sesiones, aunque tengas que acortarlas.'
+        : 'Subir peso o repeticiones en los dos primeros ejercicios de cada día.'],
+    ['Alimentación', pl ? ('Sostener ' + pl.prot + ' g de proteína y quedarte entre ' + (pl.kcal-100) + ' y ' + (pl.kcal+100) + ' kcal.') : 'Completa tu perfil para calcular las calorías.'],
+    ['Recuperación', (suenoAct != null && suenoAct < 7) ? 'Acostarte 20 minutos antes cada día.' : 'Sostener el sueño y caminar los días de descanso.'],
+    ['Seguimiento', 'Pesarte 4 días o más y medir la cintura una vez. Sin datos no hay revisión que valga.']
+  ];
+
+  return { iniAct, finSem, iniPrev, pesoAct, pesoPrev, dPeso, cintAct, cintPrev, dCint,
+           sesAct, sesPrev, volAct, volPrev, dVol, suenoAct, suenoPrev,
+           bien, mal, decision, prio,
+           hayDatos: !!(pesoAct || sesAct || suenoAct) };
+}
+
+
+/* =====================================================================
+   PLAN · carga, guardado y pintado
+   ===================================================================== */
+async function cargarPlan(){
+  if (!S.user) return;
+  const [r1, r2, r3, r4] = await Promise.all([
+    sb.from('rutina').select('*').eq('user_id', S.user.id).order('dia').order('orden'),
+    sb.from('recuperacion').select('*').eq('user_id', S.user.id).gte('fecha', sumarDias(hoyISO(), -60)).order('fecha'),
+    sb.from('checkin').select('*').eq('user_id', S.user.id).order('semana_inicio', {ascending:false}).limit(12),
+    sb.from('especializacion').select('*').eq('user_id', S.user.id).eq('activa', true)
+  ]);
+  if (r1.error && faltaTabla(r1.error)){ COACH.cargado = true; return pintarPlan180(); }
+  COACH.rutina   = r1.data || [];
+  COACH.recup    = r2.data || [];
+  COACH.checkins = r3.data || [];
+  COACH.espec    = (r4.data || [])[0] || null;
+  COACH.cargado  = true;
+  pintarPlan180();
+}
+
+function datosPlan(){
+  const p = S.perfil || {};
+  const pl = planNutricion(p);
+  return { p, pl,
+    medidas: C.medidas || [], series: G.series || [], ejercicios: G.ejercicios || [],
+    registros: S.registros || [], habitos: S.habitos || [] };
+}
+
+function avisoFaltan(faltan){
+  return '<div class="card"><h2 style="margin-top:0">Antes de armar tu plan</h2>' +
+    '<p>Para no inventarme nada, necesito que completes: <b>' + faltan.join('</b>, <b>') + '</b>.</p>' +
+    '<p class="muted">Un entrenador que te arma un plan sin conocerte no es un entrenador, es una plantilla.</p>' +
+    '<div class="row"><button class="pri" onclick="abrirPerfil()">Completar mis datos</button></div></div>';
+}
+
+/* ---------- 1 · plan de 180 días ---------- */
+function vistaPlan180(){
+  const {p, pl} = datosPlan();
+  const faltan = faltaParaPlan(p);
+  if (faltan.length) return avisoFaltan(faltan);
+  const P180 = plan180(p, pl);
+  if (!P180) return avisoFaltan(['tus datos básicos']);
+
+  const cab = '<div class="card"><div class="row" style="justify-content:space-between;align-items:flex-start">' +
+    '<div><div class="et">Plan de 180 días</div>' +
+    '<div style="font-size:26px;font-weight:700;margin-top:2px">Semana ' + P180.semanaActual + ' de 26</div>' +
+    '<div class="muted">Del ' + fechaCorta(P180.inicio) + ' al ' + fechaCorta(P180.fin) + '</div></div>' +
+    '<div style="text-align:right"><div class="et">Objetivo diario</div>' +
+    '<div style="font-size:22px;font-weight:700">' + P180.kcal + ' kcal</div>' +
+    '<div class="muted">' + P180.prot + ' g de proteína</div></div></div>' +
+    '<div class="barra" style="margin-top:12px"><i style="width:' +
+      Math.round(P180.semanaActual/26*100) + '%"></i></div></div>';
+
+  const bloques = '<div class="card"><h2 style="margin-top:0">Los seis bloques</h2>' +
+    P180.bloques.map(b =>
+      '<div class="bloque' + (b.actual ? ' activo' : b.pasado ? ' hecho' : '') + '">' +
+      '<div class="row" style="justify-content:space-between;align-items:baseline">' +
+        '<div><b>Mes ' + b.n + ' · ' + b.titulo + '</b>' +
+        (b.actual ? ' <span class="pill ok">vas aquí</span>' : '') + '</div>' +
+        '<span class="muted" style="font-size:12px">' + b.mes + '</span></div>' +
+      '<div class="muted" style="margin-top:6px"><b style="color:var(--tx)">Entreno:</b> ' + b.entreno + '</div>' +
+      '<div class="muted" style="margin-top:3px"><b style="color:var(--tx)">Comida:</b> ' + b.comida + '</div>' +
+      '<div class="row" style="margin-top:8px;gap:8px;flex-wrap:wrap">' +
+        (b.pesoMeta ? '<span class="pill">Peso ≈ ' + b.pesoMeta + ' kg</span>' : '') +
+        '<span class="pill">Fuerza +' + b.fuerzaMeta + '% en los básicos</span>' +
+      '</div></div>').join('') + '</div>';
+
+  const prio = '<div class="card"><h2 style="margin-top:0">Las tres cosas que deciden el resultado</h2><ol class="lista">' +
+    P180.prioridades.map(x => '<li>' + x + '</li>').join('') + '</ol></div>';
+
+  const ries = '<div class="card"><h2 style="margin-top:0">Dónde se te puede caer</h2><ul class="lista">' +
+    P180.riesgos.map(x => '<li>' + x + '</li>').join('') + '</ul>' +
+    '<p class="muted" style="margin-bottom:0">Esto no es una promesa de físico. Son objetivos de proceso, y se ajustan con lo que registres.</p></div>';
+
+  return cab + bloques + prio + ries;
+}
+
+/* ---------- 2 · rutina ---------- */
+function vistaRutina(){
+  const {p, ejercicios} = datosPlan();
+  const faltan = faltaParaPlan(p);
+  if (faltan.length) return avisoFaltan(faltan);
+  if (!ejercicios.length) return '<div class="card"><p>Todavía no cargué los ejercicios. Abre la pestaña Gimnasio una vez y vuelve.</p></div>';
+
+  const g = guiaRutina(p);
+  const permite = (EQUIPO[p.equipo] || EQUIPO.gimnasio).permite;
+
+  let cuerpo;
+  if (!COACH.rutina.length){
+    const prev = generarRutina(p, ejercicios);
+    cuerpo = '<div class="card"><h2 style="margin-top:0">Todavía no tienes rutina</h2>' +
+      '<p>Con tus datos te toca: <b>' + prev.nombre + '</b>, ' + prev.filas.length + ' ejercicios repartidos en ' + prev.dias + ' días.</p>' +
+      '<p class="muted">Se guarda para que puedas seguirla semana a semana. La puedes regenerar cuando cambies de objetivo o de equipo.</p>' +
+      '<div class="row"><button class="pri" id="btnGenRutina">Generar mi rutina</button></div></div>';
+  } else {
+    const porDia = {};
+    COACH.rutina.forEach(r => { (porDia[r.dia] = porDia[r.dia] || []).push(r); });
+    const split = SPLITS[Math.max(3, Math.min(6, Object.keys(porDia).length))] || SPLITS[3];
+    cuerpo = '<div class="card"><div class="row" style="justify-content:space-between">' +
+      '<h2 style="margin:0">Tu rutina</h2><button class="sm gh" id="btnRegenRutina">Regenerar</button></div>' +
+      '<p class="muted" style="margin:6px 0 0">' + (split.n) + ' · ' + (EQUIPO[p.equipo]||EQUIPO.gimnasio).n + '</p></div>' +
+      Object.keys(porDia).sort((a,b)=>a-b).map(d => {
+        const t = (split.dias[d-1] && split.dias[d-1].t) || ('Día ' + d);
+        return '<div class="card"><h3 style="margin:0 0 10px">' + t + '</h3>' +
+          '<div class="tablaWrap"><table class="tab"><thead><tr><th>Ejercicio</th><th>Series</th><th>Reps</th><th>RIR</th><th>Descanso</th></tr></thead><tbody>' +
+          porDia[d].map(r => {
+            const e = ejercicios.find(x => x.id === r.ejercicio_id) || {};
+            const sus = sustitutos(r, ejercicios, permite);
+            return '<tr><td><b>' + esc(e.nombre || 'Ejercicio') + '</b>' +
+              '<div class="muted" style="font-size:11px">' + (GRUPO_N[e.grupo]||'') +
+              (r.rol === 'principal' ? ' · principal' : '') + '</div>' +
+              (sus.length ? '<div class="muted" style="font-size:11px;margin-top:2px">Si no puedes: ' +
+                 sus.map(x=>esc(x.nombre)).join(' · ') + '</div>' : '') +
+              '</td><td class="num">' + r.series + '</td><td class="num">' + r.reps_min + '-' + r.reps_max +
+              '</td><td class="num">' + r.rir + '</td><td class="num">' + r.descanso_s + ' s</td></tr>';
+          }).join('') + '</tbody></table></div></div>';
+      }).join('');
+  }
+
+  const guia = [['Calentamiento', g.calentamiento], ['Cómo subir de peso', g.progresion],
+                ['Qué es el RIR', g.esfuerzo], ['La semana de descarga', g.descarga],
+                ['Si te estancas', g.estancado]]
+    .map(x => '<div class="card"><h3 style="margin:0 0 8px">' + x[0] + '</h3><ul class="lista">' +
+              x[1].map(y => '<li>' + y + '</li>').join('') + '</ul></div>').join('');
+
+  return cuerpo + guia;
+}
+
+/* ---------- 3 · alimentación ---------- */
+function vistaComida(){
+  const {p, pl} = datosPlan();
+  const faltan = faltaParaPlan(p);
+  if (faltan.length) return avisoFaltan(faltan);
+  const c = sistemaComida(p, pl);
+
+  const cab = '<div class="card"><h2 style="margin-top:0">Tu rango, no tu número exacto</h2>' +
+    '<p>Apunta a <b>' + c.rango[0] + ' – ' + c.rango[1] + ' kcal</b> al día. Nadie acierta las calorías al gramo, y no hace falta.</p>' +
+    '<div class="grid g2" style="margin-top:10px">' +
+      '<div class="mini"><div class="et">Día que entrenas</div><div class="v">' + c.entreno + ' kcal</div></div>' +
+      '<div class="mini"><div class="et">Día que descansas</div><div class="v">' + c.descanso + ' kcal</div></div>' +
+      '<div class="mini"><div class="et">Proteína al día</div><div class="v">' + c.prot + ' g</div></div>' +
+      '<div class="mini"><div class="et">Por comida</div><div class="v">' + c.protPorComida + ' g</div></div>' +
+    '</div><p class="muted" style="margin-bottom:0">En ' + c.nComidas + ' comidas. La suma de la semana es lo que cuenta, no el día suelto.</p></div>';
+
+  const porc = '<div class="card"><h2 style="margin-top:0">Porciones sin pesar nada</h2>' +
+    '<p class="muted" style="margin-top:0">Tu mano viaja contigo y es proporcional a tu tamaño. Es suficiente.</p>' +
+    c.porciones.map(x => '<div class="fila2"><b>' + x[0] + '</b><span class="muted">' + x[1] + '</span></div>').join('') + '</div>';
+
+  const nom = { desayuno:'Desayunos', almuerzo:'Almuerzos', cena:'Cenas', snack:'Para el hambre' };
+  const menu = '<div class="card"><h2 style="margin-top:0">Comidas que puedes repetir</h2>' +
+    '<p class="muted" style="margin-top:0">Elige dos o tres de cada bloque y rótalas. La variedad infinita es la razón número uno por la que la gente abandona.</p>' +
+    Object.keys(nom).map(k => '<h3 style="margin:14px 0 6px">' + nom[k] + '</h3>' +
+      (c.comidas[k]||[]).map(m => '<div class="fila2"><div><b>' + m.n + '</b><div class="muted" style="font-size:12px">' + m.d + '</div></div>' +
+        '<span class="pill">' + m.p + ' g prot</span></div>').join('')).join('') + '</div>';
+
+  const compra = '<div class="card"><h2 style="margin-top:0">La lista de compra</h2>' +
+    c.compra.map(x => '<div class="fila2"><b>' + x[0] + '</b><span class="muted">' + x[1] + '</span></div>').join('') + '</div>';
+
+  const aj = '<div class="card"><h2 style="margin-top:0">Cuando algo no cuadra</h2>' +
+    c.ajustes.map(x => '<div class="fila2"><b>' + x[0] + '</b><span class="muted">' + x[1] + '</span></div>').join('') +
+    '<p class="muted" style="margin-bottom:0">Nada de ayunos largos ni de eliminar grupos de alimentos. Lo que no puedas sostener seis meses, no sirve.</p></div>';
+
+  return cab + porc + menu + compra + aj;
+}
+
+/* ---------- 4 · objetivos ---------- */
+function vistaMetas(){
+  const {p, pl, medidas, series, ejercicios} = datosPlan();
+  const faltan = faltaParaPlan(p);
+  if (faltan.length) return avisoFaltan(faltan);
+  const o = objetivosProgreso(p, pl, medidas, series, ejercicios);
+
+  const dec = '<div class="card ' + (o.decision.color === 'ok' ? 'buena' : o.decision.color === 'bad' ? 'mala' : '') + '">' +
+    '<div class="et">La decisión de esta semana</div><h2 style="margin:4px 0 6px">' + o.decision.titulo + '</h2>' +
+    '<p style="margin-bottom:0">' + o.decision.texto + '</p></div>';
+
+  let tend = '<div class="card"><h2 style="margin-top:0">Tendencia, no balanza</h2>';
+  if (!o.tend.length){
+    tend += '<p>No hay pesajes registrados. Pésate en ayunas, después del baño, siempre a la misma hora.</p>';
+  } else {
+    const u = o.ultimo;
+    tend += '<div class="grid g2">' +
+      '<div class="mini"><div class="et">Último pesaje</div><div class="v">' + u.peso + ' kg</div></div>' +
+      '<div class="mini"><div class="et">Tendencia de 7 días</div><div class="v">' + u.tend + ' kg</div></div>' +
+      (o.r14 ? '<div class="mini"><div class="et">Ritmo real (14 días)</div><div class="v">' + o.r14.kgSemana + ' kg/sem</div></div>' : '') +
+      (o.meta ? '<div class="mini"><div class="et">Ritmo objetivo</div><div class="v">' + (Math.round(o.meta*100)/100) + ' kg/sem</div></div>' : '') +
+      '</div>' + graficoTendencia(o.tend) +
+      '<p class="muted" style="margin-bottom:0">La línea verde es la que manda. El peso de un día sube y baja hasta 2 kg por agua, sal y comida en tránsito: no significa nada.</p>';
+  }
+  tend += '</div>';
+
+  const fz = o.fuerza.length ? '<div class="card"><h2 style="margin-top:0">Metas de fuerza</h2>' +
+    '<div class="tablaWrap"><table class="tab"><thead><tr><th>Ejercicio</th><th>Hoy</th><th>En 1 semana</th><th>En 1 mes</th></tr></thead><tbody>' +
+    o.fuerza.map(f => '<tr><td>' + esc(f.nombre) + '</td><td class="num">' + f.actual + ' kg</td>' +
+      '<td class="num">' + f.semana + ' kg</td><td class="num">' + f.mes + ' kg</td></tr>').join('') +
+    '</tbody></table></div><p class="muted" style="margin-bottom:0">Calculado con tu nivel (' +
+    (EXPERIENCIA[p.experiencia]||EXPERIENCIA.principiante).n.toLowerCase() + '). Cuanto más entrenado, más lento se avanza: es lo normal.</p></div>' : '';
+
+  const md = o.medidasMeta.length ? '<div class="card"><h2 style="margin-top:0">Metas de medidas</h2>' +
+    o.medidasMeta.map(m => '<div class="fila2"><div><b>' + m[0] + '</b> <span class="muted">' + m[1] + '</span>' +
+      '<div class="muted" style="font-size:12px">' + m[3] + '</div></div><span class="pill libre">' + m[2] + '</span></div>').join('') + '</div>' : '';
+
+  const sem = '<div class="card"><h2 style="margin-top:0">Qué registrar cada semana</h2>' +
+    o.semanal.map(x => '<div class="fila2"><div style="flex:1"><b>' + x[0] + '</b>' +
+      '<div style="font-size:13px;margin-top:2px">' + x[1] + '</div>' +
+      '<div class="muted" style="font-size:12px;margin-top:2px">' + x[2] + '</div></div></div>').join('') + '</div>';
+
+  return dec + tend + fz + md + sem;
+}
+
+function graficoTendencia(tend){
+  const d = tend.slice(-42);
+  if (d.length < 3) return '';
+  const W = 320, H = 90, pad = 6;
+  const vs = d.map(x=>x.peso).concat(d.map(x=>x.tend));
+  const min = Math.min.apply(null, vs), max = Math.max.apply(null, vs);
+  const rango = (max - min) || 1;
+  const px = (i) => pad + i * (W - pad*2) / Math.max(1, d.length-1);
+  const py = (v) => H - pad - (v - min) / rango * (H - pad*2);
+  const linea = (campo) => d.map((x,i) => (i?'L':'M') + px(i).toFixed(1) + ' ' + py(x[campo]).toFixed(1)).join(' ');
+  return '<svg viewBox="0 0 ' + W + ' ' + H + '" style="width:100%;height:120px;margin:12px 0 4px;display:block">' +
+    '<path d="' + linea('peso') + '" fill="none" stroke="var(--tx3)" stroke-width="1" opacity=".55"/>' +
+    '<path d="' + linea('tend') + '" fill="none" stroke="var(--brand)" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round"/>' +
+    '</svg>';
+}
+
+/* ---------- 5 · puntos débiles ---------- */
+function vistaDebiles(){
+  const {p, series, ejercicios, medidas} = datosPlan();
+  const d = puntosDebiles(p, series, ejercicios, medidas);
+
+  if (!d.hayDatos) return '<div class="card"><h2 style="margin-top:0">Sin entrenamientos que analizar</h2>' +
+    '<p>Registra tus series en la pestaña Gimnasio durante dos o tres semanas y aquí te diré qué grupo se está quedando atrás.</p>' +
+    '<p class="muted" style="margin-bottom:0">Y algo importante: no diagnostico lesiones ni analizo fotos. Eso es trabajo de un profesional que te vea en persona.</p></div>';
+
+  const res = '<div class="card"><h2 style="margin-top:0">Últimas 4 semanas</h2>' +
+    '<p class="muted" style="margin-top:0">' + d.sesiones + ' sesiones registradas.</p>' +
+    (d.hallazgos.length
+      ? d.hallazgos.slice(0,6).map(h => '<div class="fila2"><div><b>' + h.que + '</b>' +
+          '<div class="muted" style="font-size:12px">' + h.por + '</div></div>' +
+          '<span class="pill ' + (h.sev>=2?'bad':'warn') + '">' + (h.exceso ? 'de más' : 'de menos') + '</span></div>').join('')
+      : '<p>Ningún grupo se sale de rango. Tu reparto de volumen está equilibrado.</p>') + '</div>';
+
+  const asi = d.asim.length ? '<div class="card"><h2 style="margin-top:0">Diferencias entre lados</h2>' +
+    d.asim.map(a => '<div class="fila2"><div><b>' + a.zona + '</b><div class="muted" style="font-size:12px">' +
+      'Izquierdo ' + a.izq + ' cm · derecho ' + a.der + ' cm. El lado ' + a.lado + ' va ' + a.dif + ' cm por detrás.</div></div>' +
+      '<span class="pill warn">' + a.pct + '%</span></div>').join('') +
+    '<p class="muted" style="margin-bottom:0">Por debajo del 4% es normal y no hay que hacer nada. Por encima, empieza los ejercicios de ese grupo con el lado flojo y haz con el fuerte las mismas repeticiones, no más.</p></div>' : '';
+
+  const pr = d.prop.length ? '<div class="card"><h2 style="margin-top:0">Proporciones</h2>' +
+    d.prop.map(x => '<div class="fila2"><b>' + x.t + '</b><span class="muted">' + x.txt + '</span></div>').join('') + '</div>' : '';
+
+  let esp = '';
+  if (COACH.espec){
+    const fin = sumarDias(COACH.espec.inicio, COACH.espec.semanas * 7);
+    const quedan = Math.max(0, Math.round((deISO(fin) - deISO(hoyISO()))/86400000/7*10)/10);
+    esp = '<div class="card buena"><div class="et">Bloque activo</div>' +
+      '<h2 style="margin:4px 0 6px">Especializando ' + (GRUPO_N[COACH.espec.grupo]||COACH.espec.grupo).toLowerCase() + '</h2>' +
+      '<p>Empezó el ' + fechaCorta(COACH.espec.inicio) + '. Quedan <b>' + quedan + ' semanas</b> antes de volver a evaluar.</p>' +
+      '<div class="row"><button class="sm gh" id="btnCerrarEspec">Cerrar el bloque</button></div></div>';
+  } else if (d.bloque){
+    const b = d.bloque;
+    esp = '<div class="card"><h2 style="margin-top:0">Bloque de especialización sugerido</h2>' +
+      '<p>El candidato es <b>' + b.nombre.toLowerCase() + '</b>: de ' + b.seriesActual + ' a ' + b.seriesNuevo + ' series por semana, durante ' + b.semanas + ' semanas.</p>' +
+      '<ol class="lista">' + b.pasos.map(x => '<li>' + x + '</li>').join('') + '</ol>' +
+      '<p class="muted">' + b.revision + '</p>' +
+      '<div class="row"><button class="pri" id="btnAbrirEspec" data-g="' + b.grupo + '" data-s="' + b.semanas + '">Empezar el bloque</button></div></div>';
+  }
+
+  return res + asi + pr + esp;
+}
+
+/* ---------- 6 · recuperación ---------- */
+function vistaRecup(){
+  const {p, series, habitos, registros} = datosPlan();
+  const r = sistemaRecuperacion(p, COACH.recup, series, habitos, registros);
+  const hoy = r.registrosHoy;
+
+  const cab = '<div class="card"><div class="row" style="justify-content:space-between">' +
+    '<h2 style="margin:0">Últimos 14 días</h2>' +
+    '<button class="sm pri" id="btnRegRecup">' + (hoy ? 'Editar hoy' : 'Registrar hoy') + '</button></div>' +
+    '<div class="grid g2" style="margin-top:12px">' +
+      '<div class="mini"><div class="et">Sueño</div><div class="v">' + (r.sueno != null ? r.sueno + ' h' : '—') + '</div></div>' +
+      '<div class="mini"><div class="et">Estrés</div><div class="v">' + (r.estres != null ? r.estres + '/5' : '—') + '</div></div>' +
+      '<div class="mini"><div class="et">Energía</div><div class="v">' + (r.energia != null ? r.energia + '/5' : '—') + '</div></div>' +
+      '<div class="mini"><div class="et">Pasos</div><div class="v">' + (r.pasos != null ? r.pasos : '—') + '</div></div>' +
+    '</div><p class="muted" style="margin-bottom:0">' + r.dias + ' días registrados · entrenas ' + r.sesionesSem + ' veces por semana y el plan dice ' + r.previstas + '.</p></div>';
+
+  const ob = '<div class="card"><h2 style="margin-top:0">Lo que más te está frenando</h2>' +
+    '<p class="muted" style="margin-top:0">En orden de impacto. Ataca el primero y no te preocupes por el resto todavía.</p>' +
+    (r.obst.length ? r.obst.map((o,i) => '<div class="obst"><div class="n">' + (i+1) + '</div><div>' +
+      '<b>' + o.t + '</b><div class="muted" style="margin:3px 0">' + o.d + '</div>' +
+      '<div>' + o.a + '</div></div></div>').join('')
+      : '<p>No veo nada que esté frenando tu recuperación. Sostenlo.</p>') + '</div>';
+
+  const rt = '<div class="card"><h2 style="margin-top:0">Rutinas que ayudan</h2>' +
+    r.rutinas.map(x => '<div class="fila2"><b>' + x[0] + '</b><span class="muted">' + x[1] + '</span></div>').join('') + '</div>';
+
+  return cab + ob + rt;
+}
+
+/* ---------- 7 · revisión semanal ---------- */
+function vistaRevision(){
+  const {p, pl, medidas, series, ejercicios, registros, habitos} = datosPlan();
+  const faltan = faltaParaPlan(p);
+  if (faltan.length) return avisoFaltan(faltan);
+  const r = revisionSemanal(p, pl, medidas, series, ejercicios, COACH.recup, registros, habitos);
+
+  if (!r.hayDatos) return '<div class="card"><h2 style="margin-top:0">La semana pasada quedó vacía</h2>' +
+    '<p>No hay pesajes, ni sesiones, ni sueño registrado entre el ' + fechaCorta(r.iniAct) + ' y el ' + fechaCorta(r.finSem) + '.</p>' +
+    '<p class="muted" style="margin-bottom:0">No voy a inventarme una revisión. Registra esta semana y el lunes hablamos.</p></div>';
+
+  const flecha = (v, bueno) => v == null ? '' :
+    '<span class="pill ' + (v === 0 ? '' : (bueno ? 'ok' : 'bad')) + '">' + (v > 0 ? '+' : '') + v + '</span>';
+
+  const cab = '<div class="card"><div class="et">Semana del ' + fechaCorta(r.iniAct) + '</div>' +
+    '<h2 style="margin:4px 0 10px">Cómo fue</h2>' +
+    '<div class="tablaWrap"><table class="tab"><thead><tr><th></th><th>Esta semana</th><th>La anterior</th><th>Cambio</th></tr></thead><tbody>' +
+    '<tr><td>Peso promedio</td><td class="num">' + (r.pesoAct != null ? r.pesoAct + ' kg' : '—') + '</td>' +
+      '<td class="num">' + (r.pesoPrev != null ? r.pesoPrev + ' kg' : '—') + '</td><td class="num">' + (r.dPeso != null ? r.dPeso + ' kg' : '—') + '</td></tr>' +
+    '<tr><td>Cintura</td><td class="num">' + (r.cintAct != null ? r.cintAct + ' cm' : '—') + '</td>' +
+      '<td class="num">' + (r.cintPrev != null ? r.cintPrev + ' cm' : '—') + '</td><td class="num">' + (r.dCint != null ? r.dCint + ' cm' : '—') + '</td></tr>' +
+    '<tr><td>Sesiones</td><td class="num">' + r.sesAct + '</td><td class="num">' + r.sesPrev + '</td><td class="num">' + (r.sesAct - r.sesPrev) + '</td></tr>' +
+    '<tr><td>Volumen</td><td class="num">' + r.volAct.toLocaleString('es') + ' kg</td>' +
+      '<td class="num">' + r.volPrev.toLocaleString('es') + ' kg</td><td class="num">' + (r.dVol != null ? r.dVol + '%' : '—') + '</td></tr>' +
+    '<tr><td>Sueño</td><td class="num">' + (r.suenoAct != null ? r.suenoAct + ' h' : '—') + '</td>' +
+      '<td class="num">' + (r.suenoPrev != null ? r.suenoPrev + ' h' : '—') + '</td><td class="num">—</td></tr>' +
+    '</tbody></table></div></div>';
+
+  const bm = '<div class="grid g2">' +
+    '<div class="card"><h3 style="margin-top:0">Lo que está funcionando</h3>' +
+      (r.bien.length ? '<ul class="lista">' + r.bien.map(x=>'<li>'+x+'</li>').join('') + '</ul>' : '<p class="muted">Nada destacable esta semana.</p>') + '</div>' +
+    '<div class="card"><h3 style="margin-top:0">Lo que se atascó</h3>' +
+      (r.mal.length ? '<ul class="lista">' + r.mal.map(x=>'<li>'+x+'</li>').join('') + '</ul>' : '<p class="muted">Nada se atascó. Buena semana.</p>') + '</div></div>';
+
+  const dec = '<div class="card ' + (r.decision.c === 'ok' ? 'buena' : r.decision.c === 'bad' ? 'mala' : '') + '">' +
+    '<div class="et">El único cambio de la semana</div><h2 style="margin:4px 0 6px">' + r.decision.t + '</h2>' +
+    '<p style="margin-bottom:0">' + r.decision.d + '</p></div>';
+
+  const pr = '<div class="card"><h2 style="margin-top:0">Prioridades de la semana que entra</h2>' +
+    r.prio.map(x => '<div class="fila2"><b>' + x[0] + '</b><span class="muted">' + x[1] + '</span></div>').join('') +
+    '<p class="muted" style="margin-bottom:0">Un cambio a la vez. Si cambias dos cosas y mejora, no sabrás cuál fue.</p>' +
+    '<div class="row"><button class="pri" id="btnGuardarCheckin">Guardar esta revisión</button></div></div>';
+
+  return cab + bm + dec + pr;
+}
+
+/* ---------- despachador ---------- */
+function pintarPlan180(){
+  const cont = $('#plCuerpo'); if (!cont) return;
+  const v = { plan:vistaPlan180, rutina:vistaRutina, comida:vistaComida, metas:vistaMetas,
+              debiles:vistaDebiles, recup:vistaRecup, revision:vistaRevision }[COACH.secc] || vistaPlan180;
+  let html;
+  try { html = v(); }
+  catch(e){ html = '<div class="card mala"><h2 style="margin-top:0">Algo falló al calcular</h2><p class="muted">' + esc(String(e && e.message || e)) + '</p></div>'; }
+  cont.innerHTML = html;
+  conectarPlan();
+  $$('#plCuerpo .card').forEach((el,i) => {
+    el.style.animation = 'entraCard .42s cubic-bezier(.2,.8,.2,1) ' + Math.min(i*55, 280) + 'ms both';
+  });
+}
+
 /* ---------- cuerpo dibujado a partir de tus medidas ---------- */
 function anchoZona(k){
   const z = ZONA[k], p = S.perfil || {};
@@ -3206,6 +4509,11 @@ function abrirPerfil(){
   $('#pfPeso').value = p.peso_kg || '';
   $('#pfObjetivo').value = p.objetivo || 'bajar_grasa';
   $('#pfActividad').value = p.nivel_actividad || 'moderado';
+  $('#pfExperiencia').value = p.experiencia || 'principiante';
+  $('#pfEquipo').value      = p.equipo || 'gimnasio';
+  $('#pfDieta').value       = p.dieta_pref || 'sin_restriccion';
+  $('#pfPresupuesto').value = p.presupuesto || 'medio';
+  $('#pfPais').value        = p.pais || '';
   $('#pfPesoObj').value = p.peso_objetivo || '';
   $('#pfFechaObj').value = p.fecha_objetivo || '';
   ajustarCamposMeta();
@@ -3232,6 +4540,12 @@ $('#btnSavePerfil').onclick = async () => {
     sexo: $('#pfSexo').value, fecha_nacimiento: $('#pfNacimiento').value,
     estatura_cm: est, peso_kg: pes, objetivo: $('#pfObjetivo').value,
     nivel_actividad: $('#pfActividad').value,
+    experiencia: $('#pfExperiencia').value,
+    equipo: $('#pfEquipo').value,
+    dieta_pref: $('#pfDieta').value,
+    presupuesto: $('#pfPresupuesto').value,
+    pais: $('#pfPais').value.trim() || null,
+    plan_inicio: S.perfil && S.perfil.plan_inicio ? S.perfil.plan_inicio : hoyISO(),
     dias_entreno_semana: Number($('#pfDiasGym').value) || 0,
     peso_objetivo: $('#pfPesoObj').value ? Number($('#pfPesoObj').value) : null,
     fecha_objetivo: $('#pfFechaObj').value || null,
@@ -3242,6 +4556,8 @@ $('#btnSavePerfil').onclick = async () => {
                                   { onConflict:'user_id,fecha,zona' });
   $('#dlgPerfil').close();
   await cargarTodo(); await cargarCuerpo();
+  COACH.cargado = false;
+  if (S.tab === 'plan') await cargarPlan();
   // la meta de agua se alinea sola con el plan
   const pl = planNutricion(S.perfil), hA = habitoAgua();
   if (pl && hA && Math.abs(aguaEnLitros(hA) - pl.agua) >= 0.15){
@@ -4687,6 +6003,88 @@ $('#btnSaveMoneda').onclick = async () => {
 ponerTipo('gasto');
 
 arrancar();
+
+/* ---------- acciones del plan ---------- */
+function conectarPlan(){
+  const g = (id) => $('#' + id);
+
+  const bg = g('btnGenRutina') || g('btnRegenRutina');
+  if (bg) bg.onclick = async () => {
+    const {p, ejercicios} = datosPlan();
+    if (COACH.rutina.length && !confirm('Esto reemplaza tu rutina actual. ¿Sigo?')) return;
+    const r = generarRutina(p, ejercicios);
+    if (!r.filas.length) return toast('No encontré ejercicios para tu equipo');
+    if (COACH.rutina.length){
+      if (!ok(await sb.from('rutina').delete().eq('user_id', S.user.id))) return;
+    }
+    const filas = r.filas.map(f => ({ user_id:S.user.id, dia:f.dia, orden:f.orden,
+      ejercicio_id:f.ejercicio_id, series:f.series, reps_min:f.reps_min, reps_max:f.reps_max,
+      rir:f.rir, descanso_s:f.descanso_s, rol:f.rol }));
+    if (!ok(await sb.from('rutina').insert(filas), 'Rutina lista')) return;
+    COACH.rutina = []; await cargarPlan(); COACH.secc = 'rutina'; pintarPlan180();
+    toast(r.nombre + ' · ' + filas.length + ' ejercicios');
+  };
+
+  const be = g('btnAbrirEspec');
+  if (be) be.onclick = async () => {
+    const fila = { user_id:S.user.id, grupo:be.dataset.g, semanas:Number(be.dataset.s)||6,
+                   inicio:hoyISO(), activa:true };
+    if (!ok(await sb.from('especializacion').insert(fila), 'Bloque iniciado')) return;
+    await cargarPlan(); COACH.secc = 'debiles'; pintarPlan180();
+  };
+
+  const bc = g('btnCerrarEspec');
+  if (bc) bc.onclick = async () => {
+    if (!ok(await sb.from('especializacion').update({activa:false}).eq('id', COACH.espec.id), 'Bloque cerrado')) return;
+    await cargarPlan(); COACH.secc = 'debiles'; pintarPlan180();
+  };
+
+  const br = g('btnRegRecup');
+  if (br) br.onclick = () => abrirRecup();
+
+  const bk = g('btnGuardarCheckin');
+  if (bk) bk.onclick = async () => {
+    const {p, pl, medidas, series, ejercicios, registros, habitos} = datosPlan();
+    const r = revisionSemanal(p, pl, medidas, series, ejercicios, COACH.recup, registros, habitos);
+    const fila = { user_id:S.user.id, semana_inicio:r.iniAct, peso_prom:r.pesoAct,
+      cintura:r.cintAct, sesiones:r.sesAct, volumen_kg:r.volAct, sueno_prom:r.suenoAct,
+      decision:{'Sostener y no tocar nada':'mantener'}[r.decision.t] || 'mantener',
+      nota:r.decision.t };
+    if (!ok(await sb.from('checkin').upsert(fila, {onConflict:'user_id,semana_inicio'}), 'Revisión guardada')) return;
+    await cargarPlan();
+  };
+}
+
+function abrirRecup(){
+  const r = COACH.recup.find(x => x.fecha === hoyISO()) || {};
+  $('#rcSueno').value    = r.sueno_h != null ? r.sueno_h : '';
+  $('#rcPasos').value    = r.pasos   != null ? r.pasos   : '';
+  $('#rcEstres').value   = r.estres  != null ? String(r.estres)  : '';
+  $('#rcEnergia').value  = r.energia != null ? String(r.energia) : '';
+  $('#rcAgujetas').value = r.agujetas!= null ? String(r.agujetas): '';
+  $('#dlgRecup').showModal();
+}
+
+/* =====================================================================
+   PLAN · eventos fijos
+   ===================================================================== */
+$$('#plSecc button').forEach(b => b.onclick = () => {
+  $$('#plSecc button').forEach(x => x.classList.remove('on'));
+  b.classList.add('on'); COACH.secc = b.dataset.p; pintarPlan180();
+});
+$('#btnDatosCoach').onclick = () => abrirPerfil();
+$('#btnCancelRecup').onclick = () => $('#dlgRecup').close();
+$('#btnSaveRecup').onclick = async () => {
+  const num = (id) => { const v = $(id).value; return v === '' ? null : Number(v); };
+  const fila = { user_id:S.user.id, fecha:hoyISO(),
+    sueno_h:num('#rcSueno'), pasos:num('#rcPasos'), estres:num('#rcEstres'),
+    energia:num('#rcEnergia'), agujetas:num('#rcAgujetas') };
+  if (fila.sueno_h != null && (fila.sueno_h < 0 || fila.sueno_h > 16)) return toast('Las horas de sueño van entre 0 y 16');
+  if (!ok(await sb.from('recuperacion').upsert(fila, {onConflict:'user_id,fecha'}), 'Registrado')) return;
+  $('#dlgRecup').close();
+  await cargarPlan(); COACH.secc = 'recup'; pintarPlan180();
+};
+
 </script>
 </body>
 </html>
