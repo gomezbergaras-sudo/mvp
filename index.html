@@ -368,6 +368,17 @@ nav#navG button{padding:9px 4px;font-size:13.5px;white-space:nowrap;text-align:c
 .puntos{display:flex;gap:5px;justify-content:center;margin:16px 0 4px}
 .puntos i{width:7px;height:7px;border-radius:50%;background:var(--line);display:block}
 .puntos i.on{background:var(--brand);width:20px;border-radius:4px}
+
+.chips{display:flex;flex-wrap:wrap;gap:7px;margin-top:12px}
+.chipm{background:var(--panel2);border:1px solid var(--line);color:var(--tx2);
+  border-radius:999px;padding:9px 15px;font-size:13.5px;min-height:40px;transition:all .16s}
+.chipm.on{background:var(--brand-soft);border-color:var(--brand);color:var(--brand-tx);font-weight:650}
+.chipm:active{transform:scale(.95)}
+.previo{margin-top:14px;padding:11px 13px;background:var(--panel2);border:1px solid var(--line);
+  border-radius:10px;font-size:13.5px}
+.aviso-eq{border-left:3px solid var(--oro);background:var(--panel2);border-radius:0 8px 8px 0;
+  padding:9px 12px;margin-bottom:7px;font-size:13px;color:var(--tx2)}
+.aviso-eq:last-child{margin-bottom:0}
 .vacio{text-align:center;padding:26px 12px 8px}
 .vacio .ic{font-size:40px;line-height:1;margin-bottom:12px;opacity:.9}
 .vacio h2{margin:0 0 8px;font-size:19px}
@@ -1283,9 +1294,17 @@ function ok(res, msg){
    Al publicar una versión nueva: sube VERSION, pon la fecha y agrega
    su entrada arriba del todo en NOVEDADES.
    ===================================================================== */
-const VERSION = '3.1.0';
+const VERSION = '3.2.0';
 const FECHA_VERSION = '2026-09-05';
 const NOVEDADES = [
+  ['3.2.0', '2026-09-05', [
+    'Eliges qué músculos quieres trabajar y la app reparte los días sola.',
+    'Atajos rápidos: cuerpo completo, tren superior, tren inferior, empuje y tirón, o brazos.',
+    'Si tu selección queda coja te lo dice y añade lo mínimo: no puedes entrenar solo empuje sin tirón, ni saltarte la pierna, y la app te explica por qué.',
+    'Lo que tú eliges recibe más volumen que lo que se añade para equilibrar.',
+    'Corregido: con gimnasio completo el ejercicio principal ya no salía press de banca sino flexiones. Ahora los candidatos se ordenan por calidad de equipo según el rol.',
+    'Ninguna sesión pasa de siete ejercicios: más de eso no se recupera.'
+  ]],
   ['3.1.0', '2026-09-05', [
     'Navegación de cinco pestañas en vez de nueve: Hoy, Avance, Gym, Cuerpo y Dinero, con subsecciones dentro de cada una.',
     'Botón flotante de acción rápida: registrar agua, marcar un hábito, anotar una serie, tu peso o cómo amaneciste sin navegar.',
@@ -2841,7 +2860,7 @@ async function sincronizarAgua(litros){
    objetivos de proceso, revisables con lo que registres.
    ===================================================================== */
 
-const COACH = { rutina:[], recup:[], checkins:[], espec:null, cargado:false, secc:'plan' };
+const COACH = { rutina:[], recup:[], checkins:[], espec:null, cargado:false, secc:'plan', foco:null };
 
 const EXPERIENCIA = {
   principiante:{ n:'Principiante', meses:'menos de 1 año', prog:0.025, seriesAjuste:-1, rirBase:3,
@@ -3032,14 +3051,20 @@ function receta(objetivo, rol, exp){
   return { series:s, reps_min:base.r[0], reps_max:base.r[1], descanso_s:base.d, rir, rol };
 }
 
+/* Con qué se hace mejor cada cosa. Para el ejercicio principal manda la barra;
+   para el trabajo de aislamiento, la polea y la mancuerna dan mejor tensión. */
+const PRIO_BASE = { barra:6, maquina:5, mancuerna:4, polea:3, kettlebell:2, peso_corporal:1, banda:0 };
+const PRIO_AISL = { polea:6, mancuerna:5, maquina:4, banda:2, kettlebell:2, barra:2, peso_corporal:1 };
+
 /* elige ejercicios reales del catálogo, sin repetir, respetando el equipo */
 function elegirEjercicios(ejercicios, grupo, cuantos, permite, usados){
   const dispo = ejercicios.filter(e => e.grupo === grupo && e.activo !== false
                                     && permite.indexOf(e.equipo) >= 0 && !usados.has(e.id));
-  const comp = dispo.filter(e => e.tipo === 'compuesto');
-  const ais  = dispo.filter(e => e.tipo !== 'compuesto');
+  const orden = (tabla) => (a, b) => (tabla[b.equipo] || 0) - (tabla[a.equipo] || 0);
+  const comp = dispo.filter(e => e.tipo === 'compuesto').sort(orden(PRIO_BASE));
+  const ais  = dispo.filter(e => e.tipo !== 'compuesto').sort(orden(PRIO_AISL));
   const out = [];
-  // primero un compuesto, luego aislamiento
+  // el primero siempre es el mejor compuesto que tu equipo permita; después, aislamiento
   for (let i = 0; i < cuantos; i++){
     const fuente = (i === 0 && comp.length) ? comp : (ais.length ? ais : comp);
     const e = fuente.shift();
@@ -3047,6 +3072,122 @@ function elegirEjercicios(ejercicios, grupo, cuantos, permite, usados){
     usados.add(e.id); out.push(e);
   }
   return out;
+}
+
+/* =====================================================================
+   REPARTO A MEDIDA · tú eliges los músculos, la app arma los días
+   ===================================================================== */
+
+/* grandes = merecen un día propio · medianos = pueden anclar · pequeños = acompañan */
+const TAMANO = { pierna:'g', espalda:'g', pecho:'g', hombro:'m', gluteo:'m',
+  biceps:'p', triceps:'p', pantorrilla:'p', abdomen:'p', trapecio:'p', antebrazo:'p' };
+
+/* qué entrena bien junto a qué, sin pisarse la recuperación */
+const COMPAT = {
+  pecho:      ['triceps','hombro','abdomen'],
+  espalda:    ['biceps','trapecio','abdomen'],
+  pierna:     ['gluteo','pantorrilla','abdomen'],
+  hombro:     ['triceps','trapecio','abdomen'],
+  gluteo:     ['pierna','pantorrilla','abdomen'],
+  biceps:     ['espalda','antebrazo'],
+  triceps:    ['pecho','hombro'],
+  pantorrilla:['pierna','gluteo'],
+  abdomen:    ['pierna','gluteo'],
+  trapecio:   ['espalda','hombro'],
+  antebrazo:  ['biceps','espalda']
+};
+
+const EMPUJE = ['pecho','hombro','triceps'];
+const TIRON  = ['espalda','biceps','trapecio'];
+const TREN_INF = ['pierna','gluteo','pantorrilla'];
+
+/* Respeta lo que elegiste, pero no te deja armar algo que te vaya a lesionar
+   o a dejar torcido. Devuelve la lista final y por qué se tocó. */
+function equilibrar(foco){
+  const lista = foco.slice();
+  const avisos = [];
+  const tiene = (arr) => arr.some(g => lista.indexOf(g) >= 0);
+  const meter = (g, razon) => { if (lista.indexOf(g) < 0){ lista.push(g); avisos.push(razon); } };
+
+  if (tiene(EMPUJE) && !tiene(TIRON))
+    meter('espalda', 'Elegiste empuje pero nada de tirón. Te añadí espalda: entrenar solo pecho y hombro te lleva los hombros hacia adelante y termina doliendo.');
+  if (tiene(TIRON) && !tiene(EMPUJE))
+    meter('pecho', 'Elegiste tirón pero nada de empuje. Te añadí pecho para que el hombro trabaje en las dos direcciones.');
+  if (!tiene(TREN_INF))
+    meter('pierna', 'No elegiste tren inferior. Te añadí pierna con lo mínimo: saltársela desequilibra la cadera y la espalda baja, y es la mitad de tu masa muscular.');
+  if (lista.indexOf('abdomen') < 0 && lista.length >= 3)
+    meter('abdomen', 'Añadí algo de abdomen: sostiene todo lo demás y cuesta poco meterlo al final.');
+
+  return { lista, avisos };
+}
+
+/* Reparte los grupos elegidos en los días que entrenas.
+   Devuelve la misma forma que SPLITS para que el generador no cambie. */
+function unirY(nombres){
+  if (nombres.length <= 1) return nombres[0] || '';
+  return nombres.slice(0, -1).join(', ') + ' y ' + nombres[nombres.length - 1];
+}
+
+function repartirFoco(foco, dias){
+  const { lista, avisos } = equilibrar(foco);
+  const tuyo = (g) => foco.indexOf(g) >= 0;      // lo que TÚ elegiste manda
+  // anclas: los grandes y medianos, y primero los que elegiste tú
+  let anclas = lista.filter(g => TAMANO[g] === 'g' || TAMANO[g] === 'm');
+  const chicos = lista.filter(g => TAMANO[g] === 'p');
+  const chicosTuyos = chicos.filter(tuyo);
+  // un grupo pequeño se gana su propio día si lo elegiste y sobran días
+  if (chicosTuyos.length && anclas.length < dias)
+    anclas = anclas.concat(chicosTuyos.slice(0, dias - anclas.length));
+  // y si TODO lo que elegiste es pequeño, esos mandan
+  if (!anclas.some(tuyo) && chicosTuyos.length) anclas = chicosTuyos.concat(anclas);
+  // lo tuyo primero, que es lo que viniste a entrenar
+  anclas.sort((a, b) => (tuyo(b) ? 1 : 0) - (tuyo(a) ? 1 : 0));
+  if (!anclas.length) anclas.push(lista[0] || 'pecho');
+
+  // una ancla por día, dando la vuelta si hay más días que anclas
+  const diasDef = [];
+  for (let d = 0; d < dias; d++){
+    const ancla = anclas[d % anclas.length];
+    const vuelta = Math.floor(d / anclas.length);            // 0 = primera pasada
+    const usados = [ancla];
+    const g = [[ancla, vuelta === 0 ? (tuyo(ancla) ? (TAMANO[ancla] === 'p' ? 3 : 4) : 2) : 2]];
+
+    // acompañantes: primero los pequeños que elegiste y que pegan con la ancla
+    (COMPAT[ancla] || []).forEach(c => {
+      if (usados.length >= 3) return;
+      if (chicos.indexOf(c) >= 0 && usados.indexOf(c) < 0){
+        usados.push(c); g.push([c, vuelta === 0 ? (tuyo(c) ? 2 : 1) : 1]);
+      }
+    });
+    // si aún cabe, una segunda ancla compatible
+    if (usados.length < 3){
+      (COMPAT[ancla] || []).forEach(c => {
+        if (usados.length >= 3) return;
+        if (anclas.indexOf(c) >= 0 && usados.indexOf(c) < 0){ usados.push(c); g.push([c, 2]); }
+      });
+    }
+    // rellenar con cualquier pequeño que haya quedado suelto
+    chicos.forEach(c => {
+      if (usados.length >= 4) return;
+      if (usados.indexOf(c) < 0 && !diasDef.some(x => x.usados.indexOf(c) >= 0)){
+        usados.push(c); g.push([c, 1]);
+      }
+    });
+
+    diasDef.push({ t: 'Día ' + (d+1) + ' · ' + unirY(usados.map(x => GRUPO_N[x])), g, usados });
+  }
+
+  // los pequeños que no entraron en ningún día se cuelan en el que menos tenga
+  chicos.forEach(c => {
+    if (diasDef.some(d => d.usados.indexOf(c) >= 0)) return;
+    const menor = diasDef.slice().sort((a,b) => a.g.length - b.g.length)[0];
+    if (menor && menor.g.length < 5){
+      menor.usados.push(c); menor.g.push([c, 1]);
+      menor.t = 'Día ' + (diasDef.indexOf(menor)+1) + ' · ' + unirY(menor.usados.map(x => GRUPO_N[x]));
+    }
+  });
+
+  return { n: 'A tu medida · ' + lista.map(g => GRUPO_N[g]).join(', '), dias: diasDef, avisos, lista };
 }
 
 /* si un grupo no tiene ejercicios para tu equipo, se completa con estos */
@@ -3057,10 +3198,12 @@ const VECINOS = {
   antebrazo:['biceps']
 };
 const MIN_POR_DIA = 4;
+const MAX_POR_DIA = 7;   // más de esto en una sesión ya no lo recuperas
 
-function generarRutina(p, ejercicios){
+function generarRutina(p, ejercicios, foco){
   const dias = Math.min(6, Math.max(3, Number(p.dias_entreno_semana) || 3));
-  const split = SPLITS[dias];
+  const elegidos = (foco && foco.length) ? foco : (p.musculos_foco || []);
+  const split = elegidos.length ? repartirFoco(elegidos, dias) : SPLITS[dias];
   const permite = (EQUIPO[p.equipo] || EQUIPO.gimnasio).permite;
   const exp = p.experiencia || 'principiante';
   const filas = [];
@@ -3090,13 +3233,21 @@ function generarRutina(p, ejercicios){
       }
     }
 
+    // una sesión no puede ser infinita: se recortan los accesorios sobrantes
+    while (delDia.length > MAX_POR_DIA){
+      let i = -1;
+      for (let k = delDia.length - 1; k >= 0; k--){ if (delDia[k].rol === 'accesorio'){ i = k; break; } }
+      delDia.splice(i >= 0 ? i : delDia.length - 1, 1);
+    }
+
     delDia.forEach((x, i) => {
       const r = receta(p.objetivo, x.rol, exp);
       filas.push(Object.assign({ dia: iDia+1, orden: i+1, ejercicio_id: x.e.id,
                                  _nombre: x.e.nombre, _grupo: x.e.grupo, _equipo: x.e.equipo }, r));
     });
   });
-  return { dias, nombre: split.n, titulos: split.dias.map(d => d.t), filas };
+  return { dias, nombre: split.n, titulos: split.dias.map(d => d.t), filas,
+           avisos: split.avisos || [], grupos: split.lista || null };
 }
 
 /* calentamiento, progresión, sustituciones y descarga */
@@ -3737,6 +3888,72 @@ function vistaPlan180(){
 }
 
 /* ---------- 2 · rutina ---------- */
+/* ---------- selector de músculos ---------- */
+const MUSCULOS_ELEGIBLES = ['pecho','espalda','pierna','hombro','gluteo','biceps','triceps','abdomen','pantorrilla','trapecio','antebrazo'];
+const ATAJOS = [
+  { n:'Cuerpo completo', g:['pecho','espalda','pierna','hombro','biceps','triceps','abdomen'] },
+  { n:'Tren superior',   g:['pecho','espalda','hombro','biceps','triceps'] },
+  { n:'Tren inferior',   g:['pierna','gluteo','pantorrilla','abdomen'] },
+  { n:'Empuje y tirón',  g:['pecho','espalda','hombro','biceps','triceps'] },
+  { n:'Brazos',          g:['biceps','triceps','antebrazo'] }
+];
+
+function focoActual(){
+  if (COACH.foco) return COACH.foco;
+  const p = S.perfil || {};
+  return (p.musculos_foco && p.musculos_foco.length) ? p.musculos_foco.slice() : [];
+}
+
+function tarjetaSelector(p){
+  const sel = focoActual();
+  const dias = Number(p.dias_entreno_semana) || 3;
+  const chips = MUSCULOS_ELEGIBLES.map(g =>
+    '<button class="chipm' + (sel.indexOf(g) >= 0 ? ' on' : '') + '" data-m="' + g + '">' +
+    GRUPO_N[g] + '</button>').join('');
+  const atajos = ATAJOS.map((a,i) => '<button class="sm gh" data-atajo="' + i + '">' + a.n + '</button>').join('');
+
+  let previo = '';
+  if (sel.length){
+    const eq = equilibrar(sel);
+    const anadidos = eq.lista.filter(g => sel.indexOf(g) < 0);
+    previo = '<div class="previo">' +
+      '<b>' + sel.length + ' ' + (sel.length === 1 ? 'grupo elegido' : 'grupos elegidos') + '</b> · ' +
+      dias + ' días por semana' +
+      (anadidos.length ? '<div class="muted" style="margin-top:6px;font-size:12.5px">Voy a añadir <b>' +
+        anadidos.map(g => GRUPO_N[g].toLowerCase()).join(', ') + '</b> para que no te quedes torcido. Te explico por qué al generar.</div>' : '') +
+      '</div>';
+  }
+
+  return '<div class="card">' +
+    '<h2 style="margin-top:0">¿Qué quieres trabajar?</h2>' +
+    '<p class="muted" style="margin-top:0">Toca los músculos y yo reparto los días. Si no eliges ninguno, uso el reparto clásico según tus días.</p>' +
+    '<div class="chips">' + chips + '</div>' +
+    '<div class="row" style="gap:6px;flex-wrap:wrap;margin-top:12px">' + atajos +
+      (sel.length ? '<button class="sm gh" data-atajo="limpiar">Limpiar</button>' : '') + '</div>' +
+    '<div class="grid g2" style="margin-top:14px">' +
+      '<div><label>Días por semana</label><select id="rtDias">' +
+        [3,4,5,6].map(d => '<option value="' + d + '"' + (d === dias ? ' selected' : '') + '>' + d + ' días</option>').join('') +
+      '</select></div>' +
+      '<div style="display:flex;align-items:flex-end">' +
+        '<button class="pri" id="btnGenRutina" style="width:100%">' +
+        (COACH.rutina.length ? 'Rehacer mi rutina' : 'Armar mi rutina') + '</button></div>' +
+    '</div>' + previo + '</div>';
+}
+
+function conectarSelector(){
+  $$('#plCuerpo .chipm').forEach(b => b.onclick = () => {
+    const g = b.dataset.m, f = focoActual();
+    const i = f.indexOf(g);
+    if (i >= 0) f.splice(i, 1); else f.push(g);
+    COACH.foco = f; pintarPlan180();
+  });
+  $$('#plCuerpo [data-atajo]').forEach(b => b.onclick = () => {
+    const v = b.dataset.atajo;
+    COACH.foco = v === 'limpiar' ? [] : ATAJOS[Number(v)].g.slice();
+    pintarPlan180();
+  });
+}
+
 function vistaRutina(){
   const {p, ejercicios} = datosPlan();
   const faltan = faltaParaPlan(p);
@@ -3747,22 +3964,31 @@ function vistaRutina(){
   const g = guiaRutina(p);
   const permite = (EQUIPO[p.equipo] || EQUIPO.gimnasio).permite;
 
-  let cuerpo;
+  let cuerpo = tarjetaSelector(p);
   if (!COACH.rutina.length){
-    const prev = generarRutina(p, ejercicios);
-    cuerpo = '<div class="card"><h2 style="margin-top:0">Todavía no tienes rutina</h2>' +
-      '<p>Con tus datos te toca: <b>' + prev.nombre + '</b>, ' + prev.filas.length + ' ejercicios repartidos en ' + prev.dias + ' días.</p>' +
-      '<p class="muted">Se guarda para que puedas seguirla semana a semana. La puedes regenerar cuando cambies de objetivo o de equipo.</p>' +
-      '<div class="row"><button class="pri" id="btnGenRutina">Generar mi rutina</button></div></div>';
+    const prev = generarRutina(p, ejercicios, focoActual());
+    cuerpo += '<div class="card">' + vacio('&#128203;', 'Todavía no tienes rutina',
+      'Con lo que hay ahora te tocaría <b>' + prev.nombre + '</b>: ' + prev.filas.length +
+      ' ejercicios en ' + prev.dias + ' días. Elige músculos arriba si quieres otra cosa.',
+      null, null,
+      'La rutina se guarda para que la sigas semana a semana. Puedes rehacerla cuando quieras.') + '</div>';
   } else {
     const porDia = {};
     COACH.rutina.forEach(r => { (porDia[r.dia] = porDia[r.dia] || []).push(r); });
     const split = SPLITS[Math.max(3, Math.min(6, Object.keys(porDia).length))] || SPLITS[3];
-    cuerpo = '<div class="card"><div class="row" style="justify-content:space-between">' +
-      '<h2 style="margin:0">Tu rutina</h2><button class="sm gh" id="btnRegenRutina">Regenerar</button></div>' +
-      '<p class="muted" style="margin:6px 0 0">' + (split.n) + ' · ' + (EQUIPO[p.equipo]||EQUIPO.gimnasio).n + '</p></div>' +
+    const nombreSplit = (p.musculos_foco && p.musculos_foco.length)
+      ? 'A tu medida · ' + p.musculos_foco.map(g => GRUPO_N[g]).join(', ')
+      : split.n;
+    cuerpo += '<div class="card"><h2 style="margin:0 0 6px">Tu rutina</h2>' +
+      '<p class="muted" style="margin:0">' + nombreSplit + ' · ' + (EQUIPO[p.equipo]||EQUIPO.gimnasio).n + '</p>' +
+      ((COACH.avisos && COACH.avisos.length)
+        ? '<div style="margin-top:12px">' + COACH.avisos.map(a =>
+            '<div class="aviso-eq">' + a + '</div>').join('') + '</div>' : '') + '</div>' +
       Object.keys(porDia).sort((a,b)=>a-b).map(d => {
-        const t = (split.dias[d-1] && split.dias[d-1].t) || ('Día ' + d);
+        const grupos = [...new Set(porDia[d].map(r => {
+          const e = ejercicios.find(x => x.id === r.ejercicio_id) || {}; return e.grupo; }).filter(Boolean))];
+        const t = grupos.length ? 'Día ' + d + ' · ' + unirY(grupos.map(g => GRUPO_N[g] || g))
+                                : ((split.dias[d-1] && split.dias[d-1].t) || ('Día ' + d));
         return '<div class="card"><h3 style="margin:0 0 10px">' + t + '</h3>' +
           '<div class="tablaWrap"><table class="tab"><thead><tr><th>Ejercicio</th><th>Series</th><th>Reps</th><th>RIR</th><th>Descanso</th></tr></thead><tbody>' +
           porDia[d].map(r => {
@@ -4021,6 +4247,7 @@ function pintarPlan180(){
   catch(e){ html = '<div class="card mala"><h2 style="margin-top:0">Algo falló al calcular</h2><p class="muted">' + esc(String(e && e.message || e)) + '</p></div>'; }
   cont.innerHTML = html;
   conectarPlan();
+  conectarSelector();
   conectarVacios('#plCuerpo');
   $$('#plCuerpo .card').forEach((el,i) => {
     el.style.animation = 'entraCard .42s cubic-bezier(.2,.8,.2,1) ' + Math.min(i*55, 280) + 'ms both';
@@ -6222,8 +6449,20 @@ function conectarPlan(){
   if (bg) bg.onclick = async () => {
     const {p, ejercicios} = datosPlan();
     if (COACH.rutina.length && !confirm('Esto reemplaza tu rutina actual. ¿Sigo?')) return;
-    const r = generarRutina(p, ejercicios);
+    const dias = Number(($('#rtDias') || {}).value) || Number(p.dias_entreno_semana) || 3;
+    const foco = focoActual();
+    const r = generarRutina(Object.assign({}, p, {dias_entreno_semana:dias}), ejercicios, foco);
     if (!r.filas.length) return toast('No encontré ejercicios para tu equipo');
+
+    // guardar la elección para que la rutina se pueda rehacer igual
+    const cambios = { musculos_foco: foco.length ? foco : null };
+    if (dias !== Number(p.dias_entreno_semana)) cambios.dias_entreno_semana = dias;
+    const up = await sb.from('perfiles').update(cambios).eq('id', S.user.id);
+    if (up.error && !faltaTabla(up.error) && !/musculos_foco/.test(up.error.message || '')){
+      if (!ok(up)) return;
+    }
+    if (!up.error){ S.perfil = Object.assign({}, S.perfil, cambios); }
+
     if (COACH.rutina.length){
       if (!ok(await sb.from('rutina').delete().eq('user_id', S.user.id))) return;
     }
@@ -6231,8 +6470,10 @@ function conectarPlan(){
       ejercicio_id:f.ejercicio_id, series:f.series, reps_min:f.reps_min, reps_max:f.reps_max,
       rir:f.rir, descanso_s:f.descanso_s, rol:f.rol }));
     if (!ok(await sb.from('rutina').insert(filas), 'Rutina lista')) return;
-    COACH.rutina = []; await cargarPlan(); COACH.secc = 'rutina'; pintarPlan180();
-    toast(r.nombre + ' · ' + filas.length + ' ejercicios');
+    COACH.avisos = r.avisos || [];
+    COACH.rutina = []; COACH.foco = null;
+    await cargarPlan(); COACH.secc = 'rutina'; pintarPlan180();
+    toast(filas.length + ' ejercicios en ' + r.dias + ' días');
   };
 
   const be = g('btnAbrirEspec');
