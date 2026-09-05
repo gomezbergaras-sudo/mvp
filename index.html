@@ -369,6 +369,26 @@ nav#navG button{padding:9px 4px;font-size:13.5px;white-space:nowrap;text-align:c
 .puntos i{width:7px;height:7px;border-radius:50%;background:var(--line);display:block}
 .puntos i.on{background:var(--brand);width:20px;border-radius:4px}
 
+
+
+.pesoSug{font-weight:650;color:var(--brand-tx)}
+.pesoSug.tuyo{color:var(--oro)}
+.modo{display:grid;grid-template-columns:1fr 1fr;gap:6px;background:var(--panel2);
+  border:1px solid var(--line);border-radius:12px;padding:4px;margin-top:12px}
+.modo button{background:transparent;border:none;color:var(--tx2);border-radius:9px;
+  padding:10px 6px;font-size:13px;min-height:42px}
+.modo button.on{background:var(--brand-soft);color:var(--brand-tx);font-weight:650;
+  box-shadow:0 0 0 1px var(--brand) inset}
+.dias{display:flex;flex-direction:column;gap:7px;margin-top:12px}
+.diaFila{display:grid;grid-template-columns:74px 1fr 16px;align-items:center;gap:10px;
+  width:100%;text-align:left;background:var(--panel2);border:1px solid var(--line);
+  border-radius:11px;padding:12px 13px;min-height:52px;color:var(--tx)}
+.diaFila .dn{font-weight:650;font-size:13.5px}
+.diaFila .dg{font-size:13px;color:var(--brand-tx)}
+.diaFila.libre .dg{color:var(--tx3,var(--tx2));opacity:.7}
+.diaFila .da{color:var(--tx2);text-align:right;font-size:16px}
+.diaFila:active{transform:scale(.99)}
+@media (max-width:620px){ .diaFila{grid-template-columns:64px 1fr 14px;padding:11px} }
 .chips{display:flex;flex-wrap:wrap;gap:7px;margin-top:12px}
 .chipm{background:var(--panel2);border:1px solid var(--line);color:var(--tx2);
   border-radius:999px;padding:9px 15px;font-size:13.5px;min-height:40px;transition:all .16s}
@@ -1033,6 +1053,18 @@ table.tab td.num{text-align:right;font-variant-numeric:tabular-nums;white-space:
   </div>
 </dialog>
 
+
+<!-- DIALOGO: MUSCULOS DE UN DIA -->
+<dialog id="dlgDia">
+  <h2 id="ddTitulo">Lunes</h2>
+  <p class="muted" style="margin-top:0">Toca los músculos que te tocan este día. Sin ninguno = descanso.</p>
+  <div class="chips" id="ddChips"></div>
+  <div class="row" style="justify-content:space-between;margin-top:16px">
+    <button class="gh sm" id="ddLimpiar">Marcar descanso</button>
+    <button class="pri" id="ddListo">Listo</button>
+  </div>
+</dialog>
+
 <!-- DIALOGO RECUPERACION -->
 <dialog id="dlgRecup">
   <h2>Cómo amaneciste</h2>
@@ -1294,9 +1326,17 @@ function ok(res, msg){
    Al publicar una versión nueva: sube VERSION, pon la fecha y agrega
    su entrada arriba del todo en NOVEDADES.
    ===================================================================== */
-const VERSION = '3.2.0';
+const VERSION = '3.3.0';
 const FECHA_VERSION = '2026-09-05';
 const NOVEDADES = [
+  ['3.3.0', '2026-09-05', [
+    'Los días y los músculos ahora son una sola cosa, y la decides tú.',
+    'Dos modos: que la app reparta los músculos que elijas, o armar tú cada día de la semana a mano.',
+    'La rutina ya no dice "Día 1": dice Lunes, Martes, Miércoles.',
+    'Lo que elijas se guarda también en el gimnasio, así que el "hoy toca entrenar" coincide siempre con tu rutina.',
+    'Columna de peso sugerido en cada ejercicio: sale de tu historial si ya lo hiciste, y si no, se estima con tu peso corporal, tu sexo, tu nivel y el rango de repeticiones.',
+    'El peso viene redondeado a lo que existe de verdad: 2,5 kg en barra, pares en mancuernas, 5 kg en máquinas y poleas.'
+  ]],
   ['3.2.0', '2026-09-05', [
     'Eliges qué músculos quieres trabajar y la app reparte los días sola.',
     'Atajos rápidos: cuerpo completo, tren superior, tren inferior, empuje y tirón, o brazos.',
@@ -2202,7 +2242,7 @@ async function cargarGym(){
     toast('Error: ' + e.error.message); return;
   }
   G.ejercicios = e.data || [];
-  G.dias = {};
+  G.dias = {}; COACH.dias = null;
   (d.data || []).forEach(x => G.dias[x.dia] = x);
 
   const paso = 500; let inicio = 0, todo = [];
@@ -2860,7 +2900,7 @@ async function sincronizarAgua(litros){
    objetivos de proceso, revisables con lo que registres.
    ===================================================================== */
 
-const COACH = { rutina:[], recup:[], checkins:[], espec:null, cargado:false, secc:'plan', foco:null };
+const COACH = { rutina:[], recup:[], checkins:[], espec:null, cargado:false, secc:'plan', foco:null, dias:null, modo:'auto' };
 
 const EXPERIENCIA = {
   principiante:{ n:'Principiante', meses:'menos de 1 año', prog:0.025, seriesAjuste:-1, rirBase:3,
@@ -3075,6 +3115,119 @@ function elegirEjercicios(ejercicios, grupo, cuantos, permite, usados){
 }
 
 /* =====================================================================
+   PESO SUGERIDO
+   Primero mira lo que TÚ ya has levantado. Solo si no hay historial,
+   estima con tu peso corporal, tu sexo y tu nivel.
+   Es un punto de partida, no una orden: la primera serie manda.
+   ===================================================================== */
+
+/* Fracción del peso corporal para 8-10 repeticiones, hombre intermedio.
+   Las mancuernas son POR MANCUERNA, no la suma de las dos. */
+const COEF_NOMBRE = [
+  [/press de banca con barra/i,            0.75], [/press inclinado con barra/i,       0.62],
+  [/press declinado con barra/i,           0.78], [/press de pecho en m[aá]quina/i,    0.70],
+  [/press de banca con mancuernas/i,       0.30], [/press inclinado con mancuernas/i,  0.26],
+  [/aperturas/i,                           0.12], [/cruce de poleas/i,                 0.13],
+  [/peck deck|contractor/i,                0.35],
+  [/peso muerto convencional|peso muerto sumo/i, 1.30], [/rack pull/i,                 1.45],
+  [/peso muerto rumano|piernas r[ií]gidas/i, 1.00],
+  [/remo con barra|remo pendlay|remo en t/i, 0.70], [/remo en m[aá]quina/i,            0.65],
+  [/remo con mancuerna/i,                  0.30], [/remo en polea/i,                   0.60],
+  [/jal[oó]n/i,                            0.65], [/pull[- ]?over/i,                   0.22],
+  [/dominadas|fondos/i,                    0.00],  /* peso corporal */
+  [/sentadilla libre|sentadilla sumo/i,    1.00], [/sentadilla frontal/i,              0.75],
+  [/sentadilla hack/i,                     1.20], [/prensa/i,                          1.80],
+  [/zancada|desplante|b[uú]lgara/i,        0.28], [/extensi[oó]n de cu[aá]driceps|extensiones de cu/i, 0.50],
+  [/curl femoral|femoral/i,                0.40], [/buenos d[ií]as/i,                  0.45],
+  [/hip thrust|empuje de cadera/i,         1.10], [/patada de gl[uú]teo/i,             0.18],
+  [/press militar con barra|press militar sentado/i, 0.48], [/press militar con mancuernas|press arnold/i, 0.22],
+  [/elevaciones laterales|elevaciones frontales/i, 0.08], [/p[aá]jaros|posterior/i,     0.07],
+  [/encogimientos/i,                       0.80],
+  [/curl con barra|curl barra z/i,         0.35], [/curl con mancuernas|curl martillo|curl concentrado|curl inclinado/i, 0.14],
+  [/curl en polea|curl predicador/i,       0.28],
+  [/extensi[oó]n .*tr[ií]ceps|press franc[eé]s|patada de tr[ií]ceps/i, 0.30],
+  [/extensi[oó]n en polea/i,               0.35], [/press cerrado/i,                   0.60],
+  [/elevaci[oó]n de talones|gemelo/i,      1.00],
+  [/mu[nñ]eca|antebrazo/i,                 0.15]
+];
+
+/* si el nombre no dice nada, se usa el grupo y el equipo */
+const COEF_GRUPO = {
+  pecho:{barra:0.70,mancuerna:0.26,maquina:0.65,polea:0.13,peso_corporal:0,banda:0,kettlebell:0.20},
+  espalda:{barra:0.75,mancuerna:0.28,maquina:0.62,polea:0.55,peso_corporal:0,banda:0,kettlebell:0.22},
+  pierna:{barra:0.95,mancuerna:0.28,maquina:1.00,polea:0.30,peso_corporal:0,banda:0,kettlebell:0.30},
+  hombro:{barra:0.45,mancuerna:0.14,maquina:0.42,polea:0.10,peso_corporal:0,banda:0,kettlebell:0.14},
+  biceps:{barra:0.33,mancuerna:0.14,maquina:0.28,polea:0.28,peso_corporal:0,banda:0,kettlebell:0.14},
+  triceps:{barra:0.32,mancuerna:0.14,maquina:0.35,polea:0.33,peso_corporal:0,banda:0,kettlebell:0.14},
+  gluteo:{barra:1.00,mancuerna:0.30,maquina:0.55,polea:0.20,peso_corporal:0,banda:0,kettlebell:0.30},
+  pantorrilla:{barra:0.90,mancuerna:0.30,maquina:1.00,polea:0.35,peso_corporal:0,banda:0,kettlebell:0.30},
+  trapecio:{barra:0.80,mancuerna:0.32,maquina:0.60,polea:0.45,peso_corporal:0,banda:0,kettlebell:0.32},
+  antebrazo:{barra:0.16,mancuerna:0.08,maquina:0.20,polea:0.18,peso_corporal:0,banda:0,kettlebell:0.08},
+  abdomen:{barra:0.15,mancuerna:0.12,maquina:0.30,polea:0.25,peso_corporal:0,banda:0,kettlebell:0.14}
+};
+
+const NIVEL_F  = { principiante:0.62, intermedio:1.00, avanzado:1.35 };
+/* las mujeres tienen menos ventaja en tren superior que en inferior */
+const SEXO_F   = { arriba:0.62, abajo:0.75 };
+const ABAJO    = ['pierna','gluteo','pantorrilla'];
+
+function redondearPeso(kg, equipo){
+  if (kg <= 0) return 0;
+  if (equipo === 'mancuerna' || equipo === 'kettlebell')
+    return kg < 10 ? Math.round(kg) : Math.round(kg / 2) * 2;
+  if (equipo === 'maquina' || equipo === 'polea') return Math.max(5, Math.round(kg / 5) * 5);
+  return Math.max(2.5, Math.round(kg / 2.5) * 2.5);          // barra y discos
+}
+
+/* lo que ya levantaste manda sobre cualquier fórmula */
+function pesoDeHistorial(ejercicioId, series){
+  const mias = series.filter(s => s.ejercicio_id === ejercicioId && Number(s.peso) > 0)
+                     .sort((a,b) => a.fecha < b.fecha ? 1 : -1);
+  if (!mias.length) return null;
+  const ultimaFecha = mias[0].fecha;
+  const delDia = mias.filter(s => s.fecha === ultimaFecha);
+  const mejor = delDia.reduce((a,b) => Number(b.peso) > Number(a.peso) ? b : a);
+  return { kg: Number(mejor.peso), reps: Number(mejor.repeticiones) || null, fecha: ultimaFecha };
+}
+
+function pesoSugerido(ej, fila, p, series){
+  if (!ej) return null;
+  const equipo = ej.equipo || 'barra';
+
+  // 1) tu propio historial
+  const h = pesoDeHistorial(ej.id, series || []);
+  if (h) return { kg: h.kg, texto: h.kg + ' kg', fuente:'historial',
+                  nota:'Tu último registro: ' + h.kg + ' kg' + (h.reps ? ' × ' + h.reps : '') };
+
+  // 2) peso corporal
+  const peso = Number(p && p.peso_kg) || 0;
+  if (!peso) return { kg:null, texto:'—', fuente:'sindatos', nota:'Pon tu peso en Mis datos y te lo calculo' };
+  if (equipo === 'peso_corporal' || equipo === 'banda')
+    return { kg:null, texto:'Tu peso', fuente:'corporal',
+             nota:'Con tu peso corporal. Si te sobran repeticiones, añade lastre o haz la variante difícil.' };
+
+  // 3) estimación
+  let coef = null;
+  for (const [re, c] of COEF_NOMBRE){ if (re.test(ej.nombre || '')){ coef = c; break; } }
+  if (coef === null) coef = ((COEF_GRUPO[ej.grupo] || {})[equipo]);
+  if (coef === null || coef === undefined) return { kg:null, texto:'—', fuente:'sindatos', nota:'' };
+  if (coef === 0)
+    return { kg:null, texto:'Tu peso', fuente:'corporal', nota:'Con tu peso corporal.' };
+
+  const nivel = NIVEL_F[p.experiencia] || NIVEL_F.principiante;
+  const sexo  = p.sexo === 'mujer' ? (ABAJO.indexOf(ej.grupo) >= 0 ? SEXO_F.abajo : SEXO_F.arriba) : 1;
+  // las tablas son para 8-10 reps: menos repeticiones aguantan más peso
+  const media = ((Number(fila && fila.reps_min) || 8) + (Number(fila && fila.reps_max) || 10)) / 2;
+  const reps  = media <= 6 ? 1.15 : media <= 8 ? 1.06 : media <= 11 ? 1.00 : media <= 14 ? 0.90 : 0.82;
+
+  const bruto = peso * coef * nivel * sexo * reps;
+  const kg = redondearPeso(bruto, equipo);
+  const porLado = (equipo === 'mancuerna' || equipo === 'kettlebell');
+  return { kg, texto: kg + ' kg' + (porLado ? ' c/u' : ''), fuente:'estimado',
+           nota:'Estimado con tus ' + peso + ' kg y tu nivel. Ajústalo en la primera serie.' };
+}
+
+/* =====================================================================
    REPARTO A MEDIDA · tú eliges los músculos, la app arma los días
    ===================================================================== */
 
@@ -3190,6 +3343,51 @@ function repartirFoco(foco, dias){
   return { n: 'A tu medida · ' + lista.map(g => GRUPO_N[g]).join(', '), dias: diasDef, avisos, lista };
 }
 
+/* =====================================================================
+   LOS DÍAS · un solo lugar
+   Lo que elijas aquí manda en la rutina Y en el "hoy toca" del gimnasio.
+   ===================================================================== */
+const DIAS_N = ['', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
+const DIAS_C = ['', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'];
+
+/* dónde caen los días de entreno para que descanses repartido */
+const REPARTO_SEMANA = { 1:[1], 2:[1,4], 3:[1,3,5], 4:[1,2,4,5], 5:[1,2,3,5,6], 6:[1,2,3,4,5,6], 7:[1,2,3,4,5,6,7] };
+
+function diasDelUsuario(){
+  if (COACH.dias) return COACH.dias;
+  const base = {};
+  Object.keys(G.dias || {}).forEach(k => {
+    const d = G.dias[k]; base[Number(d.dia)] = (d.grupos || []).slice();
+  });
+  COACH.dias = [1,2,3,4,5,6,7].map(d => ({ dia:d, grupos: base[d] || [] }));
+  return COACH.dias;
+}
+const hayDiasArmados = () => diasDelUsuario().some(d => d.grupos.length);
+
+/* convierte lo que el usuario armó en la forma que entiende el generador */
+function splitDeDias(dias){
+  const activos = dias.filter(d => d.grupos.length);
+  return {
+    n: 'Tus días · ' + activos.map(d => DIAS_C[d.dia]).join(', '),
+    dias: activos.map(d => ({
+      t: DIAS_N[d.dia] + ' · ' + unirY(d.grupos.map(g => GRUPO_N[g] || g)),
+      diaSemana: d.dia,
+      g: d.grupos.map((g, i) => [g, i === 0 ? 3 : 2])
+    })),
+    avisos: [], lista: [...new Set(activos.flatMap(d => d.grupos))]
+  };
+}
+
+/* reparte los grupos elegidos por la app sobre días reales de la semana */
+function conDiasSemana(split, nDias){
+  const dias = REPARTO_SEMANA[Math.min(7, Math.max(1, nDias))] || [1,3,5];
+  split.dias.forEach((d, i) => {
+    d.diaSemana = dias[i] || (i + 1);
+    d.t = DIAS_N[d.diaSemana] + ' · ' + d.t.replace(/^Día \d+ · /, '');
+  });
+  return split;
+}
+
 /* si un grupo no tiene ejercicios para tu equipo, se completa con estos */
 const VECINOS = {
   pecho:['triceps','hombro'], espalda:['biceps','trapecio'], hombro:['pecho','trapecio'],
@@ -3200,15 +3398,22 @@ const VECINOS = {
 const MIN_POR_DIA = 4;
 const MAX_POR_DIA = 7;   // más de esto en una sesión ya no lo recuperas
 
-function generarRutina(p, ejercicios, foco){
+function generarRutina(p, ejercicios, foco, diasManual){
   const dias = Math.min(6, Math.max(3, Number(p.dias_entreno_semana) || 3));
   const elegidos = (foco && foco.length) ? foco : (p.musculos_foco || []);
-  const split = elegidos.length ? repartirFoco(elegidos, dias) : SPLITS[dias];
+  let split;
+  if (diasManual && diasManual.some(d => d.grupos.length)){
+    split = splitDeDias(diasManual);                 // tú armaste los días
+  } else {
+    split = elegidos.length ? repartirFoco(elegidos, dias) : SPLITS[dias];
+    split = conDiasSemana(JSON.parse(JSON.stringify(split)), dias);
+  }
   const permite = (EQUIPO[p.equipo] || EQUIPO.gimnasio).permite;
   const exp = p.experiencia || 'principiante';
   const filas = [];
 
   split.dias.forEach((d, iDia) => {
+    const dSemana = d.diaSemana || (iDia + 1);
     const usados = new Set();
     const delDia = [];
     d.g.forEach((par, iGrupo) => {
@@ -3242,12 +3447,14 @@ function generarRutina(p, ejercicios, foco){
 
     delDia.forEach((x, i) => {
       const r = receta(p.objetivo, x.rol, exp);
-      filas.push(Object.assign({ dia: iDia+1, orden: i+1, ejercicio_id: x.e.id,
+      filas.push(Object.assign({ dia: dSemana, orden: i+1, ejercicio_id: x.e.id,
                                  _nombre: x.e.nombre, _grupo: x.e.grupo, _equipo: x.e.equipo }, r));
     });
   });
-  return { dias, nombre: split.n, titulos: split.dias.map(d => d.t), filas,
-           avisos: split.avisos || [], grupos: split.lista || null };
+  return { dias: split.dias.length, nombre: split.n, titulos: split.dias.map(d => d.t), filas,
+           avisos: split.avisos || [], grupos: split.lista || null,
+           diasSemana: split.dias.map(d => ({ dia: d.diaSemana, grupos: [...new Set(d.g.map(x => x[0]))],
+                                              titulo: d.t.replace(/^[^·]+· /, '') })) };
 }
 
 /* calentamiento, progresión, sustituciones y descarga */
@@ -3907,6 +4114,36 @@ function focoActual(){
 function tarjetaSelector(p){
   const sel = focoActual();
   const dias = Number(p.dias_entreno_semana) || 3;
+  const manual = COACH.modo === 'manual';
+  const misDias = diasDelUsuario();
+
+  const cab = '<div class="card"><h2 style="margin-top:0">¿Qué quieres trabajar?</h2>' +
+    '<div class="modo">' +
+      '<button data-modo="auto"' + (manual ? '' : ' class="on"') + '>La app reparte</button>' +
+      '<button data-modo="manual"' + (manual ? ' class="on"' : '') + '>Yo elijo el día</button>' +
+    '</div>';
+
+  if (manual){
+    const filas = misDias.map(d => {
+      const vacio = !d.grupos.length;
+      return '<button class="diaFila' + (vacio ? ' libre' : '') + '" data-dia="' + d.dia + '">' +
+        '<span class="dn">' + DIAS_N[d.dia] + '</span>' +
+        '<span class="dg">' + (vacio ? 'Descanso' : unirY(d.grupos.map(g => GRUPO_N[g]))) + '</span>' +
+        '<span class="da">' + (vacio ? '+' : '›') + '</span></button>';
+    }).join('');
+    const activos = misDias.filter(d => d.grupos.length).length;
+    return cab +
+      '<p class="muted" style="margin:12px 0 0">Toca cada día y elige qué músculos te tocan. Los que dejes vacíos son descanso.</p>' +
+      '<div class="dias">' + filas + '</div>' +
+      '<button class="pri" id="btnGenRutina" style="width:100%;margin-top:14px"' +
+        (activos ? '' : ' disabled') + '>' +
+        (activos ? (COACH.rutina.length ? 'Rehacer con estos días' : 'Armar mi rutina')
+                 : 'Elige al menos un día') + '</button>' +
+      (activos ? '<div class="previo"><b>' + activos + ' ' + (activos === 1 ? 'día' : 'días') +
+        ' de entreno</b> · ' + (7 - activos) + ' de descanso</div>' : '') +
+      '</div>';
+  }
+
   const chips = MUSCULOS_ELEGIBLES.map(g =>
     '<button class="chipm' + (sel.indexOf(g) >= 0 ? ' on' : '') + '" data-m="' + g + '">' +
     GRUPO_N[g] + '</button>').join('');
@@ -3916,17 +4153,16 @@ function tarjetaSelector(p){
   if (sel.length){
     const eq = equilibrar(sel);
     const anadidos = eq.lista.filter(g => sel.indexOf(g) < 0);
-    previo = '<div class="previo">' +
-      '<b>' + sel.length + ' ' + (sel.length === 1 ? 'grupo elegido' : 'grupos elegidos') + '</b> · ' +
-      dias + ' días por semana' +
+    const caen = (REPARTO_SEMANA[dias] || []).map(d => DIAS_C[d]).join(', ');
+    previo = '<div class="previo"><b>' + sel.length + ' ' + (sel.length === 1 ? 'grupo elegido' : 'grupos elegidos') +
+      '</b> · entrenas ' + caen +
       (anadidos.length ? '<div class="muted" style="margin-top:6px;font-size:12.5px">Voy a añadir <b>' +
         anadidos.map(g => GRUPO_N[g].toLowerCase()).join(', ') + '</b> para que no te quedes torcido. Te explico por qué al generar.</div>' : '') +
       '</div>';
   }
 
-  return '<div class="card">' +
-    '<h2 style="margin-top:0">¿Qué quieres trabajar?</h2>' +
-    '<p class="muted" style="margin-top:0">Toca los músculos y yo reparto los días. Si no eliges ninguno, uso el reparto clásico según tus días.</p>' +
+  return cab +
+    '<p class="muted" style="margin:12px 0 0">Toca los músculos y yo reparto los días. Si no eliges ninguno, uso el reparto clásico.</p>' +
     '<div class="chips">' + chips + '</div>' +
     '<div class="row" style="gap:6px;flex-wrap:wrap;margin-top:12px">' + atajos +
       (sel.length ? '<button class="sm gh" data-atajo="limpiar">Limpiar</button>' : '') + '</div>' +
@@ -3941,6 +4177,9 @@ function tarjetaSelector(p){
 }
 
 function conectarSelector(){
+  $$('#plCuerpo [data-modo]').forEach(b => b.onclick = () => {
+    COACH.modo = b.dataset.modo; pintarPlan180();
+  });
   $$('#plCuerpo .chipm').forEach(b => b.onclick = () => {
     const g = b.dataset.m, f = focoActual();
     const i = f.indexOf(g);
@@ -3952,10 +4191,27 @@ function conectarSelector(){
     COACH.foco = v === 'limpiar' ? [] : ATAJOS[Number(v)].g.slice();
     pintarPlan180();
   });
+  $$('#plCuerpo .diaFila').forEach(b => b.onclick = () => abrirDia(Number(b.dataset.dia)));
+}
+
+/* ---------- elegir los músculos de un día ---------- */
+function abrirDia(dia){
+  COACH.diaEdit = dia;
+  const d = diasDelUsuario().find(x => x.dia === dia);
+  $('#ddTitulo').textContent = DIAS_N[dia];
+  $('#ddChips').innerHTML = MUSCULOS_ELEGIBLES.map(g =>
+    '<button class="chipm' + (d.grupos.indexOf(g) >= 0 ? ' on' : '') + '" data-dm="' + g + '">' +
+    GRUPO_N[g] + '</button>').join('');
+  $$('#ddChips .chipm').forEach(b => b.onclick = () => {
+    const g = b.dataset.dm, i = d.grupos.indexOf(g);
+    if (i >= 0) d.grupos.splice(i, 1); else d.grupos.push(g);
+    b.classList.toggle('on');
+  });
+  $('#dlgDia').showModal();
 }
 
 function vistaRutina(){
-  const {p, ejercicios} = datosPlan();
+  const {p, ejercicios, series} = datosPlan();
   const faltan = faltaParaPlan(p);
   if (faltan.length) return avisoFaltan(faltan);
   if (!ejercicios.length) return '<div class="card">' + vacio('&#127939;', 'Faltan los ejercicios',
@@ -3976,30 +4232,38 @@ function vistaRutina(){
     const porDia = {};
     COACH.rutina.forEach(r => { (porDia[r.dia] = porDia[r.dia] || []).push(r); });
     const split = SPLITS[Math.max(3, Math.min(6, Object.keys(porDia).length))] || SPLITS[3];
-    const nombreSplit = (p.musculos_foco && p.musculos_foco.length)
-      ? 'A tu medida · ' + p.musculos_foco.map(g => GRUPO_N[g]).join(', ')
-      : split.n;
+    const diasRutina = Object.keys(porDia).map(Number).sort((a,b) => a-b);
+    const nombreSplit = diasRutina.map(d => DIAS_C[d] || ('D' + d)).join(' · ') +
+      '  ·  ' + diasRutina.length + (diasRutina.length === 1 ? ' día' : ' días') + ' por semana';
     cuerpo += '<div class="card"><h2 style="margin:0 0 6px">Tu rutina</h2>' +
       '<p class="muted" style="margin:0">' + nombreSplit + ' · ' + (EQUIPO[p.equipo]||EQUIPO.gimnasio).n + '</p>' +
+      '<div class="muted" style="margin-top:10px;font-size:12.5px">' +
+      'La columna <b>Peso</b> es un punto de partida: sale de tu historial si ya hiciste ese ejercicio, ' +
+      'y si no, de tu peso corporal y tu nivel. <b>La primera serie manda</b>: si te sobran más de dos ' +
+      'repeticiones, sube; si no llegas al mínimo del rango, baja.</div>' +
       ((COACH.avisos && COACH.avisos.length)
         ? '<div style="margin-top:12px">' + COACH.avisos.map(a =>
             '<div class="aviso-eq">' + a + '</div>').join('') + '</div>' : '') + '</div>' +
       Object.keys(porDia).sort((a,b)=>a-b).map(d => {
         const grupos = [...new Set(porDia[d].map(r => {
           const e = ejercicios.find(x => x.id === r.ejercicio_id) || {}; return e.grupo; }).filter(Boolean))];
-        const t = grupos.length ? 'Día ' + d + ' · ' + unirY(grupos.map(g => GRUPO_N[g] || g))
-                                : ((split.dias[d-1] && split.dias[d-1].t) || ('Día ' + d));
+        const nomDia = DIAS_N[Number(d)] || ('Día ' + d);
+        const t = grupos.length ? nomDia + ' · ' + unirY(grupos.map(g => GRUPO_N[g] || g))
+                                : ((split.dias[d-1] && split.dias[d-1].t) || nomDia);
         return '<div class="card"><h3 style="margin:0 0 10px">' + t + '</h3>' +
-          '<div class="tablaWrap"><table class="tab"><thead><tr><th>Ejercicio</th><th>Series</th><th>Reps</th><th>RIR</th><th>Descanso</th></tr></thead><tbody>' +
+          '<div class="tablaWrap"><table class="tab"><thead><tr><th>Ejercicio</th><th>Peso</th><th>Series</th><th>Reps</th><th>RIR</th><th>Desc.</th></tr></thead><tbody>' +
           porDia[d].map(r => {
             const e = ejercicios.find(x => x.id === r.ejercicio_id) || {};
             const sus = sustitutos(r, ejercicios, permite);
+            const pw = pesoSugerido(e, r, p, series);
             return '<tr><td><b>' + esc(e.nombre || 'Ejercicio') + '</b>' +
               '<div class="muted" style="font-size:11px">' + (GRUPO_N[e.grupo]||'') +
               (r.rol === 'principal' ? ' · principal' : '') + '</div>' +
               (sus.length ? '<div class="muted" style="font-size:11px;margin-top:2px">Si no puedes: ' +
                  sus.map(x=>esc(x.nombre)).join(' · ') + '</div>' : '') +
-              '</td><td class="num">' + r.series + '</td><td class="num">' + r.reps_min + '-' + r.reps_max +
+              '</td><td class="num pesoSug' + (pw && pw.fuente === 'historial' ? ' tuyo' : '') + '">' +
+              (pw ? pw.texto : '—') + '</td>' +
+              '<td class="num">' + r.series + '</td><td class="num">' + r.reps_min + '-' + r.reps_max +
               '</td><td class="num">' + r.rir + '</td><td class="num">' + r.descanso_s + ' s</td></tr>';
           }).join('') + '</tbody></table></div></div>';
       }).join('');
@@ -6449,9 +6713,12 @@ function conectarPlan(){
   if (bg) bg.onclick = async () => {
     const {p, ejercicios} = datosPlan();
     if (COACH.rutina.length && !confirm('Esto reemplaza tu rutina actual. ¿Sigo?')) return;
-    const dias = Number(($('#rtDias') || {}).value) || Number(p.dias_entreno_semana) || 3;
-    const foco = focoActual();
-    const r = generarRutina(Object.assign({}, p, {dias_entreno_semana:dias}), ejercicios, foco);
+    const manual = COACH.modo === 'manual';
+    const dias = manual ? diasDelUsuario().filter(d => d.grupos.length).length
+                        : (Number(($('#rtDias') || {}).value) || Number(p.dias_entreno_semana) || 3);
+    const foco = manual ? [] : focoActual();
+    const r = generarRutina(Object.assign({}, p, {dias_entreno_semana:dias}), ejercicios, foco,
+                            manual ? diasDelUsuario() : null);
     if (!r.filas.length) return toast('No encontré ejercicios para tu equipo');
 
     // guardar la elección para que la rutina se pueda rehacer igual
@@ -6470,7 +6737,20 @@ function conectarPlan(){
       ejercicio_id:f.ejercicio_id, series:f.series, reps_min:f.reps_min, reps_max:f.reps_max,
       rir:f.rir, descanso_s:f.descanso_s, rol:f.rol }));
     if (!ok(await sb.from('rutina').insert(filas), 'Rutina lista')) return;
+
+    // los mismos días quedan en el gimnasio, para que "hoy toca" coincida
+    if (r.diasSemana && r.diasSemana.length){
+      const porDia = {};
+      r.diasSemana.forEach(d => {
+        porDia[d.dia] = { user_id:S.user.id, dia:d.dia, titulo:d.titulo || '', grupos:d.grupos };
+      });
+      const todos = [1,2,3,4,5,6,7].map(d => porDia[d] ||
+        ({ user_id:S.user.id, dia:d, titulo:'', grupos:[] }));
+      const rd = await sb.from('dias_entreno').upsert(todos, { onConflict:'user_id,dia' });
+      if (!rd.error){ G.cargado = false; }
+    }
     COACH.avisos = r.avisos || [];
+    COACH.dias = null;
     COACH.rutina = []; COACH.foco = null;
     await cargarPlan(); COACH.secc = 'rutina'; pintarPlan180();
     toast(filas.length + ' ejercicios en ' + r.dias + ' días');
@@ -6636,6 +6916,13 @@ function quizasGuia(){
   if (!vista && nuevo) setTimeout(abrirGuia, 900);
 }
 
+
+$('#ddListo').onclick = () => { $('#dlgDia').close(); pintarPlan180(); };
+$('#ddLimpiar').onclick = () => {
+  const d = diasDelUsuario().find(x => x.dia === COACH.diaEdit);
+  if (d) d.grupos = [];
+  $('#dlgDia').close(); pintarPlan180();
+};
 </script>
 </body>
 </html>
