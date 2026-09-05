@@ -675,6 +675,63 @@ table.tab td.num{text-align:right;font-variant-numeric:tabular-nums;white-space:
   .cu-total b{font-size:17px}
   .cu .mo b,.cu .tx b{font-size:13.5px}
 }
+/* ===================== COPILOTO ===================== */
+.co-punt{display:flex;align-items:center;gap:16px;background:var(--panel2);border:1px solid var(--line);
+  border-radius:14px;padding:14px}
+.co-punt svg{flex:0 0 auto}
+.co-nivel{font-family:var(--f-titulo);font-weight:800;font-size:19px;letter-spacing:.02em}
+.co-med{padding:13px 0;border-bottom:1px solid var(--line)}
+.co-med:last-child{border-bottom:0}
+.co-med b{font-size:14px;font-weight:620}
+.co-val{font-weight:700;font-size:14px;font-variant-numeric:tabular-nums;white-space:nowrap}
+.co-bar{height:7px;border-radius:99px;background:var(--input);border:1px solid var(--line);
+  overflow:hidden;margin:8px 0 7px}
+.co-bar>i{display:block;height:100%;border-radius:99px;transition:width .4s cubic-bezier(.2,.8,.2,1)}
+.co-d{font-size:12.5px;color:var(--tx2);line-height:1.45}
+.co-f{font-size:11.5px;color:var(--tx2);opacity:.82;line-height:1.5;margin-top:5px}
+.co-graf{position:relative;width:100%;background:var(--panel2);border:1px solid var(--line);
+  border-radius:12px;padding:10px 8px 4px;margin-top:12px}
+.co-graf svg{width:100%;height:150px;display:block}
+.co-eje{display:flex;justify-content:space-between;font-size:10px;color:var(--tx2);
+  padding:6px 2px 2px;letter-spacing:.02em}
+.co-riesgo{margin-top:12px;padding:11px 13px;border-radius:11px;font-size:13px;line-height:1.45;
+  border:1px solid var(--line);background:var(--panel2)}
+.co-riesgo.ok{border-color:color-mix(in srgb, var(--ok) 45%, transparent);background:var(--ok-soft);color:var(--ok)}
+.co-riesgo.oro{border-color:color-mix(in srgb, var(--oro) 45%, transparent);background:var(--oro-soft);color:var(--oro-tx)}
+.co-riesgo.bad{border-color:color-mix(in srgb, var(--bad) 45%, transparent);
+  background:var(--bad-soft,rgba(220,60,60,.12));color:var(--bad)}
+.co-mando{margin-bottom:14px;font-size:13px}
+.co-mando b{font-variant-numeric:tabular-nums}
+.co-mando input[type=range]{width:100%;margin-top:6px;padding:0;height:26px;background:transparent;border:0}
+.co-check{display:flex;align-items:center;gap:9px;font-size:13px;text-transform:none;letter-spacing:0;
+  color:var(--tx);margin:0}
+.co-check input{width:18px;height:18px;min-height:18px;flex:0 0 18px}
+.co-comp{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
+.co-est{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:12px}
+.co-est.mejor{border-color:var(--brand);background:var(--brand-soft)}
+.co-est-n{font-family:var(--f-titulo);font-weight:800;font-size:22px;line-height:1.1;margin-top:3px}
+.co-hito{display:flex;justify-content:space-between;align-items:baseline;gap:10px;
+  padding:9px 0;border-bottom:1px solid var(--line);font-size:13px}
+.co-hito:last-child{border-bottom:0}
+.co-hito b{font-variant-numeric:tabular-nums;white-space:nowrap}
+.co-alerta{border-left:3px solid var(--line);padding:10px 0 10px 12px;margin-bottom:12px}
+.co-alerta:last-child{margin-bottom:0}
+.co-alerta.bad{border-left-color:var(--bad)}
+.co-alerta.oro{border-left-color:var(--oro)}
+.co-alerta b{display:block;font-size:14px;font-weight:640;margin-bottom:3px}
+.co-alerta span{font-size:12.5px;color:var(--tx2);line-height:1.5}
+.co-cruce{background:var(--panel2);border:1px solid var(--line);border-radius:12px;
+  padding:13px 14px;margin-bottom:10px}
+.co-cruce:last-child{margin-bottom:0}
+.co-cruce b{display:block;font-size:14px;font-weight:640;margin-bottom:4px}
+.co-cruce span{font-size:12.5px;color:var(--tx2);line-height:1.55}
+@media (max-width:620px){
+  .co-punt{gap:12px;padding:12px}
+  .co-punt svg{width:88px;height:88px}
+  .co-nivel{font-size:17px}
+  .co-comp{grid-template-columns:1fr}
+  .co-est-n{font-size:20px}
+}
 </style>
 </head>
 <body>
@@ -1170,6 +1227,77 @@ table.tab td.num{text-align:right;font-variant-numeric:tabular-nums;white-space:
       </div>
     </section>
 
+    <!-- ============ COPILOTO FINANCIERO ============ -->
+    <section id="tCopiloto" class="hidden">
+
+      <div class="card">
+        <div class="row" style="justify-content:space-between;align-items:flex-start">
+          <div>
+            <h2 style="margin:0">Diagnóstico</h2>
+            <p class="muted" style="margin:4px 0 0">Seis medidas, cada una con su fórmula. Nada sale de una opinión:
+              todo sale de lo que registraste.</p>
+          </div>
+          <button class="sm" id="btnSupuestos">Supuestos</button>
+        </div>
+        <div id="coPuntaje" style="margin-top:14px"></div>
+        <div id="coMedidas"></div>
+      </div>
+
+      <div class="card">
+        <div class="row" style="justify-content:space-between;align-items:center;margin-bottom:4px">
+          <h2 style="margin:0">Flujo de caja proyectado</h2>
+          <div class="row" id="coPlazo" style="gap:6px">
+            <button class="sm on" data-m="6">6 meses</button>
+            <button class="sm" data-m="12">12 meses</button>
+          </div>
+        </div>
+        <div id="coFlujo"></div>
+      </div>
+
+      <div class="card">
+        <h2>Simulador de escenarios</h2>
+        <p class="muted" style="margin-top:0">Mueve los mandos y el gráfico de arriba se recalcula. Los supuestos
+          quedan a la vista: si no te crees uno, cámbialo.</p>
+        <div id="coSim"></div>
+      </div>
+
+      <div class="card">
+        <div class="row" style="justify-content:space-between;align-items:center;margin-bottom:10px">
+          <h2 style="margin:0">Deudas</h2>
+          <button class="sm" id="btnNuevaDeuda">+ Deuda</button>
+        </div>
+        <div id="coDeudas"></div>
+      </div>
+
+      <div class="card" id="coDevCard">
+        <h2>Qué le pasa a tu dinero en bolívares</h2>
+        <div id="coDev"></div>
+      </div>
+
+      <div class="card">
+        <h2>Jubilación y libertad financiera</h2>
+        <div id="coJub"></div>
+      </div>
+
+      <div class="card">
+        <h2>Alertas</h2>
+        <div id="coAlertas"></div>
+      </div>
+
+      <div class="card">
+        <h2>Salud y dinero</h2>
+        <p class="muted" style="margin-top:0">Aquí es donde los módulos dejan de ser islas: lo que haces con el
+          cuerpo cuesta dinero, y lo que haces con el dinero afecta al cuerpo.</p>
+        <div id="coPuente"></div>
+      </div>
+
+      <div class="card">
+        <p class="muted" style="margin:0;font-size:12.5px">Esto no es asesoría financiera ni fiscal. Son cálculos
+          sobre tus propios datos, con los supuestos que tú pusiste. Las proyecciones son escenarios, no promesas:
+          una simulación con tu varianza histórica te dice qué es probable, nunca qué va a pasar.</p>
+      </div>
+    </section>
+
     <!-- REPORTE -->
     <section id="tReporte" class="hidden">
       <div class="card">
@@ -1416,6 +1544,69 @@ table.tab td.num{text-align:right;font-variant-numeric:tabular-nums;white-space:
     <button class="gh" id="hgCancelar">Cancelar</button>
   </div>
 </div>
+
+<!-- ============ DIÁLOGO: deuda ============ -->
+<dialog id="dlgDeuda">
+  <h3 id="deTitulo">Nueva deuda</h3>
+  <div class="grid g2">
+    <div><label>Nombre</label><input id="deNombre" placeholder="Tarjeta Banesco"></div>
+    <div><label>Tipo</label><select id="deTipo">
+      <option value="tarjeta">Tarjeta de crédito</option>
+      <option value="prestamo">Préstamo bancario</option>
+      <option value="personal">Personal</option>
+      <option value="vehiculo">Vehículo</option>
+      <option value="hipoteca">Hipoteca</option>
+      <option value="estudio">Estudios</option>
+      <option value="otro">Otra</option>
+    </select></div>
+  </div>
+  <div class="grid g2" style="margin-top:10px">
+    <div><label>Saldo que debes</label><input id="deSaldo" type="number" step="0.01" min="0" inputmode="decimal" placeholder="0.00"></div>
+    <div><label>Moneda</label><select id="deMoneda"></select></div>
+  </div>
+  <div class="grid g2" style="margin-top:10px">
+    <div><label>Interés anual %</label><input id="deTasa" type="number" step="0.01" min="0" inputmode="decimal" placeholder="48"></div>
+    <div><label>Pago mínimo al mes</label><input id="deMinimo" type="number" step="0.01" min="0" inputmode="decimal" placeholder="0.00"></div>
+  </div>
+  <div class="muted" style="font-size:12px;margin-top:8px">El interés anual es el que dice tu contrato o tu estado de
+    cuenta. Si no lo sabes, míralo: es el número que decide si sales de la deuda en un año o en seis.</div>
+  <div class="row" style="margin-top:16px;justify-content:space-between">
+    <button class="gh sm" id="deBorrar">Eliminar</button>
+    <div class="row">
+      <button class="sm" id="deCancelar">Cancelar</button>
+      <button class="pri" id="deGuardar">Guardar</button>
+    </div>
+  </div>
+</dialog>
+
+<!-- ============ DIÁLOGO: supuestos ============ -->
+<dialog id="dlgSupuestos">
+  <h3>Supuestos del simulador</h3>
+  <p class="muted" style="margin:0 0 14px">Ninguna proyección vale nada sin esto. Cámbialo cuando quieras: todo
+    lo que ves arriba se recalcula.</p>
+  <div class="grid g2">
+    <div><label>Edad a la que quieres retirarte</label><input id="suEdad" type="number" min="40" max="90"></div>
+    <div><label>Fondo de emergencia (meses)</label><input id="suFondo" type="number" min="1" max="36"></div>
+  </div>
+  <div class="grid g2" style="margin-top:10px">
+    <div><label>Inflación anual esperada %</label><input id="suInfl" type="number" step="0.1" min="0"></div>
+    <div><label>Retorno anual esperado %</label><input id="suRet" type="number" step="0.1"></div>
+  </div>
+  <div class="grid g2" style="margin-top:10px">
+    <div><label>Aporte mensual a inversión</label><input id="suAporte" type="number" step="0.01" min="0"></div>
+    <div><label>Gasto mensual al retirarte</label><input id="suGasto" type="number" step="0.01" min="0" placeholder="tu gasto actual"></div>
+  </div>
+  <div style="margin-top:10px"><label>Tolerancia al riesgo</label><select id="suRiesgo">
+    <option value="conservador">Conservador · duermo tranquilo</option>
+    <option value="moderado">Moderado</option>
+    <option value="agresivo">Agresivo · aguanto caídas</option>
+  </select></div>
+  <div class="muted" id="suNota" style="font-size:12px;margin-top:10px"></div>
+  <div class="row" style="margin-top:16px;justify-content:flex-end">
+    <button class="sm" id="suCancelar">Cancelar</button>
+    <button class="pri" id="suGuardar">Guardar</button>
+  </div>
+</dialog>
 
 <!-- ============ DIÁLOGO: cuenta ============ -->
 <dialog id="dlgCuenta">
@@ -1814,9 +2005,20 @@ function ok(res, msg){
    Al publicar una versión nueva: sube VERSION, pon la fecha y agrega
    su entrada arriba del todo en NOVEDADES.
    ===================================================================== */
-const VERSION = '4.2.0';
+const VERSION = '5.0.0';
 const FECHA_VERSION = '2026-09-05';
 const NOVEDADES = [
+  ['5.0.0', '2026-09-05', [
+    'Copiloto: una pestaña nueva dentro de Dinero donde todos los módulos por fin colaboran.',
+    'Diagnóstico con puntaje y seis medidas, cada una con la fórmula a la vista: tasa de ahorro, meses de autonomía, carga de deuda, exposición a devaluación, estabilidad del gasto y pagos fijos al día.',
+    'Flujo de caja proyectado con simulación de Monte Carlo sobre tu propia varianza: el escenario malo, el probable y el bueno, no una línea recta.',
+    'Motor de deudas con amortización real: avalancha contra bola de nieve, la fecha exacta en que sales de cada una y cuántos intereses te ahorra poner algo más cada mes.',
+    'Erosión del bolívar medida con tus propias tasas: a qué ritmo pierde valor lo que tienes quieto y cuánto te cuesta al mes.',
+    'Simulador de escenarios: pierdo el ingreso, aprieto el cinturón, se dispara todo. Con los supuestos editables.',
+    'Jubilación con retorno real después de inflación y la regla del 4%, explicando sus límites.',
+    'Alertas por reglas sobre tus números: gasto atípico a más de dos desviaciones, saldo proyectado en rojo, tasa desactualizada, intereses que pesan.',
+    'Puente salud y dinero: cuánto te cuesta cada entrenamiento que sí haces, qué relación tiene lo que comes fuera con tu objetivo, y si tu constancia con el cuerpo se parece a la que tienes con el dinero.'
+  ]],
   ['4.2.0', '2026-09-05', [
     'Cuentas: Banco de Venezuela, Banesco, Banesco Panamá, Binance, AirTM, efectivo… cada una con su propia moneda y su propio saldo.',
     'Tasa del día que pones tú a mano. Se guarda con la fecha, así un gasto de hace tres meses no se recalcula solo cuando el dólar se mueve.',
@@ -2488,9 +2690,9 @@ const NAVG = [
   { k:'progreso', n:'Progreso', hijos:[['progreso','Progreso'], ['metas','Metas'], ['reporte','Reporte']] },
   { k:'gym',      n:'Gym',      hijos:[['gym','Gimnasio']] },
   { k:'cuerpo',   n:'Cuerpo',   hijos:[['cuerpo','Mis medidas'], ['avatar','Gemelo 3D'], ['plan','Entrenador']] },
-  { k:'dinero',   n:'Dinero',   hijos:[['finanzas','Finanzas']] }
+  { k:'dinero',   n:'Dinero',   hijos:[['finanzas','Resumen'], ['copiloto','Copiloto']] }
 ];
-const TODAS = ['hoy','habitos','progreso','metas','gym','cuerpo','avatar','plan','finanzas','reporte'];
+const TODAS = ['hoy','habitos','progreso','metas','gym','cuerpo','avatar','plan','finanzas','copiloto','reporte'];
 const grupoDe = (t) => (NAVG.find(g => g.hijos.some(h => h[0] === t)) || NAVG[0]).k;
 S.grupo = 'hoy';
 S.ultima = {};   // recuerda en qué subsección estabas de cada grupo
@@ -2506,7 +2708,8 @@ function mostrarTab(t, dir){
   $$('#navG button').forEach(b => b.classList.toggle('on', b.dataset.g === S.grupo));
   pintarSubnav();
   if ((t === 'gym' || t === 'reporte') && !G.cargado) cargarGym();
-  if ((t === 'finanzas' || t === 'reporte') && !F.cargado) cargarFinanzas();
+  if ((t === 'finanzas' || t === 'copiloto' || t === 'reporte') && !F.cargado) cargarFinanzas();
+  if (t === 'copiloto' && F.cargado) pintarCopiloto();
   if ((t === 'cuerpo' || t === 'plan' || t === 'reporte') && !C.cargado) cargarCuerpo();
   if (t === 'avatar') abrirAvatar();
   if (t === 'plan'){ if (!G.cargado) cargarGym();
@@ -6791,9 +6994,9 @@ const CLASE_SUGERIDA = {
 };
 const MESES = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
 
-const F = { mov:[], presup:[], metas:[], pagos:[], cuentas:[], tasas:[], mes:hoyISO().slice(0,7),
-            tipo:'gasto', hgTipo:'gasto', pagoEdit:null, cuentaEdit:null,
-            faltaPagos:false, faltaCuentas:false, cargado:false };
+const F = { mov:[], presup:[], metas:[], pagos:[], cuentas:[], tasas:[], deudas:[],
+            mes:hoyISO().slice(0,7), tipo:'gasto', hgTipo:'gasto', pagoEdit:null, cuentaEdit:null,
+            deudaEdit:null, faltaPagos:false, faltaCuentas:false, faltaDeudas:false, cargado:false };
 
 /* todo lo que se suma y se compara va en tu moneda de referencia */
 const money = (n) => (typeof plata === 'function')
@@ -6831,10 +7034,13 @@ async function cargarFinanzas(){
   ]);
   F.presup = pr.data || []; F.metas = me.data || [];
 
-  const [cu, ta] = await Promise.all([
+  const [cu, ta, de] = await Promise.all([
     sb.from('cuentas').select('*').order('orden'),
-    sb.from('tasas').select('*').order('fecha')
+    sb.from('tasas').select('*').order('fecha'),
+    sb.from('deudas').select('*')
   ]);
+  if (de.error){ F.deudas = []; F.faltaDeudas = faltaTabla(de.error); }
+  else { F.deudas = de.data || []; F.faltaDeudas = false; }
   if (cu.error){ F.cuentas = []; F.faltaCuentas = faltaTabla(cu.error); }
   else { F.cuentas = cu.data || []; F.faltaCuentas = false; }
   F.tasas = ta.error ? [] : (ta.data || []);
@@ -6918,6 +7124,7 @@ function pintarFinanzas(){
   }
   ponerCuentas('#fiCuenta', null);
   pintarHero(); pintarCuentas(); pintarPagos();
+  if (S.tab === 'copiloto') pintarCopiloto();
   pintarCategorias(r); pintarReglas(r); pintarMeses(); pintarRecorte(r);
   pintarConsejos(r); pintarMetasAhorro(r); pintarMovimientos();
 }
@@ -10152,6 +10359,939 @@ function ponerCuentas(selId, monedaId, valor){
 $('#btnTraspaso').onclick = abrirTraspaso;
 
 /* mover un pago fijo o un gasto sin cuenta no rompe nada: queda sin cuenta */
+
+
+/* =====================================================================
+   NÚCLEO COMPARTIDO
+   Un solo lugar que lee hábitos, gimnasio, cuerpo y dinero y deja un
+   estado común. Los módulos dejan de ser islas: el plan de 180 días y
+   el presupuesto miran los mismos números.
+
+   Nada de lo que hay aquí es machine learning. Es estadística sobre tu
+   propio historial: medianas, desviaciones, tendencia por mínimos
+   cuadrados y simulación de Monte Carlo. Predice de verdad, y por eso
+   cada resultado viene con sus supuestos a la vista.
+   ===================================================================== */
+const NUCLEO = { estado:null, sello:0 };
+
+/* ---------- estadística básica ---------- */
+function mediana(l){
+  if (!l || !l.length) return 0;
+  const a = l.slice().sort((x, y) => x - y), m = a.length >> 1;
+  return a.length % 2 ? a[m] : (a[m-1] + a[m]) / 2;
+}
+function promedio(l){ return (!l || !l.length) ? 0 : l.reduce((a, b) => a + b, 0) / l.length; }
+function desviacion(l){
+  if (!l || l.length < 2) return 0;
+  const m = promedio(l);
+  return Math.sqrt(l.reduce((a, x) => a + (x - m) * (x - m), 0) / (l.length - 1));
+}
+function percentil(l, p){
+  if (!l || !l.length) return 0;
+  const a = l.slice().sort((x, y) => x - y);
+  const i = (a.length - 1) * p, b = Math.floor(i), r = i - b;
+  return b + 1 < a.length ? a[b] + r * (a[b+1] - a[b]) : a[b];
+}
+/* tendencia por mínimos cuadrados: devuelve la pendiente por paso */
+function pendiente(l){
+  const n = (l || []).length; if (n < 2) return 0;
+  let sx = 0, sy = 0, sxy = 0, sxx = 0;
+  l.forEach((y, x) => { sx += x; sy += y; sxy += x * y; sxx += x * x; });
+  const d = n * sxx - sx * sx;
+  return d === 0 ? 0 : (n * sxy - sx * sy) / d;
+}
+/* normal estándar por Box-Muller, para el Monte Carlo */
+let _z2 = null;
+function normal(){
+  if (_z2 !== null){ const z = _z2; _z2 = null; return z; }
+  let u = 0, v = 0;
+  while (u === 0) u = Math.random();
+  while (v === 0) v = Math.random();
+  const r = Math.sqrt(-2 * Math.log(u));
+  _z2 = r * Math.sin(2 * Math.PI * v);
+  return r * Math.cos(2 * Math.PI * v);
+}
+const acotar = (x, a, b) => x < a ? a : x > b ? b : x;
+
+/* ---------- el estado común ---------- */
+function nucleoEstado(forzar){
+  const sello = (F.mov || []).length * 1000 + (S.registros || []).length +
+                (F.cuentas || []).length * 7 + (F.deudas || []).length * 13 +
+                (F.tasas || []).length * 3 + (G.series || []).length;
+  if (!forzar && NUCLEO.estado && NUCLEO.sello === sello) return NUCLEO.estado;
+
+  const hoy = hoyISO(), ref = monedaRef();
+  const p = S.perfil || {};
+
+  /* ---- dinero: los últimos 6 meses cerrados, sin contar el actual ---- */
+  const meses = [];
+  for (let i = 1; i <= 6; i++) meses.push(mesSumar(hoy.slice(0,7), -i));
+  const conDatos = meses.filter(m => delMes(m).length > 0);
+  const ingMes = conDatos.map(m => resumen(m).ingresos);
+  const gasMes = conDatos.map(m => resumen(m).gastos);
+  const gastoFijoMes = conDatos.map(m => resumen(m).fijos);
+  const gastoVarMes  = conDatos.map(m => resumen(m).variables);
+
+  const ingresoTipico = conDatos.length ? mediana(ingMes) : 0;
+  const gastoTipico   = conDatos.length ? mediana(gasMes) : 0;
+  const gastoFijo     = conDatos.length ? mediana(gastoFijoMes) : 0;
+  const gastoVar      = conDatos.length ? mediana(gastoVarMes) : 0;
+  const sdGasto       = desviacion(gasMes);
+  const sdIngreso     = desviacion(ingMes);
+  const tendGasto     = pendiente(gasMes.slice().reverse());   // por mes, del más viejo al más nuevo
+
+  /* ---- lo que tienes ---- */
+  const T = (typeof totalCuentas === 'function') ? totalCuentas() : { ref:0, bs:0, n:0, incompleto:false };
+  const liquido = T.ref;
+  const ahorroMetas = (F.metas || []).filter(m => m.activa !== false)
+                        .reduce((a, m) => a + Number(m.acumulado || 0), 0);
+
+  /* ---- deudas, todas en la moneda de referencia ---- */
+  const deudas = (F.deudas || []).filter(d => d.activa).map(d => {
+    const cv = (x) => { const v = convertir(Number(x), d.moneda, ref, hoy); return v == null ? Number(x) : v; };
+    return { id:d.id, nombre:d.nombre, tipo:d.tipo, moneda:d.moneda,
+             saldo:cv(d.saldo), saldoOrig:Number(d.saldo),
+             tasa:Number(d.tasa_anual), minimo:cv(d.pago_minimo), minimoOrig:Number(d.pago_minimo) };
+  });
+  const deudaTotal = deudas.reduce((a, d) => a + d.saldo, 0);
+  const deudaMinimos = deudas.reduce((a, d) => a + d.minimo, 0);
+  const interesMes = deudas.reduce((a, d) => a + d.saldo * (d.tasa / 100) / 12, 0);
+
+  /* ---- exposición por moneda ---- */
+  const porMoneda = {};
+  (F.cuentas || []).filter(c => c.activa).forEach(c => {
+    const s = saldoCuenta(c);
+    const v = convertir(s, c.moneda, ref, hoy);
+    if (v == null) return;
+    porMoneda[c.moneda] = (porMoneda[c.moneda] || 0) + v;
+  });
+  const totalMonedas = Object.values(porMoneda).reduce((a, b) => a + b, 0);
+  const enBolivares = totalMonedas > 0 ? (porMoneda.VES || 0) / totalMonedas : 0;
+  // concentración por cuenta (Herfindahl): 1 = todo en una sola
+  const saldos = (F.cuentas || []).filter(c => c.activa)
+                   .map(c => { const v = convertir(saldoCuenta(c), c.moneda, ref, hoy); return v == null ? 0 : Math.max(0, v); });
+  const sumaS = saldos.reduce((a, b) => a + b, 0);
+  const concentracion = sumaS > 0 ? saldos.reduce((a, s) => a + Math.pow(s / sumaS, 2), 0) : 0;
+
+  /* ---- devaluación real, calculada de tus propias tasas ---- */
+  const dev = devaluacion();
+
+  /* ---- salud y hábitos ---- */
+  const dias30 = []; for (let i = 0; i < 30; i++) dias30.push(sumarDias(hoy, -i));
+  let toca = 0, hechos = 0;
+  dias30.forEach(f => {
+    (S.habitos || []).forEach(h => {
+      if (!tocaHoy(h, f)) return;
+      toca++; const r = regDe(h.id, f); if (r && r.cumplido) hechos++;
+    });
+  });
+  const cumplimiento = toca ? hechos / toca : null;
+  const diasGym = new Set((G.series || []).filter(s => s.fecha >= sumarDias(hoy, -28)).map(s => s.fecha));
+  const gymMes = diasGym.size;
+  const comp = (typeof composicion === 'function' && p.sexo && p.peso_kg && p.estatura_cm)
+                 ? composicion(p, C.medidas || []) : null;
+
+  const E = {
+    hoy:hoy, ref:ref, mesesConDatos:conDatos.length,
+    ingresoTipico:ingresoTipico, gastoTipico:gastoTipico,
+    gastoFijo:gastoFijo, gastoVar:gastoVar,
+    sdGasto:sdGasto, sdIngreso:sdIngreso, tendGasto:tendGasto,
+    ahorroMes: ingresoTipico - gastoTipico,
+    tasaAhorro: ingresoTipico > 0 ? (ingresoTipico - gastoTipico) / ingresoTipico : null,
+    liquido:liquido, liquidoBs:T.bs, cuentas:T.n, faltaTasa:T.incompleto,
+    ahorroMetas:ahorroMetas,
+    deudas:deudas, deudaTotal:deudaTotal, deudaMinimos:deudaMinimos, interesMes:interesMes,
+    cargaDeuda: ingresoTipico > 0 ? deudaMinimos / ingresoTipico : null,
+    porMoneda:porMoneda, enBolivares:enBolivares, concentracion:concentracion,
+    devaluacion:dev,
+    runway: gastoTipico > 0 ? liquido / gastoTipico : null,
+    cumplimiento:cumplimiento, gymMes:gymMes, comp:comp,
+    patrimonio: liquido - deudaTotal
+  };
+  NUCLEO.estado = E; NUCLEO.sello = sello;
+  return E;
+}
+
+/* ---------- devaluación medida, no supuesta ----------
+   Toma tu historial de tasas y calcula a qué ritmo real ha perdido
+   valor el bolívar. Si solo tienes dos tasas, lo dice. */
+function devaluacion(){
+  const ref = monedaRef();
+  const objetivo = ref === 'VES' ? 'USD' : ref;
+  const l = (F.tasas || []).filter(t => t.moneda === objetivo)
+              .sort((a, b) => a.fecha.localeCompare(b.fecha));
+  if (l.length < 2) return { hay:false, n:l.length, moneda:objetivo };
+  const a = l[0], b = l[l.length - 1];
+  const dias = Math.max(1, (deISO(b.fecha) - deISO(a.fecha)) / 86400000);
+  const factor = Number(b.valor) / Number(a.valor);
+  if (!(factor > 0)) return { hay:false, n:l.length, moneda:objetivo };
+  const mensual = Math.pow(factor, 30 / dias) - 1;      // cuánto sube la divisa al mes
+  const anual   = Math.pow(factor, 365 / dias) - 1;
+  // lo que pierde el bolívar es la otra cara de lo que sube la divisa
+  return { hay:true, n:l.length, moneda:objetivo, dias:Math.round(dias),
+           desde:a.fecha, hasta:b.fecha, subeDivisaMes:mensual, subeDivisaAnual:anual,
+           pierdeBsMes: 1 - 1 / (1 + mensual), pierdeBsAnual: 1 - 1 / (1 + anual),
+           tasaIni:Number(a.valor), tasaFin:Number(b.valor) };
+}
+
+/* =====================================================================
+   MOTORES FINANCIEROS
+   ===================================================================== */
+
+/* ---------- 1. DIAGNÓSTICO: seis medidas con su fórmula a la vista ---------- */
+function diagnostico(){
+  const E = nucleoEstado();
+  const p = S.perfil || {};
+  const M = [];
+  const meta = (x, a, b) => acotar((x - a) / (b - a), 0, 1) * 100;   // 0 en a, 100 en b
+
+  // 1. tasa de ahorro
+  if (E.tasaAhorro != null){
+    const v = E.tasaAhorro * 100;
+    M.push({ k:'ahorro', n:'Tasa de ahorro', v:v.toFixed(1).replace('.',',') + '%',
+      p: meta(v, -10, 30), peso:2,
+      f:'(ingreso − gasto) ÷ ingreso, con la mediana de tus últimos ' + E.mesesConDatos + ' meses',
+      d: v < 0 ? 'Gastas más de lo que entra.' : v < 10 ? 'Por debajo del 10%: cualquier imprevisto te descuadra.'
+         : v < 20 ? 'Aceptable. El 20% es donde empieza a construirse patrimonio.'
+         : 'Buena. Mantenerla es lo que separa a quien ahorra de quien acumula.' });
+  }
+  // 2. meses de autonomía
+  if (E.runway != null){
+    M.push({ k:'runway', n:'Meses de autonomía', v: E.runway.toFixed(1).replace('.',',') + ' meses',
+      p: meta(E.runway, 0, Number(p.fondo_meses || 6)), peso:2,
+      f:'lo que tienes en cuentas ÷ tu gasto mensual típico',
+      d: E.runway < 1 ? 'Menos de un mes. Esto es lo primero que hay que arreglar.'
+         : E.runway < 3 ? 'Poco margen: un imprevisto te obliga a endeudarte.'
+         : E.runway < 6 ? 'Vas bien. Seis meses es el objetivo clásico.'
+         : 'Cubierto. A partir de aquí el exceso rinde más invertido que quieto.' });
+  }
+  // 3. carga de deuda
+  if (E.cargaDeuda != null){
+    const v = E.cargaDeuda * 100;
+    M.push({ k:'deuda', n:'Carga de deuda', v: v.toFixed(1).replace('.',',') + '% del ingreso',
+      p: 100 - meta(v, 0, 40), peso:2,
+      f:'suma de los pagos mínimos ÷ ingreso mensual',
+      d: v === 0 ? 'Sin deudas registradas.'
+         : v < 15 ? 'Manejable.' : v < 36 ? 'Alta. Por encima del 36% los bancos ya te ven como riesgo.'
+         : 'Muy alta. Los intereses se están comiendo tu capacidad de ahorro.' });
+  }
+  // 4. exposición a la devaluación
+  if (E.cuentas > 0 && E.ref !== 'VES'){
+    const v = E.enBolivares * 100;
+    M.push({ k:'moneda', n:'Expuesto en bolívares', v: v.toFixed(1).replace('.',',') + '% de tu dinero',
+      p: 100 - meta(v, 5, 60), peso:1.5,
+      f:'saldo en bolívares ÷ saldo total, convertido a ' + E.ref,
+      d: v < 10 ? 'Poco expuesto.' : v < 30 ? 'Razonable si es lo que gastas en el mes.'
+         : 'Mucho quieto en bolívares. Lo que no vayas a gastar este mes pierde valor cada día.' });
+  }
+  // 5. estabilidad del gasto
+  if (E.gastoTipico > 0 && E.mesesConDatos >= 3){
+    const cv = E.sdGasto / E.gastoTipico;
+    M.push({ k:'estable', n:'Estabilidad del gasto', v:'±' + (cv * 100).toFixed(0) + '% mes a mes',
+      p: 100 - meta(cv * 100, 5, 45), peso:1,
+      f:'desviación estándar de tu gasto ÷ tu gasto típico',
+      d: cv < 0.15 ? 'Muy predecible: se puede planificar.' : cv < 0.30 ? 'Normal.'
+         : 'Muy variable. Presupuestar así es difícil: mira qué categoría se dispara.' });
+  }
+  // 6. cumplimiento de pagos fijos
+  const pf = (F.pagos || []).filter(x => x.activo);
+  if (pf.length){
+    let debidos = 0, pagados = 0;
+    pf.forEach(x => {
+      const v = ultimaFechaVencida(x, E.hoy);
+      if (!v) return; debidos++; if (pagoRegistrado(x, v)) pagados++;
+    });
+    if (debidos){
+      const v = pagados / debidos * 100;
+      M.push({ k:'pagos', n:'Pagos fijos al día', v: pagados + ' de ' + debidos,
+        p: v, peso:1, f:'pagos vencidos que ya están registrados',
+        d: v === 100 ? 'Todo al día.' : 'Tienes ' + (debidos - pagados) + ' sin registrar. O no los pagaste, o no los anotaste.' });
+    }
+  }
+
+  const pesoTot = M.reduce((a, x) => a + x.peso, 0);
+  const puntaje = pesoTot ? Math.round(M.reduce((a, x) => a + x.p * x.peso, 0) / pesoTot) : null;
+  return { medidas:M, puntaje:puntaje,
+           nivel: puntaje == null ? null : puntaje >= 80 ? 'Sólida' : puntaje >= 60 ? 'Estable'
+                  : puntaje >= 40 ? 'Frágil' : 'En riesgo' };
+}
+
+/* ---------- 2. FLUJO DE CAJA: Monte Carlo con tu propia varianza ----------
+   No es una línea recta. Cada mes se sortea un ingreso y un gasto de una
+   normal centrada en tu mediana, con tu desviación real. 2000 caminos.
+   Devuelve las bandas 10, 50 y 90. */
+function flujoCaja(meses, ajuste){
+  const E = nucleoEstado();
+  const n = meses || 6, N = 2000;
+  const aj = Object.assign({ ingreso:0, gasto:0, devalua:false, extra:0 }, ajuste || {});
+  if (!(E.ingresoTipico > 0) && !(E.gastoTipico > 0)) return null;
+
+  const mi = E.ingresoTipico * (1 + aj.ingreso / 100);
+  const mg = E.gastoTipico   * (1 + aj.gasto / 100);
+  // con dos o tres meses de historial, la desviación medida subestima la
+  // incertidumbre real. Se pone un suelo más ancho y se avisa.
+  const pocos = E.mesesConDatos < 4;
+  const si = Math.max(E.sdIngreso, mi * (pocos ? 0.10 : 0.04));
+  const sg = Math.max(E.sdGasto,   mg * (pocos ? 0.14 : 0.06));
+  const dev = E.devaluacion;
+  const erosionMes = (aj.devalua && dev.hay && E.ref !== 'VES')
+    ? E.enBolivares * dev.pierdeBsMes : 0;
+
+  const caminos = [];
+  for (let k = 0; k < N; k++){
+    let saldo = E.liquido, fila = [];
+    for (let m = 1; m <= n; m++){
+      const ing = Math.max(0, mi + normal() * si);
+      const gas = Math.max(0, mg + normal() * sg);
+      saldo = saldo * (1 - erosionMes) + ing - gas + aj.extra;
+      fila.push(saldo);
+    }
+    caminos.push(fila);
+  }
+  const p10 = [], p50 = [], p90 = [], quiebra = [];
+  for (let m = 0; m < n; m++){
+    const col = caminos.map(c => c[m]);
+    p10.push(percentil(col, 0.10));
+    p50.push(percentil(col, 0.50));
+    p90.push(percentil(col, 0.90));
+    quiebra.push(col.filter(x => x < 0).length / N);
+  }
+  const etiquetas = [];
+  for (let m = 1; m <= n; m++) etiquetas.push(mesNombre(mesSumar(E.hoy.slice(0,7), m)).split(' ')[0]);
+  return { n:n, p10:p10, p50:p50, p90:p90, quiebra:quiebra, etiquetas:etiquetas, pocos:pocos,
+           meses:E.mesesConDatos, inicio:E.liquido, mi:mi, mg:mg, si:si, sg:sg, erosionMes:erosionMes,
+           riesgoFinal:quiebra[n-1], mesQuiebra: quiebra.findIndex(q => q >= 0.5) + 1 };
+}
+
+/* ---------- 3. DEUDAS: amortización real ----------
+   Simula mes a mes: primero corren los intereses, después se aplican los
+   pagos. Compara avalancha (mayor tasa primero) contra bola de nieve
+   (menor saldo primero) con el mismo dinero. */
+function amortizar(deudas, extra, orden){
+  const d = deudas.map(x => ({ id:x.id, nombre:x.nombre, saldo:x.saldo, tasa:x.tasa, minimo:x.minimo }));
+  if (!d.length) return null;
+  const total = d.reduce((a, x) => a + x.minimo, 0) + (extra || 0);
+  let interes = 0, mes = 0, libres = [];
+  const MAX = 600;
+  while (d.some(x => x.saldo > 0.01) && mes < MAX){
+    mes++;
+    d.forEach(x => { if (x.saldo > 0){ const i = x.saldo * (x.tasa / 100) / 12; x.saldo += i; interes += i; } });
+    let bolsa = total;
+    // primero el mínimo de cada una
+    d.forEach(x => { if (x.saldo > 0){ const pg = Math.min(x.minimo, x.saldo, bolsa); x.saldo -= pg; bolsa -= pg; } });
+    // lo que sobre, a la que toque según la estrategia
+    const cola = d.filter(x => x.saldo > 0.01).sort(orden === 'bola'
+      ? (a, b) => a.saldo - b.saldo
+      : (a, b) => b.tasa - a.tasa || a.saldo - b.saldo);
+    for (const x of cola){
+      if (bolsa <= 0.01) break;
+      const pg = Math.min(bolsa, x.saldo); x.saldo -= pg; bolsa -= pg;
+    }
+    d.forEach(x => { if (x.saldo <= 0.01 && !libres.some(l => l.id === x.id)) libres.push({ id:x.id, nombre:x.nombre, mes:mes }); });
+  }
+  const inicial = deudas.reduce((a, x) => a + x.saldo, 0);
+  return { meses:mes, interes:interes, pagado:inicial + interes, libres:libres,
+           completo: mes < MAX, cuota:total };
+}
+function planDeudas(extra){
+  const E = nucleoEstado();
+  if (!E.deudas.length) return null;
+  const av = amortizar(E.deudas, extra || 0, 'avalancha');
+  const bn = amortizar(E.deudas, extra || 0, 'bola');
+  const solo = amortizar(E.deudas, 0, 'avalancha');
+  return { avalancha:av, bola:bn, sinExtra:solo, extra:extra || 0,
+           ahorro: bn && av ? bn.interes - av.interes : 0,
+           ahorroExtra: solo && av ? solo.interes - av.interes : 0,
+           mesesMenos: solo && av ? solo.meses - av.meses : 0 };
+}
+
+/* ---------- 4. JUBILACIÓN Y LIBERTAD FINANCIERA ---------- */
+function planJubilacion(){
+  const E = nucleoEstado(), p = S.perfil || {};
+  const edad = edadDe(p.fecha_nacimiento);
+  if (!edad) return null;
+  const meta = Number(p.edad_jubilacion || 65);
+  const anios = Math.max(0, meta - edad);
+  const infl = Number(p.inflacion_anual || 0) / 100;
+  const nom  = Number(p.retorno_anual || 6) / 100;
+  const real = (1 + nom) / (1 + infl) - 1;             // Fisher: lo que de verdad rinde
+  const aporte = Number(p.aporte_mensual || 0);
+  const gastoHoy = Number(p.gasto_jubilacion || E.gastoTipico || 0);
+
+  // capital futuro: lo que ya tienes más los aportes, a retorno real
+  const r = real / 12, n = anios * 12;
+  const base = Math.max(0, E.liquido - E.deudaTotal);
+  const futuro = r === 0 ? base + aporte * n
+    : base * Math.pow(1 + r, n) + aporte * ((Math.pow(1 + r, n) - 1) / r);
+  // lo que necesitas: regla del 4% sobre el gasto anual, en dinero de hoy
+  const necesita = gastoHoy * 12 / 0.04;
+  const rentaPosible = futuro * 0.04 / 12;
+  const falta = Math.max(0, necesita - futuro);
+  const aporteNecesario = (r === 0 || n === 0) ? (n ? falta / n : 0)
+    : falta * r / (Math.pow(1 + r, n) - 1);
+  // años hasta la libertad financiera con el ahorro actual
+  const ahorroAnual = Math.max(0, E.ahorroMes) * 12;
+  let aniosLibertad = null;
+  if (ahorroAnual > 0 && necesita > base){
+    if (real <= 0) aniosLibertad = (necesita - base) / ahorroAnual;
+    else {
+      // resolver n en base(1+r)^n + A((1+r)^n-1)/r = necesita
+      const A = ahorroAnual, k = (necesita * real + A) / (base * real + A);
+      aniosLibertad = k > 0 ? Math.log(k) / Math.log(1 + real) : null;
+    }
+  }
+  return { edad:edad, meta:meta, anios:anios, real:real, nominal:nom, inflacion:infl,
+           aporte:aporte, base:base, futuro:futuro, necesita:necesita,
+           rentaPosible:rentaPosible, gastoHoy:gastoHoy, falta:falta,
+           aporteNecesario:aporteNecesario, aniosLibertad:aniosLibertad,
+           alcanza: futuro >= necesita };
+}
+
+/* ---------- 5. ALERTAS POR REGLAS ---------- */
+function alertas(){
+  const E = nucleoEstado(), A = [];
+  const p = S.perfil || {};
+
+  if (E.faltaTasa)
+    A.push({ g:'bad', t:'Falta una tasa', d:'Hay cuentas que no puedo convertir. Actualiza la tasa del día o el total que ves está incompleto.' });
+
+  const usadas = (typeof monedasEnUso === 'function') ? monedasEnUso() : [];
+  usadas.forEach(m => {
+    const f = fechaTasa(m);
+    if (!f) return;
+    const dias = Math.round((deISO(E.hoy) - deISO(f)) / 86400000);
+    if (dias >= 7) A.push({ g:'oro', t:'Tasa de ' + m + ' con ' + dias + ' días',
+      d:'Todo lo que conviertes hoy usa una tasa de hace ' + dias + ' días. En un país con esta inflación, eso ya no es tu dinero real.' });
+  });
+
+  if (E.runway != null && E.runway < 1)
+    A.push({ g:'bad', t:'Menos de un mes de autonomía',
+      d:'Con lo que tienes en cuentas cubres ' + (E.runway * 30).toFixed(0) + ' días de tu gasto típico.' });
+  else if (E.runway != null && E.runway < 3)
+    A.push({ g:'oro', t:'Fondo de emergencia corto',
+      d:'Te alcanza para ' + E.runway.toFixed(1).replace('.',',') + ' meses. El objetivo que pusiste es ' + (p.fondo_meses || 6) + '.' });
+
+  if (E.tasaAhorro != null && E.tasaAhorro < 0)
+    A.push({ g:'bad', t:'Gastas más de lo que entra',
+      d:'En tus últimos ' + E.mesesConDatos + ' meses el gasto típico supera al ingreso en ' + money(-E.ahorroMes) + ' al mes.' });
+
+  // gasto atípico: más de dos desviaciones sobre tu propia media por categoría
+  const mesAct = E.hoy.slice(0,7);
+  porCategoria(mesAct, 'gasto').forEach(c => {
+    const hist = [];
+    for (let i = 1; i <= 6; i++){
+      const m = mesSumar(mesAct, -i);
+      if (!delMes(m).length) continue;
+      hist.push(suma(delMes(m).filter(x => x.tipo === 'gasto' && x.categoria === c.categoria)));
+    }
+    if (hist.length < 3) return;
+    const mu = promedio(hist), sd = desviacion(hist);
+    if (sd <= 0) return;
+    const z = (c.monto - mu) / sd;
+    if (z >= 2) A.push({ g:'oro', t:'Gasto atípico en ' + c.categoria,
+      d:'Llevas ' + money(c.monto) + ' este mes contra ' + money(mu) + ' de promedio. Está a ' +
+        z.toFixed(1).replace('.',',') + ' desviaciones: no es ruido normal.' });
+  });
+
+  if (E.interesMes > 0 && E.ingresoTipico > 0 && E.interesMes / E.ingresoTipico > 0.05)
+    A.push({ g:'bad', t:'Los intereses pesan',
+      d:'Pagas ' + money(E.interesMes) + ' al mes solo en intereses: el ' +
+        (100 * E.interesMes / E.ingresoTipico).toFixed(1).replace('.',',') + '% de tu ingreso, antes de bajar un centavo de la deuda.' });
+
+  const fc = flujoCaja(6);
+  if (fc && fc.mesQuiebra > 0)
+    A.push({ g:'bad', t:'Saldo en rojo en ' + fc.mesQuiebra + (fc.mesQuiebra === 1 ? ' mes' : ' meses'),
+      d:'Si nada cambia, en más de la mitad de los escenarios te quedas sin dinero para el mes ' + fc.mesQuiebra + '.' });
+  else if (fc && fc.riesgoFinal >= 0.15)
+    A.push({ g:'oro', t:'Riesgo de quedarte corto',
+      d:'En ' + Math.round(fc.riesgoFinal * 100) + ' de cada 100 escenarios terminas los 6 meses en negativo.' });
+
+  const dev = E.devaluacion;
+  if (dev.hay && E.enBolivares > 0.25 && dev.pierdeBsMes > 0.02){
+    const pierde = (E.porMoneda.VES || 0) * dev.pierdeBsMes;
+    A.push({ g:'oro', t:'Lo que tienes en bolívares se encoge',
+      d:'Al ritmo medido en tus propias tasas, pierdes cerca de ' + money(pierde) + ' al mes solo por tenerlo quieto.' });
+  }
+
+  if (E.concentracion > 0.8 && E.cuentas > 1)
+    A.push({ g:'oro', t:'Todo en una sola cuenta',
+      d:'El ' + Math.round(Math.sqrt(E.concentracion) * 100) + '% de tu dinero está en una cuenta. Si esa falla, fallas tú.' });
+
+  return A;
+}
+
+/* ---------- 6. PUENTE SALUD ↔ DINERO ---------- */
+function puenteSalud(){
+  const E = nucleoEstado(), H = [];
+  const p = S.perfil || {};
+  const hoy = E.hoy;
+
+  // el gimnasio que pagas contra el que usas
+  const pagoGym = (F.pagos || []).find(x => x.activo && /gym|gimnas|smart ?fit|crossfit|entrena/i.test(x.nombre || ''));
+  if (pagoGym){
+    const c = cuentaDe(pagoGym.cuenta_id);
+    const mensual = convertir(Number(pagoGym.monto), c ? c.moneda : E.ref, E.ref, hoy) || Number(pagoGym.monto);
+    if (E.gymMes > 0){
+      H.push({ t:'Cada entrenamiento te cuesta ' + money(mensual / E.gymMes),
+        d:'Pagas ' + money(mensual) + ' al mes por ' + esc(pagoGym.nombre) + ' y en los últimos 28 días registraste ' +
+           E.gymMes + (E.gymMes === 1 ? ' día' : ' días') + '. ' +
+          (E.gymMes >= 12 ? 'A ese precio por sesión, está bien pagado.'
+           : E.gymMes >= 8 ? 'Con dos sesiones más al mes bajaría bastante.'
+           : 'A menos de dos veces por semana, sale más caro que pagar por clase.') });
+    } else {
+      H.push({ t:'Pagas ' + money(mensual) + ' al mes de gimnasio y no registraste ni un día',
+        d:'O no estás yendo, o no estás registrando. En el primer caso es dinero tirado; en el segundo, no puedes medir nada.' });
+    }
+  }
+
+  // restaurantes contra el objetivo de grasa
+  const rest = porCategoria(hoy.slice(0,7), 'gasto').find(c => /restaurant|comida r[aá]pida|delivery/i.test(c.categoria));
+  if (rest && E.comp && p.objetivo === 'bajar_grasa'){
+    const pl = planNutricion(p);
+    if (pl){
+      const kcalFuera = 900;   // una comida fuera ronda las 900 kcal, contra unas 550 en casa
+      const veces = Math.round(rest.monto / Math.max(1, rest.monto / 8));
+      H.push({ t:'Restaurantes: ' + money(rest.monto) + ' este mes',
+        d:'Tu plan es un déficit de ' + Math.abs(pl.kcal - pl.gasto) + ' kcal al día. Una comida fuera ronda las ' +
+          kcalFuera + ' kcal contra unas 550 en casa: cada salida se come casi un día entero de déficit. ' +
+          'No te digo que no salgas; te digo lo que cuesta en los dos sentidos.' });
+    }
+  }
+
+  // constancia en hábitos y constancia en el dinero
+  if (E.cumplimiento != null && E.tasaAhorro != null){
+    const h = Math.round(E.cumplimiento * 100), a = Math.round(E.tasaAhorro * 100);
+    if (h >= 70 && a < 10)
+      H.push({ t:'Eres constante con los hábitos, no con el dinero',
+        d:'Cumples el ' + h + '% de tus hábitos y ahorras el ' + a + '% de lo que ganas. La misma cabeza que sostiene una racha de 30 días puede sostener una transferencia automática el día que cobras.' });
+    else if (h < 40 && a >= 20)
+      H.push({ t:'Con el dinero eres disciplinado; con el cuerpo no',
+        d:'Ahorras el ' + a + '% y cumples el ' + h + '% de tus hábitos. Trata el entrenamiento como tratas una factura: fecha fija y no se negocia.' });
+    else if (h >= 70 && a >= 20)
+      H.push({ t:'Las dos disciplinas van juntas',
+        d:'Cumples el ' + h + '% de tus hábitos y ahorras el ' + a + '%. Esto casi nunca es casualidad: es la misma constancia aplicada a dos sitios.' });
+  }
+
+  // el plan de 180 días también cuesta dinero
+  if (E.comp && p.objetivo){
+    const pl = planNutricion(p);
+    if (pl && E.gastoTipico > 0){
+      const alim = porCategoria(hoy.slice(0,7), 'gasto').find(c => /aliment|mercado|comida/i.test(c.categoria));
+      if (alim)
+        H.push({ t:'Tu plan de comida y tu presupuesto',
+          d:'Tu plan pide ' + pl.prot + ' g de proteína al día. Llevas ' + money(alim.monto) +
+            ' en alimentación este mes. La proteína es lo caro del plan: si hay que recortar, recorta en otra categoría antes que ahí.' });
+    }
+  }
+
+  // salud como riesgo financiero
+  if (E.comp && E.comp.cinAlt >= 0.55 && E.runway != null && E.runway < 3)
+    H.push({ t:'Dos riesgos que se suman',
+      d:'Tu índice cintura/estatura está en ' + E.comp.cinAlt.toFixed(2).replace('.',',') +
+        ' y tu fondo de emergencia cubre ' + E.runway.toFixed(1).replace('.',',') +
+        ' meses. Un problema de salud con ese colchón se convierte en un problema financiero.' });
+
+  return H;
+}
+
+/* =====================================================================
+   PANTALLA COPILOTO
+   ===================================================================== */
+const CO = { plazo:6, sim:{ ingreso:0, gasto:0, extra:0, devalua:true }, extraDeuda:0 };
+
+function pintarCopiloto(){
+  nucleoEstado(true);
+  pintarDiagnostico(); pintarSimulador(); pintarFlujo();
+  pintarDeudasCop(); pintarDevaluacion(); pintarJubilacion();
+  pintarAlertas(); pintarPuente();
+}
+
+/* ---------- diagnóstico ---------- */
+function pintarDiagnostico(){
+  const D = diagnostico(), E = nucleoEstado();
+  const c = $('#coPuntaje'), m = $('#coMedidas');
+  if (!D.medidas.length){
+    c.innerHTML = '';
+    m.innerHTML = '<p class="muted">Necesito al menos un mes de movimientos registrados para diagnosticar algo. ' +
+      'Registra tus ingresos y tus gastos durante un mes y esto se llena solo.</p>';
+    return;
+  }
+  const col = D.puntaje >= 80 ? 'var(--ok)' : D.puntaje >= 60 ? 'var(--brand)'
+            : D.puntaje >= 40 ? 'var(--oro)' : 'var(--bad)';
+  const r = 46, circ = 2 * Math.PI * r;
+  c.innerHTML =
+    '<div class="co-punt">' +
+      '<svg viewBox="0 0 110 110" width="104" height="104">' +
+        '<circle cx="55" cy="55" r="' + r + '" fill="none" stroke="var(--line)" stroke-width="9"/>' +
+        '<circle cx="55" cy="55" r="' + r + '" fill="none" stroke="' + col + '" stroke-width="9" ' +
+          'stroke-linecap="round" stroke-dasharray="' + circ.toFixed(1) + '" ' +
+          'stroke-dashoffset="' + (circ * (1 - D.puntaje / 100)).toFixed(1) + '" ' +
+          'transform="rotate(-90 55 55)"/>' +
+        '<text x="55" y="60" text-anchor="middle" font-size="27" font-weight="800" fill="var(--tx)">' + D.puntaje + '</text>' +
+      '</svg>' +
+      '<div><div class="co-nivel" style="color:' + col + '">' + D.nivel + '</div>' +
+        '<div class="muted" style="font-size:12.5px;line-height:1.45;margin-top:4px">Promedio ponderado de las ' +
+        D.medidas.length + ' medidas de abajo. Sube arreglando la que esté más roja, no la más fácil.</div>' +
+        '<div class="muted" style="font-size:12px;margin-top:6px">Base: ' + E.mesesConDatos +
+        (E.mesesConDatos === 1 ? ' mes' : ' meses') + ' con movimientos · totales en ' + E.ref + '</div></div>' +
+    '</div>';
+
+  m.innerHTML = D.medidas.map(x =>
+    '<div class="co-med"><div class="row" style="justify-content:space-between;align-items:baseline;gap:10px">' +
+      '<b>' + esc(x.n) + '</b><span class="co-val">' + esc(x.v) + '</span></div>' +
+      '<div class="co-bar"><i style="width:' + x.p.toFixed(1) + '%;background:' +
+        (x.p >= 70 ? 'var(--ok)' : x.p >= 45 ? 'var(--brand)' : x.p >= 25 ? 'var(--oro)' : 'var(--bad)') + '"></i></div>' +
+      '<div class="co-d">' + esc(x.d) + '</div>' +
+      '<div class="co-f">' + esc(x.f) + '</div></div>').join('');
+}
+
+/* ---------- flujo de caja ---------- */
+function pintarFlujo(){
+  const c = $('#coFlujo'), E = nucleoEstado();
+  const fc = flujoCaja(CO.plazo, CO.sim);
+  if (!fc){
+    c.innerHTML = '<p class="muted">Sin ingresos ni gastos registrados no hay nada que proyectar.</p>';
+    return;
+  }
+  const W = 320, H = 150, pad = 4;
+  const todos = fc.p10.concat(fc.p90, [fc.inicio, 0]);
+  let lo = Math.min.apply(null, todos), hi = Math.max.apply(null, todos);
+  if (hi - lo < 1){ hi += 1; lo -= 1; }
+  const mx = (hi - lo) * 0.08; lo -= mx; hi += mx;
+  const X = (i) => pad + (i / fc.n) * (W - pad * 2);
+  const Y = (v) => H - pad - ((v - lo) / (hi - lo)) * (H - pad * 2);
+  const pts = (arr, ini) => (ini ? 'M' + X(0) + ',' + Y(fc.inicio) + ' L' : 'M') +
+    arr.map((v, i) => X(i + 1) + ',' + Y(v)).join(' L');
+  const area = 'M' + X(0) + ',' + Y(fc.inicio) + ' L' +
+    fc.p90.map((v, i) => X(i + 1) + ',' + Y(v)).join(' L') + ' L' +
+    fc.p10.slice().reverse().map((v, i) => X(fc.n - i) + ',' + Y(v)).join(' L') + ' Z';
+  const y0 = Y(0);
+
+  c.innerHTML =
+    '<div class="co-graf"><svg viewBox="0 0 ' + W + ' ' + H + '" preserveAspectRatio="none">' +
+      (y0 > pad && y0 < H - pad ? '<line x1="0" y1="' + y0.toFixed(1) + '" x2="' + W + '" y2="' + y0.toFixed(1) +
+        '" stroke="var(--bad)" stroke-width="1" stroke-dasharray="4 3" opacity=".65"/>' : '') +
+      '<path d="' + area + '" fill="var(--brand)" opacity=".16"/>' +
+      '<path d="' + pts(fc.p50, true) + '" fill="none" stroke="var(--brand)" stroke-width="2.2" ' +
+        'stroke-linejoin="round" vector-effect="non-scaling-stroke"/>' +
+    '</svg><div class="co-eje">' + fc.etiquetas.map(e => '<span>' + esc(e) + '</span>').join('') + '</div></div>' +
+    '<div class="grid g3" style="gap:8px;margin-top:12px">' +
+      '<div class="stat"><div class="l">Escenario malo</div><div class="av-big ' +
+        (fc.p10[fc.n-1] < 0 ? 'baja' : '') + '">' + esc(money(fc.p10[fc.n-1])) + '</div>' +
+        '<div class="av-f">1 de cada 10</div></div>' +
+      '<div class="stat"><div class="l">Lo más probable</div><div class="av-big">' +
+        esc(money(fc.p50[fc.n-1])) + '</div><div class="av-f">la mitad de los casos</div></div>' +
+      '<div class="stat"><div class="l">Escenario bueno</div><div class="av-big sube">' +
+        esc(money(fc.p90[fc.n-1])) + '</div><div class="av-f">1 de cada 10</div></div>' +
+    '</div>' +
+    '<div class="co-f" style="margin-top:12px">Simulación de Monte Carlo con 2.000 caminos. Cada mes sortea un ' +
+      'ingreso y un gasto de una normal centrada en tu mediana (' + esc(money(fc.mi)) + ' y ' + esc(money(fc.mg)) +
+      ') con tu desviación real (±' + esc(money(fc.si)) + ' y ±' + esc(money(fc.sg)) + '). ' +
+      'Parte de ' + esc(money(fc.inicio)) + ' en cuentas' +
+      (fc.erosionMes > 0 ? ' y descuenta ' + (fc.erosionMes * 100).toFixed(2).replace('.',',') +
+        '% al mes por lo que tienes en bolívares.' : '.') +
+      (fc.pocos ? ' Con solo ' + fc.meses + (fc.meses === 1 ? ' mes' : ' meses') + ' de historial, la banda ' +
+        'está ensanchada a propósito: dos datos no bastan para medir tu variabilidad real.' : '') + '</div>' +
+    (fc.riesgoFinal > 0.02
+      ? '<div class="co-riesgo ' + (fc.riesgoFinal >= 0.15 ? 'bad' : 'oro') + '">Terminas en negativo en ' +
+        Math.round(fc.riesgoFinal * 100) + ' de cada 100 escenarios' +
+        (fc.mesQuiebra > 0 ? ' · el saldo se cruza a cero hacia el mes ' + fc.mesQuiebra : '') + '</div>'
+      : '<div class="co-riesgo ok">Ningún escenario relevante te deja en negativo en ' + fc.n + ' meses</div>');
+}
+
+/* ---------- simulador ---------- */
+function pintarSimulador(){
+  const c = $('#coSim'); if (!c) return;
+  const s = CO.sim;
+  const mando = (id, n, val, min, max, paso, fmt) =>
+    '<div class="co-mando"><div class="row" style="justify-content:space-between">' +
+      '<span>' + n + '</span><b id="' + id + 'V">' + fmt(val) + '</b></div>' +
+      '<input type="range" id="' + id + '" min="' + min + '" max="' + max + '" step="' + paso + '" value="' + val + '"></div>';
+  const E = nucleoEstado();
+  const pct = (v) => (v > 0 ? '+' : '') + v + '%';
+  c.innerHTML =
+    mando('siIng', 'Si tu ingreso cambia', s.ingreso, -100, 50, 5, pct) +
+    mando('siGas', 'Si tu gasto cambia', s.gasto, -50, 50, 5, pct) +
+    mando('siExt', 'Si metes o sacas cada mes', s.extra,
+          -Math.round(Math.max(50, E.ingresoTipico)), Math.round(Math.max(50, E.ingresoTipico)),
+          Math.max(1, Math.round(Math.max(50, E.ingresoTipico) / 50)), (v) => money(v)) +
+    '<label class="co-check"><input type="checkbox" id="siDev"' + (s.devalua ? ' checked' : '') + '>' +
+      '<span>Contar lo que pierde tu dinero en bolívares</span></label>' +
+    '<div class="row" style="gap:6px;margin-top:12px;flex-wrap:wrap">' +
+      '<button class="sm" data-esc="normal">Como estás</button>' +
+      '<button class="sm" data-esc="paro">Pierdo el ingreso</button>' +
+      '<button class="sm" data-esc="apreta">Aprieto el cinturón</button>' +
+      '<button class="sm" data-esc="crisis">Se dispara todo</button>' +
+    '</div>';
+
+  const enlazar = (id, campo, fmt) => {
+    const el = $('#' + id); if (!el) return;
+    el.oninput = () => {
+      CO.sim[campo] = Number(el.value);
+      $('#' + id + 'V').textContent = fmt(Number(el.value));
+      pintarFlujo();
+    };
+  };
+  enlazar('siIng', 'ingreso', pct);
+  enlazar('siGas', 'gasto', pct);
+  enlazar('siExt', 'extra', (v) => money(v));
+  $('#siDev').onchange = () => { CO.sim.devalua = $('#siDev').checked; pintarFlujo(); };
+  c.querySelectorAll('[data-esc]').forEach(b => b.onclick = () => {
+    const e = b.dataset.esc;
+    CO.sim = e === 'paro'   ? { ingreso:-100, gasto:0,   extra:0, devalua:true }
+           : e === 'apreta' ? { ingreso:0,    gasto:-25, extra:0, devalua:true }
+           : e === 'crisis' ? { ingreso:-20,  gasto:25,  extra:0, devalua:true }
+           :                  { ingreso:0,    gasto:0,   extra:0, devalua:true };
+    pintarSimulador(); pintarFlujo();
+  });
+}
+$$('#coPlazo button').forEach(b => b.onclick = () => {
+  CO.plazo = Number(b.dataset.m);
+  $$('#coPlazo button').forEach(x => x.classList.toggle('on', x === b));
+  pintarFlujo();
+});
+
+/* ---------- deudas ---------- */
+function pintarDeudasCop(){
+  const c = $('#coDeudas'), E = nucleoEstado();
+  if (!E.deudas.length){
+    c.innerHTML = '<p class="muted" style="margin:0">Sin deudas registradas. Si tienes una tarjeta con saldo o un ' +
+      'préstamo, agrégalo: con el interés y el pago mínimo te digo la fecha exacta en que sales y cuánto te cuesta ' +
+      'el camino.</p>' + (F.faltaDeudas ? '<p class="muted" style="margin-top:10px">Antes tienes que correr ' +
+      '<b>esquema_v7.txt</b> en Supabase.</p>' : '');
+    return;
+  }
+  const P = planDeudas(CO.extraDeuda);
+  const A = P.avalancha, B = P.bola;
+  const fechaDe = (m) => {
+    const d = deISO(hoyISO()); d.setMonth(d.getMonth() + m);
+    return d.toLocaleDateString('es-VE', { month:'short', year:'numeric' }).replace('.', '');
+  };
+  const maxExtra = Math.max(20, Math.round(Math.max(0, E.ahorroMes)));
+
+  c.innerHTML =
+    (F.deudas || []).filter(d => d.activa).map(d => {
+      const enRef = E.deudas.find(x => x.id === d.id);
+      const iMes = Number(d.saldo) * (Number(d.tasa_anual) / 100) / 12;
+      return '<button class="cu" data-d="' + d.id + '">' +
+        '<span class="ic">' + svgIco('banco') + '</span>' +
+        '<span class="tx"><b>' + esc(d.nombre) + '</b><span>' +
+          Number(d.tasa_anual).toFixed(1).replace('.',',') + '% anual · mínimo ' +
+          esc(plata(d.pago_minimo, d.moneda)) + ' · intereses ' + esc(plata(iMes, d.moneda)) + '/mes</span></span>' +
+        '<span class="mo"><b class="baja">' + esc(plata(d.saldo, d.moneda)) + '</b>' +
+          '<span>' + esc(d.moneda) + '</span></span></button>';
+    }).join('') +
+    '<div class="cu-total" style="margin-top:12px"><span>Debes en total<br>' +
+      '<span class="muted" style="font-size:11.5px">Intereses: ' + esc(money(E.interesMes)) + ' al mes</span></span>' +
+      '<span style="text-align:right"><b class="baja">' + esc(money(E.deudaTotal)) + '</b></span></div>' +
+
+    '<div class="co-mando" style="margin-top:14px"><div class="row" style="justify-content:space-between">' +
+      '<span>Además del mínimo, puedo poner</span><b id="coExtraV">' + esc(money(CO.extraDeuda)) + '</b></div>' +
+      '<input type="range" id="coExtra" min="0" max="' + maxExtra + '" step="' +
+      Math.max(1, Math.round(maxExtra / 40)) + '" value="' + Math.min(CO.extraDeuda, maxExtra) + '"></div>' +
+
+    (A && A.completo
+      ? '<div class="co-comp">' +
+          '<div class="co-est mejor"><div class="l">Avalancha · primero la de más interés</div>' +
+            '<div class="co-est-n">' + A.meses + ' meses</div>' +
+            '<div class="av-f">Libre en ' + fechaDe(A.meses) + ' · intereses ' + esc(money(A.interes)) + '</div></div>' +
+          '<div class="co-est"><div class="l">Bola de nieve · primero la más pequeña</div>' +
+            '<div class="co-est-n">' + B.meses + ' meses</div>' +
+            '<div class="av-f">Libre en ' + fechaDe(B.meses) + ' · intereses ' + esc(money(B.interes)) + '</div></div>' +
+        '</div>' +
+        '<div class="co-f" style="margin-top:10px">Con el mismo dinero, la avalancha te ahorra ' +
+          esc(money(Math.max(0, P.ahorro))) + ' en intereses' +
+          (B.meses !== A.meses ? ' y ' + Math.abs(B.meses - A.meses) + ' meses' : '') +
+          '. La bola de nieve libera deudas antes y motiva más; si te cuesta sostener el plan, esa gana. ' +
+          'La matemática prefiere la avalancha, tu cabeza a veces prefiere la otra.</div>' +
+        (CO.extraDeuda > 0
+          ? '<div class="co-riesgo ok">Esos ' + esc(money(CO.extraDeuda)) + ' extra al mes te sacan ' +
+            P.mesesMenos + (P.mesesMenos === 1 ? ' mes' : ' meses') + ' antes y te ahorran ' +
+            esc(money(Math.max(0, P.ahorroExtra))) + ' en intereses</div>'
+          : '') +
+        '<div style="margin-top:12px">' + A.libres.map(l =>
+            '<div class="co-hito"><span>' + esc(l.nombre) + '</span><b>' + fechaDe(l.mes) + '</b></div>').join('') + '</div>'
+      : '<div class="co-riesgo bad">Con los pagos mínimos que pusiste, esta deuda no se termina de pagar nunca: ' +
+        'los intereses crecen más rápido que el abono. Sube el pago o renegocia la tasa.</div>');
+
+  c.querySelectorAll('[data-d]').forEach(b => b.onclick = () => abrirDeuda(b.dataset.d));
+  const ex = $('#coExtra');
+  if (ex) ex.oninput = () => { CO.extraDeuda = Number(ex.value); $('#coExtraV').textContent = money(CO.extraDeuda);
+                               clearTimeout(CO.t); CO.t = setTimeout(pintarDeudasCop, 220); };
+}
+
+/* ---------- devaluación ---------- */
+function pintarDevaluacion(){
+  const c = $('#coDev'), E = nucleoEstado(), d = E.devaluacion;
+  const card = $('#coDevCard');
+  if (E.ref === 'VES' || !E.cuentas){ card.classList.add('hidden'); return; }
+  card.classList.remove('hidden');
+  if (!d.hay){
+    c.innerHTML = '<p class="muted" style="margin:0">Necesito al menos dos tasas registradas en fechas distintas ' +
+      'para medir a qué ritmo pierde valor el bolívar. Llevas ' + d.n + '. Actualiza la tasa unos días y esto ' +
+      'se calcula solo, con tus números, no con los de un titular.</p>';
+    return;
+  }
+  const enBs = E.porMoneda.VES || 0;
+  const pierdeMes = enBs * d.pierdeBsMes, pierdeAnio = enBs * d.pierdeBsAnual;
+  c.innerHTML =
+    '<div class="grid g2" style="gap:10px">' +
+      '<div class="stat"><div class="l">El ' + esc(d.moneda) + ' sube</div><div class="av-big">' +
+        (d.subeDivisaMes * 100).toFixed(1).replace('.',',') + '%</div><div class="av-f">al mes, medido en tus tasas</div></div>' +
+      '<div class="stat"><div class="l">El bolívar pierde</div><div class="av-big baja">' +
+        (d.pierdeBsAnual * 100).toFixed(1).replace('.',',') + '%</div><div class="av-f">al año a ese ritmo</div></div>' +
+    '</div>' +
+    (enBs > 0
+      ? '<div class="co-riesgo ' + (pierdeMes / Math.max(1, E.gastoTipico) > 0.05 ? 'bad' : 'oro') + '">' +
+        'Tienes ' + esc(money(enBs)) + ' en bolívares. A este ritmo eso pierde ' + esc(money(pierdeMes)) +
+        ' al mes y ' + esc(money(pierdeAnio)) + ' al año, sin que gastes nada.</div>'
+      : '<div class="co-riesgo ok">No tienes saldo en bolívares expuesto.</div>') +
+    '<div class="co-f" style="margin-top:10px">Medido entre el ' + esc(fechaCorta(d.desde)) + ' y el ' +
+      esc(fechaCorta(d.hasta)) + ' — ' + d.dias + ' días, de ' + esc(plata(d.tasaIni, 'VES')) + ' a ' +
+      esc(plata(d.tasaFin, 'VES')) + ' por ' + esc(d.moneda) + ' — y llevado a ritmo mensual y anual. ' +
+      'Son ' + d.n + ' tasas tuyas: cuantas más registres, más fiable es. Esto no predice el futuro, ' +
+      'mide lo que ya pasó.</div>';
+}
+
+/* ---------- jubilación ---------- */
+function pintarJubilacion(){
+  const c = $('#coJub'), J = planJubilacion(), E = nucleoEstado();
+  if (!J){
+    c.innerHTML = '<p class="muted" style="margin:0">Necesito tu fecha de nacimiento. Está en Cuerpo → Mis datos.</p>';
+    return;
+  }
+  const pct = (x) => (x * 100).toFixed(1).replace('.',',') + '%';
+  c.innerHTML =
+    '<div class="grid g3" style="gap:8px">' +
+      '<div class="stat"><div class="l">Te faltan</div><div class="av-big">' + J.anios + '</div>' +
+        '<div class="av-f">años para los ' + J.meta + '</div></div>' +
+      '<div class="stat"><div class="l">Llegarías con</div><div class="av-big">' + esc(money(J.futuro)) + '</div>' +
+        '<div class="av-f">en dinero de hoy</div></div>' +
+      '<div class="stat"><div class="l">Necesitas</div><div class="av-big">' + esc(money(J.necesita)) + '</div>' +
+        '<div class="av-f">para tu gasto actual</div></div>' +
+    '</div>' +
+    '<div class="co-riesgo ' + (J.alcanza ? 'ok' : 'oro') + '">' +
+      (J.alcanza
+        ? 'Con lo que tienes y aportas, llegas. Eso te daría ' + esc(money(J.rentaPosible)) + ' al mes de renta.'
+        : 'Te faltarían ' + esc(money(J.falta)) + '. Haría falta aportar ' + esc(money(J.aporteNecesario)) +
+          ' al mes desde hoy, contra los ' + esc(money(J.aporte)) + ' que pusiste.') + '</div>' +
+    (J.aniosLibertad != null && isFinite(J.aniosLibertad) && J.aniosLibertad > 0
+      ? '<div class="co-hito" style="margin-top:10px"><span>Libertad financiera al ritmo de ahorro actual</span>' +
+        '<b>' + (J.aniosLibertad > 60 ? 'más de 60 años' : J.aniosLibertad.toFixed(1).replace('.',',') + ' años') + '</b></div>'
+      : '') +
+    '<div class="co-f" style="margin-top:12px">Supuestos: retorno nominal ' + pct(J.nominal) + ', inflación ' +
+      pct(J.inflacion) + ', así que el <b>retorno real</b> es ' + pct(J.real) +
+      ' — que es el único que importa, porque es lo que crece por encima de los precios. ' +
+      'El capital necesario sale de la regla del 4%: retirar el 4% anual de una cartera diversificada ha sido ' +
+      'sostenible en horizontes de 30 años en el mercado estadounidense del siglo XX. No es una ley de la física, ' +
+      'y en un país con la inflación de Venezuela hay que tomarla con más cuidado todavía. ' +
+      'Cambia los supuestos en <b>Supuestos</b> y esto se recalcula.</div>';
+}
+
+/* ---------- alertas ---------- */
+function pintarAlertas(){
+  const c = $('#coAlertas'), A = alertas();
+  if (!A.length){
+    c.innerHTML = '<p class="muted" style="margin:0">Nada que avisarte hoy. Las alertas salen de reglas sobre tus ' +
+      'propios números: gasto atípico a más de dos desviaciones, saldo proyectado en rojo, tasa desactualizada, ' +
+      'fondo de emergencia corto, intereses que pesan demasiado.</p>';
+    return;
+  }
+  c.innerHTML = A.map(x =>
+    '<div class="co-alerta ' + x.g + '"><b>' + esc(x.t) + '</b><span>' + esc(x.d) + '</span></div>').join('');
+}
+
+/* ---------- puente salud y dinero ---------- */
+function pintarPuente(){
+  const c = $('#coPuente'), H = puenteSalud();
+  if (!H.length){
+    c.innerHTML = '<p class="muted" style="margin:0">Cuando tengas registrado el gimnasio como pago fijo, ' +
+      'tus entrenamientos en Gym y tus gastos por categoría, aquí aparecen los cruces: cuánto te cuesta cada ' +
+      'sesión que sí haces, qué relación tiene lo que comes fuera con tu objetivo, y si tu constancia con el ' +
+      'cuerpo se parece a tu constancia con el dinero.</p>';
+    return;
+  }
+  c.innerHTML = H.map(x => '<div class="co-cruce"><b>' + x.t + '</b><span>' + x.d + '</span></div>').join('');
+}
+
+/* ---------- diálogo de deuda ---------- */
+function abrirDeuda(id){
+  const d = (F.deudas || []).find(x => x.id === id) || null;
+  F.deudaEdit = d ? d.id : null;
+  $('#deTitulo').textContent = d ? d.nombre : 'Nueva deuda';
+  $('#deNombre').value = d ? d.nombre : '';
+  $('#deTipo').value   = d ? d.tipo : 'tarjeta';
+  $('#deSaldo').value  = d ? Number(d.saldo) : '';
+  $('#deTasa').value   = d ? Number(d.tasa_anual) : '';
+  $('#deMinimo').value = d ? Number(d.pago_minimo) : '';
+  if (!$('#deMoneda').dataset.listo){
+    $('#deMoneda').innerHTML = MONEDAS.map(m => '<option value="' + m.c + '">' + m.n + ' (' + m.c + ')</option>').join('');
+    $('#deMoneda').dataset.listo = '1';
+  }
+  $('#deMoneda').value = d ? d.moneda : monedaRef();
+  $('#deBorrar').classList.toggle('hidden', !d);
+  $('#dlgDeuda').showModal();
+}
+$('#deCancelar').onclick = () => $('#dlgDeuda').close();
+$('#btnNuevaDeuda').onclick = () => abrirDeuda(null);
+$('#deGuardar').onclick = async () => {
+  const nombre = $('#deNombre').value.trim();
+  const saldo = Number(String($('#deSaldo').value).replace(',', '.'));
+  const tasa  = Number(String($('#deTasa').value).replace(',', '.')) || 0;
+  const min   = Number(String($('#deMinimo').value).replace(',', '.')) || 0;
+  if (!nombre) return toast('Ponle nombre a la deuda');
+  if (!(saldo >= 0)) return toast('Escribe el saldo');
+  const fila = { user_id:S.user.id, nombre:nombre, tipo:$('#deTipo').value, saldo:saldo,
+                 tasa_anual:tasa, pago_minimo:min, moneda:$('#deMoneda').value, activa:true };
+  const r = F.deudaEdit
+    ? await sb.from('deudas').update(fila).eq('id', F.deudaEdit)
+    : await sb.from('deudas').insert(fila);
+  if (faltaTabla(r.error)) return toast('Falta correr esquema_v7 en Supabase');
+  if (!ok(r, F.deudaEdit ? 'Deuda actualizada' : 'Deuda registrada')) return;
+  $('#dlgDeuda').close(); await cargarFinanzas(); pintarCopiloto();
+};
+$('#deBorrar').onclick = async () => {
+  if (!F.deudaEdit) return;
+  const r = await sb.from('deudas').update({ activa:false }).eq('id', F.deudaEdit);
+  if (!ok(r, 'Deuda eliminada')) return;
+  $('#dlgDeuda').close(); await cargarFinanzas(); pintarCopiloto();
+};
+
+/* ---------- diálogo de supuestos ---------- */
+$('#btnSupuestos').onclick = () => {
+  const p = S.perfil || {}, E = nucleoEstado();
+  $('#suEdad').value   = p.edad_jubilacion || 65;
+  $('#suFondo').value  = p.fondo_meses || 6;
+  $('#suInfl').value   = p.inflacion_anual != null ? Number(p.inflacion_anual) : '';
+  $('#suRet').value    = p.retorno_anual != null ? Number(p.retorno_anual) : 6;
+  $('#suAporte').value = p.aporte_mensual != null ? Number(p.aporte_mensual) : 0;
+  $('#suGasto').value  = p.gasto_jubilacion != null ? Number(p.gasto_jubilacion) : '';
+  $('#suRiesgo').value = p.tolerancia_riesgo || 'moderado';
+  const d = E.devaluacion;
+  $('#suNota').innerHTML = d.hay
+    ? 'Por tus propias tasas, el ' + esc(d.moneda) + ' subió un ' + (d.subeDivisaAnual * 100).toFixed(1).replace('.',',') +
+      '% anual en los últimos ' + d.dias + ' días. Si tu dinero vive en bolívares, esa es tu inflación de verdad, ' +
+      'no la que digan los titulares.'
+    : 'Cuando tengas dos tasas registradas en fechas distintas, aquí te digo la inflación que miden tus propios datos.';
+  $('#dlgSupuestos').showModal();
+};
+$('#suCancelar').onclick = () => $('#dlgSupuestos').close();
+$('#suGuardar').onclick = async () => {
+  const n = (id, def) => { const v = Number(String($(id).value).replace(',', '.')); return isFinite(v) ? v : def; };
+  const fila = {
+    edad_jubilacion: acotar(Math.round(n('#suEdad', 65)), 40, 90),
+    fondo_meses: acotar(Math.round(n('#suFondo', 6)), 1, 36),
+    inflacion_anual: acotar(n('#suInfl', 0), 0, 1000),
+    retorno_anual: acotar(n('#suRet', 6), -50, 100),
+    aporte_mensual: Math.max(0, n('#suAporte', 0)),
+    gasto_jubilacion: $('#suGasto').value === '' ? null : Math.max(0, n('#suGasto', 0)),
+    tolerancia_riesgo: $('#suRiesgo').value
+  };
+  const r = await sb.from('perfiles').update(fila).eq('id', S.user.id);
+  if (faltaTabla(r.error)) return toast('Falta correr esquema_v7 en Supabase');
+  if (!ok(r, 'Supuestos guardados')) return;
+  $('#dlgSupuestos').close(); await cargarTodo(); pintarCopiloto();
+};
 
 </script>
 </body>
