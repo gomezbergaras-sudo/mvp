@@ -337,6 +337,28 @@ nav#navG button{padding:9px 4px;font-size:13.5px;white-space:nowrap;text-align:c
 .bloque.hecho{opacity:.55}
 
 
+
+/* ---------- barra fija: armar la rutina ---------- */
+body.con-barra .wrap{padding-bottom:calc(120px + env(safe-area-inset-bottom))}
+.barra-accion{position:fixed;left:0;right:0;bottom:0;z-index:38;
+  background:linear-gradient(to top,var(--bg) 62%,rgba(0,0,0,0));
+  padding:16px 12px calc(14px + env(safe-area-inset-bottom));
+  animation:subeBarra .26s cubic-bezier(.2,.8,.2,1)}
+@keyframes subeBarra{from{transform:translateY(100%);opacity:0}to{transform:translateY(0);opacity:1}}
+.ba-caja{max-width:940px;margin:0 auto;display:flex;align-items:center;gap:14px;
+  background:var(--panel);border:1px solid var(--brand);border-radius:16px;padding:12px 14px;
+  box-shadow:0 12px 34px rgba(0,0,0,.5)}
+.ba-txt{flex:1;min-width:0;line-height:1.3}
+.ba-txt b{display:block;font-size:14px}
+.ba-txt span{font-size:12.5px;color:var(--tx2)}
+.ba-caja button{white-space:nowrap;min-height:48px;padding:12px 26px;font-size:14.5px}
+.ba-caja button:disabled{opacity:.45}
+@media (max-width:620px){
+  .barra-accion{padding:14px 10px calc(12px + env(safe-area-inset-bottom))}
+  .ba-caja{padding:11px 12px;gap:10px}
+  .ba-txt b{font-size:13px} .ba-txt span{font-size:11.5px}
+  .ba-caja button{padding:12px 18px;font-size:13.5px}
+}
 /* ---------- botón de acción rápida ---------- */
 .fab{position:fixed;right:16px;bottom:calc(20px + env(safe-area-inset-bottom));z-index:40;
   width:58px;height:58px;border-radius:50%;font-size:30px;line-height:1;font-weight:400;
@@ -1029,6 +1051,15 @@ table.tab td.num{text-align:right;font-variant-numeric:tabular-nums;white-space:
 
 
 
+
+<!-- BARRA FIJA PARA ARMAR LA RUTINA -->
+<div id="barraRutina" class="barra-accion hidden">
+  <div class="ba-caja">
+    <div class="ba-txt"><b id="baTitulo"></b><span id="baSub"></span></div>
+    <button class="pri" id="baBoton">Armar mi rutina</button>
+  </div>
+</div>
+
 <!-- BOTON DE ACCION RAPIDA -->
 <button id="fab" class="fab" aria-label="Acción rápida">+</button>
 <div id="hojaRapida" class="hoja hidden">
@@ -1326,9 +1357,14 @@ function ok(res, msg){
    Al publicar una versión nueva: sube VERSION, pon la fecha y agrega
    su entrada arriba del todo en NOVEDADES.
    ===================================================================== */
-const VERSION = '3.3.0';
+const VERSION = '3.3.1';
 const FECHA_VERSION = '2026-09-05';
 const NOVEDADES = [
+  ['3.3.1', '2026-09-05', [
+    'El botón de armar la rutina ahora queda fijo abajo, siempre a la vista: eliges los días y los músculos y lo tienes ahí, sin bajar a buscarlo.',
+    'La barra te dice al momento qué vas a armar: cuántos días, en cuáles caen y cuántos de descanso.',
+    'Mientras no elijas ningún día, el botón queda desactivado y te dice qué falta.'
+  ]],
   ['3.3.0', '2026-09-05', [
     'Los días y los músculos ahora son una sola cosa, y la decides tú.',
     'Dos modos: que la app reparta los músculos que elijas, o armar tú cada día de la semana a mano.',
@@ -1975,6 +2011,8 @@ function mostrarTab(t, dir){
                      if (!COACH.cargado) cargarPlan(); else pintarPlan180(); }
   if (t === 'reporte') setTimeout(() => pintarReporte(S.repTipo || 'diario'), 400);
   animarSeccion($('#t' + t.charAt(0).toUpperCase() + t.slice(1)), dir || 0);
+  if (t !== 'plan'){ const br = $('#barraRutina'); if (br) br.classList.add('hidden');
+                     document.body.classList.remove('con-barra'); }
   actualizarRapido();
 }
 
@@ -4135,10 +4173,6 @@ function tarjetaSelector(p){
     return cab +
       '<p class="muted" style="margin:12px 0 0">Toca cada día y elige qué músculos te tocan. Los que dejes vacíos son descanso.</p>' +
       '<div class="dias">' + filas + '</div>' +
-      '<button class="pri" id="btnGenRutina" style="width:100%;margin-top:14px"' +
-        (activos ? '' : ' disabled') + '>' +
-        (activos ? (COACH.rutina.length ? 'Rehacer con estos días' : 'Armar mi rutina')
-                 : 'Elige al menos un día') + '</button>' +
       (activos ? '<div class="previo"><b>' + activos + ' ' + (activos === 1 ? 'día' : 'días') +
         ' de entreno</b> · ' + (7 - activos) + ' de descanso</div>' : '') +
       '</div>';
@@ -4166,14 +4200,10 @@ function tarjetaSelector(p){
     '<div class="chips">' + chips + '</div>' +
     '<div class="row" style="gap:6px;flex-wrap:wrap;margin-top:12px">' + atajos +
       (sel.length ? '<button class="sm gh" data-atajo="limpiar">Limpiar</button>' : '') + '</div>' +
-    '<div class="grid g2" style="margin-top:14px">' +
-      '<div><label>Días por semana</label><select id="rtDias">' +
+    '<div style="margin-top:14px;max-width:220px"><label>Días por semana</label>' +
+      '<select id="rtDias">' +
         [3,4,5,6].map(d => '<option value="' + d + '"' + (d === dias ? ' selected' : '') + '>' + d + ' días</option>').join('') +
-      '</select></div>' +
-      '<div style="display:flex;align-items:flex-end">' +
-        '<button class="pri" id="btnGenRutina" style="width:100%">' +
-        (COACH.rutina.length ? 'Rehacer mi rutina' : 'Armar mi rutina') + '</button></div>' +
-    '</div>' + previo + '</div>';
+      '</select></div>' + previo + '</div>';
 }
 
 function conectarSelector(){
@@ -4192,6 +4222,7 @@ function conectarSelector(){
     pintarPlan180();
   });
   $$('#plCuerpo .diaFila').forEach(b => b.onclick = () => abrirDia(Number(b.dataset.dia)));
+  const sd = $('#rtDias'); if (sd) sd.onchange = () => pintarBarraRutina();
 }
 
 /* ---------- elegir los músculos de un día ---------- */
@@ -4501,6 +4532,47 @@ function vistaRevision(){
   return cab + bm + dec + pr;
 }
 
+
+/* ---------- barra fija: aparece cuando ya hay algo que armar ---------- */
+function pintarBarraRutina(){
+  const bar = $('#barraRutina'); if (!bar) return;
+  const enRutina = S.tab === 'plan' && COACH.secc === 'rutina';
+  const p = S.perfil || {};
+  if (!enRutina || faltaParaPlan(p).length){
+    bar.classList.add('hidden'); document.body.classList.remove('con-barra');
+    actualizarRapido(); return;
+  }
+  const manual = COACH.modo === 'manual';
+  const dias = manual ? diasDelUsuario().filter(d => d.grupos.length) : [];
+  const sel = manual ? [] : focoActual();
+  const nDias = manual ? dias.length : (Number(($('#rtDias')||{}).value) || Number(p.dias_entreno_semana) || 3);
+  const listo = manual ? dias.length > 0 : true;
+
+  let titulo, sub;
+  if (manual){
+    if (!dias.length){ titulo = 'Elige al menos un día'; sub = 'Toca un día de arriba y marca los músculos'; }
+    else {
+      titulo = dias.length + (dias.length === 1 ? ' día de entreno' : ' días de entreno');
+      sub = dias.map(d => DIAS_C[d.dia]).join(' · ') + '  ·  ' + (7 - dias.length) + ' de descanso';
+    }
+  } else if (sel.length){
+    titulo = sel.length + (sel.length === 1 ? ' grupo elegido' : ' grupos elegidos');
+    sub = sel.map(g => GRUPO_N[g]).join(', ');
+  } else {
+    titulo = 'Reparto clásico';
+    sub = nDias + ' días · elige músculos arriba si quieres otra cosa';
+  }
+
+  $('#baTitulo').textContent = titulo;
+  $('#baSub').textContent = sub;
+  const b = $('#baBoton');
+  b.disabled = !listo;
+  b.textContent = COACH.rutina.length ? 'Rehacer mi rutina' : 'Armar mi rutina';
+  bar.classList.remove('hidden');
+  document.body.classList.add('con-barra');
+  actualizarRapido();
+}
+
 /* ---------- despachador ---------- */
 function pintarPlan180(){
   const cont = $('#plCuerpo'); if (!cont) return;
@@ -4513,6 +4585,7 @@ function pintarPlan180(){
   conectarPlan();
   conectarSelector();
   conectarVacios('#plCuerpo');
+  pintarBarraRutina();
   $$('#plCuerpo .card').forEach((el,i) => {
     el.style.animation = 'entraCard .42s cubic-bezier(.2,.8,.2,1) ' + Math.min(i*55, 280) + 'ms both';
   });
@@ -6709,7 +6782,7 @@ arrancar();
 function conectarPlan(){
   const g = (id) => $('#' + id);
 
-  const bg = g('btnGenRutina') || g('btnRegenRutina');
+  const bg = g('baBoton') || g('btnGenRutina') || g('btnRegenRutina');
   if (bg) bg.onclick = async () => {
     const {p, ejercicios} = datosPlan();
     if (COACH.rutina.length && !confirm('Esto reemplaza tu rutina actual. ¿Sigo?')) return;
@@ -6858,7 +6931,8 @@ function actualizarRapido(){
   const f = $('#fab'); if (!f) return;
   const hayDialogo = !!document.querySelector('dialog[open]');
   const hayHoja = !$('#hojaRapida').classList.contains('hidden');
-  f.classList.toggle('oculto', !S.user || $('#vApp').classList.contains('hidden') || hayDialogo || hayHoja);
+  const hayBarra = !$('#barraRutina').classList.contains('hidden');
+  f.classList.toggle('oculto', !S.user || $('#vApp').classList.contains('hidden') || hayDialogo || hayHoja || hayBarra);
 }
 /* cualquier diálogo que se abra o cierre esconde o devuelve el botón */
 (function(){
