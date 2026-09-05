@@ -736,6 +736,47 @@ table.tab td.num{text-align:right;font-variant-numeric:tabular-nums;white-space:
   .co-comp{grid-template-columns:1fr}
   .co-est-n{font-size:20px}
 }
+/* ===================== RETO DEL RANKING ===================== */
+.cn-cab{display:flex;justify-content:space-between;align-items:flex-start;gap:14px;flex-wrap:wrap}
+.cn-eyebrow{font-family:var(--f-titulo);font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--oro-tx);font-weight:700}
+.cn-reloj{text-align:right;flex:0 0 auto}
+.cn-reloj span{display:block;font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--tx2)}
+.cn-reloj b{font-family:var(--f-titulo);font-size:17px;font-weight:800;font-variant-numeric:tabular-nums}
+.cn-reloj.urge b{color:var(--bad)}
+.cn-premios{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px;margin:16px 0 4px}
+.cn-premio{display:flex;align-items:center;gap:9px;background:var(--panel2);border:1px solid var(--line);
+  border-radius:12px;padding:11px 12px;min-height:56px}
+.cn-premio.oro{border-color:color-mix(in srgb, var(--oro) 55%, transparent);background:var(--oro-soft)}
+.cn-premio .m{font-size:20px;line-height:1;flex:0 0 auto}
+.cn-premio .t{font-size:13.5px;font-weight:600;line-height:1.35}
+.cn-estado{border-radius:12px;padding:13px 15px;margin-top:14px;border:1px solid var(--line);background:var(--panel2)}
+.cn-estado b{display:block;font-size:14.5px;margin-bottom:3px}
+.cn-estado span{display:block;font-size:12.5px;color:var(--tx2);line-height:1.5}
+.cn-estado.dentro{border-color:color-mix(in srgb, var(--ok) 50%, transparent);background:var(--ok-soft)}
+.cn-estado.dentro b{color:var(--ok)}
+.cn-estado.falta{border-color:color-mix(in srgb, var(--oro) 50%, transparent);background:var(--oro-soft)}
+.cn-estado.falta b{color:var(--oro-tx)}
+.cn-podio{margin-top:14px;border-top:1px solid var(--line);padding-top:8px}
+.cn-fila{display:flex;align-items:center;gap:11px;padding:9px 0;border-bottom:1px solid var(--line)}
+.cn-fila:last-child{border-bottom:0}
+.cn-fila.yo{font-weight:650}
+.cn-fila .m{font-size:17px;line-height:1;flex:0 0 auto}
+.cn-fila .n{flex:1;min-width:0;font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cn-fila .p{font-family:var(--f-titulo);font-weight:800;font-size:15px;font-variant-numeric:tabular-nums}
+.rg-p{display:flex;gap:12px;align-items:flex-start;padding:9px 0;border-bottom:1px solid var(--line)}
+.rg-p:last-of-type{border-bottom:0}
+.rg-p b{font-family:var(--f-titulo);font-size:19px;font-weight:800;flex:0 0 34px;color:var(--brand-tx);
+  font-variant-numeric:tabular-nums}
+.rg-p span{font-size:13px;line-height:1.5;color:var(--tx2)}
+#rgCuerpo h4{font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--tx2);margin:18px 0 6px}
+#rgCuerpo p,#rgCuerpo li{font-size:13px;line-height:1.55}
+#rgCuerpo ul{padding-left:18px;margin:0}
+.tag.oro{background:var(--oro-soft);color:var(--oro-tx);border-color:color-mix(in srgb, var(--oro) 45%, transparent);font-weight:600}
+@media (max-width:620px){
+  .cn-premios{grid-template-columns:1fr}
+  .cn-reloj{text-align:left}
+}
 </style>
 </head>
 <body>
@@ -931,12 +972,16 @@ table.tab td.num{text-align:right;font-variant-numeric:tabular-nums;white-space:
         <div id="gyComp"></div>
       </div>
 
+      <div class="card hidden" id="gyConcursoCard">
+        <div id="gyConcurso"></div>
+      </div>
+
       <div class="card">
         <div class="row" style="justify-content:space-between;margin-bottom:4px">
           <h2 style="margin:0">Ranking de progreso</h2>
           <button class="sm" id="btnRankCfg">Mi participación</button>
         </div>
-        <p class="muted" style="margin-top:0">Puntaje 0-100 = 50% crecimiento de volumen + 30% récords nuevos + 20% días entrenados. Nadie ve tus series, solo estos números.</p>
+        <p class="muted" style="margin-top:0">Puntaje 0-100 = 35% crecimiento contra tu propia media de 4 semanas + 25% récords verificados + 20% días de la semana + 20% constancia. Nadie ve tus series, solo estos números.</p>
         <div id="gyRank"></div>
       </div>
     </section>
@@ -1612,6 +1657,16 @@ table.tab td.num{text-align:right;font-variant-numeric:tabular-nums;white-space:
   </div>
 </dialog>
 
+<!-- ============ DIÁLOGO: reglas del concurso ============ -->
+<dialog id="dlgReglas">
+  <h3 id="rgTitulo">Reglas del reto</h3>
+  <div id="rgCuerpo" style="max-height:56vh;overflow-y:auto"></div>
+  <div class="row" style="margin-top:16px;justify-content:flex-end">
+    <button class="sm" id="rgCerrar">Cerrar</button>
+    <button class="pri" id="rgAceptar">Acepto y participo</button>
+  </div>
+</dialog>
+
 <!-- ============ DIÁLOGO: cuenta ============ -->
 <dialog id="dlgCuenta">
   <h3 id="cuTitulo">Nueva cuenta</h3>
@@ -2009,9 +2064,17 @@ function ok(res, msg){
    Al publicar una versión nueva: sube VERSION, pon la fecha y agrega
    su entrada arriba del todo en NOVEDADES.
    ===================================================================== */
-const VERSION = '5.0.1';
+const VERSION = '5.1.0';
 const FECHA_VERSION = '2026-09-05';
 const NOVEDADES = [
+  ['5.1.0', '2026-09-05', [
+    'Reto semanal con premios en el ranking del gimnasio: primero, segundo y tercero, con la cuenta atrás al domingo y tu posición en vivo.',
+    'El marcador se rehizo para que el reto sea ganable de verdad: 35% crecer contra tu propia media de 4 semanas, 25% récords verificados, 20% días de la semana y 20% constancia.',
+    'Se cerraron dos huecos que dejaban ganar sin entrenar: los ejercicios que nunca hiciste ya no cuentan como récord, y una cuenta nueva ya no arranca con 100 puntos.',
+    'Series imposibles (más de 400 kg o más de 50 repeticiones) siguen en tu historial pero no puntúan.',
+    'Una semana que supera 2,5 veces tu propia media queda marcada para revisión antes de premiar.',
+    'Reglas completas dentro de la app: cómo se gana, qué no cuenta y qué hace falta para optar a premio.'
+  ]],
   ['5.0.1', '2026-09-05', [
     'Seguridad: se corrigió una falla por la que el alias de otro usuario en el ranking del gimnasio podía ejecutar código en tu sesión. Era la más grave de la app y ya no existe.',
     'Se escaparon 14 puntos donde texto tuyo o de otro usuario llegaba a la pantalla sin filtrar.',
@@ -2981,7 +3044,8 @@ const CLASICO = {
   6: ['', []], 7: ['', []]
 };
 
-const G = { ejercicios:[], dias:{}, series:[], ranking:[], cargado:false };
+const G = { ejercicios:[], dias:{}, series:[], ranking:[], concurso:null,
+            inscrito:false, faltaConcurso:false, cargado:false };
 
 async function cargarGym(){
   const desde = sumarDias(hoyISO(), -120);
@@ -3011,6 +3075,7 @@ async function cargarGym(){
   const r = await sb.rpc('ranking_gym');
   G.ranking = r.error ? [] : (r.data || []);
   if (r.error) console.warn('ranking:', r.error.message);
+  await cargarConcurso();
 
   G.cargado = true;
   pintarGym();
@@ -3153,24 +3218,30 @@ function pintarComparativa(){
 }
 
 function pintarRanking(){
+  pintarConcurso();
   const c = $('#gyRank');
   if (!G.ranking.length){
     c.innerHTML = '<p class="muted">Nadie ha registrado entrenamientos esta semana todavía.</p>';
     return;
   }
   const medalla = p => p === 1 ? '🥇' : p === 2 ? '🥈' : p === 3 ? '🥉' : p + '.';
+  const hayCon = !!G.concurso;
   c.innerHTML =
     '<div style="overflow-x:auto"><table class="datos">' +
-    '<tr><th>#</th><th>Quién</th><th>Puntaje</th><th>Crecimiento</th><th>Récords</th><th>Días</th><th>Volumen</th></tr>' +
+    '<tr><th>#</th><th>Quién</th><th>Puntaje</th><th>Crecimiento</th><th>Récords</th><th>Días</th>' +
+    (hayCon ? '<th>Semanas</th>' : '') + '<th>Volumen</th></tr>' +
     G.ranking.map(r => {
       const cr = Number(r.crecimiento);
-      return '<tr' + (r.soy_yo ? ' class="yo"' : '') + '>' +
+      const marca = r.elegible === false ? ' <span class="tag" title="' + esc(r.motivo || '') + '">fuera de premio</span>'
+                  : r.revisar ? ' <span class="tag oro">en revisión</span>' : '';
+      return '<tr' + (r.soy_yo ? ' class="yo"' : '') + (r.elegible === false ? ' style="opacity:.65"' : '') + '>' +
       '<td>' + medalla(r.posicion) + '</td>' +
-      '<td>' + esc(r.nombre) + (r.soy_yo ? ' <span class="tag yo">tú</span>' : '') + '</td>' +
+      '<td>' + esc(r.nombre) + (r.soy_yo ? ' <span class="tag yo">tú</span>' : '') + (hayCon ? marca : '') + '</td>' +
       '<td style="font-weight:700">' + Number(r.puntaje).toFixed(1) + '</td>' +
       '<td class="' + (cr > 0 ? 'sube' : cr < 0 ? 'baja' : 'muted') + '">' +
         (cr > 0 ? '▲ +' : cr < 0 ? '▼ ' : '') + cr.toFixed(1) + '%</td>' +
       '<td>' + r.prs + '</td><td>' + r.dias + '</td>' +
+      (hayCon ? '<td>' + (r.semanas != null ? r.semanas : '—') + '</td>' : '') +
       '<td class="muted">' + Math.round(Number(r.volumen)).toLocaleString('es') + ' kg</td></tr>';
     }).join('') +
     '</table></div>';
@@ -11300,6 +11371,148 @@ $('#suGuardar').onclick = async () => {
   if (faltaTabla(r.error)) return toast('Falta correr esquema_v7 en Supabase');
   if (!ok(r, 'Supuestos guardados')) return;
   $('#dlgSupuestos').close(); await cargarTodo(); pintarCopiloto();
+};
+
+
+/* =====================================================================
+   CONCURSO DEL RANKING
+   El marcador premia crecer contra tu propia media, superarte de verdad
+   y aparecer todas las semanas. No premia levantar más kilos que el más
+   grande del grupo: por eso alguien de 55 kg le puede ganar a uno de 100.
+   ===================================================================== */
+function lunesDeEstaSemana(){ return lunesDe(hoyISO()); }
+
+async function cargarConcurso(){
+  const lun = lunesDeEstaSemana();
+  const c = await sb.from('concursos').select('*').eq('semana_inicio', lun).maybeSingle();
+  if (c.error){
+    G.concurso = null; G.faltaConcurso = faltaTabla(c.error);
+    return;
+  }
+  G.faltaConcurso = false;
+  G.concurso = c.data || null;
+  if (G.concurso){
+    const i = await sb.from('concurso_inscritos').select('*')
+                .eq('concurso_id', G.concurso.id).eq('user_id', S.user.id).maybeSingle();
+    G.inscrito = !i.error && !!i.data;
+  } else G.inscrito = false;
+}
+
+function cierreDelReto(){
+  const lun = deISO(lunesDeEstaSemana());
+  const fin = new Date(lun.getFullYear(), lun.getMonth(), lun.getDate() + 6, 23, 59, 59);
+  const ms = fin - new Date();
+  if (ms <= 0) return { txt:'Cerrado', urgente:true };
+  const h = Math.floor(ms / 3600000), d = Math.floor(h / 24);
+  if (d >= 1) return { txt: d + (d === 1 ? ' día' : ' días') + ' y ' + (h - d * 24) + ' h', urgente:false };
+  return { txt: h + ' h ' + Math.floor((ms % 3600000) / 60000) + ' min', urgente:true };
+}
+
+function pintarConcurso(){
+  const card = $('#gyConcursoCard'), c = $('#gyConcurso');
+  if (!card) return;
+  const C = G.concurso;
+  if (!C){ card.classList.add('hidden'); return; }
+  card.classList.remove('hidden');
+
+  const yo = (G.ranking || []).find(r => r.soy_yo);
+  const top = (G.ranking || []).filter(r => r.elegible).slice(0, 3);
+  const cierre = cierreDelReto();
+  const premios = [C.premio_1, C.premio_2, C.premio_3].filter(Boolean);
+  const medalla = ['🥇','🥈','🥉'];
+
+  let estado;
+  if (!G.inscrito){
+    estado = '<div class="cn-estado fuera"><b>No estás compitiendo</b>' +
+      '<span>Acepta las reglas para que tu semana cuente. Es gratis y puedes salirte cuando quieras.</span>' +
+      '<button class="pri sm" id="cnEntrar" style="margin-top:10px">Ver reglas y participar</button></div>';
+  } else if (!yo){
+    estado = '<div class="cn-estado fuera"><b>Aún no registras nada esta semana</b>' +
+      '<span>El reto arranca cuando registras tu primera serie.</span></div>';
+  } else if (!yo.elegible){
+    estado = '<div class="cn-estado falta"><b>Compites, pero todavía no optas a premio</b>' +
+      '<span>' + esc(yo.motivo || 'Te faltan requisitos mínimos.') + '</span></div>';
+  } else if (yo.revisar){
+    estado = '<div class="cn-estado falta"><b>Tu semana quedó marcada para revisión</b>' +
+      '<span>' + esc(yo.motivo || '') + ' No es una acusación: es el filtro que protege a todos. ' +
+      'Si es real, se valida y cobras.</span></div>';
+  } else {
+    estado = '<div class="cn-estado dentro"><b>Vas ' + yo.posicion + '.º con ' +
+      Number(yo.puntaje).toFixed(1) + ' puntos</b><span>' +
+      (yo.posicion <= premios.length
+        ? 'Estás en zona de premio. Falta cerrar la semana.'
+        : 'Te separan ' + (Number(top.length ? top[Math.min(premios.length, top.length) - 1].puntaje : 0) - Number(yo.puntaje)).toFixed(1) +
+          ' puntos del último puesto premiado.') + '</span></div>';
+  }
+
+  c.innerHTML =
+    '<div class="cn-cab">' +
+      '<div><div class="cn-eyebrow">Reto de la semana</div>' +
+        '<h2 style="margin:2px 0 0">' + esc(C.nombre) + '</h2>' +
+        (C.patrocinador ? '<div class="muted" style="font-size:12.5px;margin-top:3px">Premia ' + esc(C.patrocinador) + '</div>' : '') +
+      '</div>' +
+      '<div class="cn-reloj ' + (cierre.urgente ? 'urge' : '') + '">' +
+        '<span>Cierra en</span><b>' + esc(cierre.txt) + '</b></div>' +
+    '</div>' +
+
+    '<div class="cn-premios">' + premios.map((p, i) =>
+      '<div class="cn-premio' + (i === 0 ? ' oro' : '') + '"><span class="m">' + medalla[i] + '</span>' +
+      '<span class="t">' + esc(p) + '</span></div>').join('') + '</div>' +
+
+    estado +
+
+    (top.length
+      ? '<div class="cn-podio">' + top.map((r, i) =>
+          '<div class="cn-fila' + (r.soy_yo ? ' yo' : '') + '"><span class="m">' + medalla[i] + '</span>' +
+          '<span class="n">' + esc(r.nombre) + (r.soy_yo ? ' <span class="tag yo">tú</span>' : '') + '</span>' +
+          '<span class="p">' + Number(r.puntaje).toFixed(1) + '</span></div>').join('') + '</div>'
+      : '<p class="muted" style="margin:12px 0 0">Todavía nadie cumple los mínimos. La semana está abierta.</p>') +
+
+    '<button class="sm gh" id="cnReglas" style="width:100%;margin-top:12px">Cómo se gana y cómo se pierde</button>';
+
+  const b1 = $('#cnEntrar'); if (b1) b1.onclick = () => abrirReglas(true);
+  const b2 = $('#cnReglas'); if (b2) b2.onclick = () => abrirReglas(!G.inscrito);
+}
+
+function abrirReglas(puedeAceptar){
+  const C = G.concurso; if (!C) return;
+  $('#rgTitulo').textContent = C.nombre;
+  const min = 'Para optar a premio hace falta: <b>' + (C.min_dias || 3) + ' días</b> de entreno en la semana, ' +
+              '<b>' + (C.min_series || 8) + ' series</b> registradas y <b>' + (C.min_semanas || 4) +
+              ' semanas</b> de historial en la app.';
+  $('#rgCuerpo').innerHTML =
+    '<h4 style="margin-top:0">Cómo se puntúa · 100 puntos</h4>' +
+    '<div class="rg-p"><b>35</b><span>Crecimiento de tu volumen contra <b>tu propia mediana</b> de las últimas 4 semanas. ' +
+      'No contra la de los demás: compites contigo.</span></div>' +
+    '<div class="rg-p"><b>25</b><span>Récords verificados: superar tu mejor peso en un ejercicio que ya venías haciendo, ' +
+      'con al menos 3 sesiones previas y un salto creíble.</span></div>' +
+    '<div class="rg-p"><b>20</b><span>Días entrenados esta semana, hasta 5.</span></div>' +
+    '<div class="rg-p"><b>20</b><span>Constancia: en cuántas de las 4 semanas anteriores apareciste.</span></div>' +
+    '<h4>Requisitos</h4><p>' + min + '</p>' +
+    '<h4>Lo que no cuenta</h4>' +
+    '<ul><li>Ejercicios que nunca habías hecho: no generan récord.</li>' +
+      '<li>Series imposibles (más de 400 kg o más de 50 repeticiones): quedan en tu historial pero no puntúan.</li>' +
+      '<li>Semanas que superan 2,5 veces tu propia media: se marcan para revisión antes de premiar.</li>' +
+      '<li>Cuentas nuevas: sin 4 semanas de historial se compite, pero no se opta a premio.</li></ul>' +
+    '<h4>Antes de entregar</h4>' +
+    '<p>Los tres primeros se revisan a mano. Si algo no cuadra, se pide una foto o un vídeo de una serie. ' +
+      'No es desconfianza: es lo que hace que ganar signifique algo.</p>' +
+    (C.reglas ? '<h4>Condiciones</h4><p>' + esc(C.reglas) + '</p>' : '') +
+    '<p class="muted" style="font-size:12.5px">Tu nombre aparece en la tabla solo si activaste tu participación pública. ' +
+      'Nadie ve tus series ni tus pesos, solo el puntaje.</p>';
+  $('#rgAceptar').classList.toggle('hidden', !puedeAceptar);
+  $('#dlgReglas').showModal();
+}
+$('#rgCerrar').onclick = () => $('#dlgReglas').close();
+$('#rgAceptar').onclick = async () => {
+  const C = G.concurso; if (!C) return;
+  const r = await sb.from('concurso_inscritos').insert({ concurso_id:C.id, user_id:S.user.id });
+  if (faltaTabla(r.error)) return toast('Falta correr esquema_v8 en Supabase');
+  if (r.error && !/duplicate|unique/i.test(r.error.message)) return ok(r);
+  G.inscrito = true;
+  $('#dlgReglas').close();
+  toast('Estás dentro del reto');
+  pintarConcurso();
 };
 
 </script>
