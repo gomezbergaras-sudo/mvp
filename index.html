@@ -483,6 +483,49 @@ table.tab td.num{text-align:right;font-variant-numeric:tabular-nums;white-space:
 .tema.on{border-color:var(--brand);box-shadow:0 0 0 1px var(--brand) inset}
 .tema .sw{display:flex;gap:5px;margin-bottom:9px}
 .tema .sw i{width:22px;height:22px;border-radius:6px;border:1px solid rgba(128,128,128,.35)}
+/* ===================== GEMELO DIGITAL 3D ===================== */
+.g3{grid-template-columns:repeat(auto-fit,minmax(98px,1fr))}
+.tag.ok{background:var(--ok-soft);color:var(--ok);border-color:color-mix(in srgb, var(--ok) 45%, transparent);font-weight:600}
+.tag.oro{background:var(--oro-soft);color:var(--oro-tx);border-color:color-mix(in srgb, var(--oro) 45%, transparent);font-weight:600}
+.tag.bad{background:var(--bad-soft,rgba(220,60,60,.14));color:var(--bad);border-color:color-mix(in srgb, var(--bad) 45%, transparent);font-weight:600}
+.av-lienzo{position:relative;width:100%;height:min(58vh,440px);min-height:290px;border-radius:16px;
+  border:1px solid var(--line);overflow:hidden;touch-action:none;cursor:grab;
+  background:radial-gradient(120% 90% at 50% 8%, var(--panel2) 0%, var(--panel) 62%, var(--input) 100%)}
+.av-lienzo:active{cursor:grabbing}
+.av-carga{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;
+  justify-content:center;gap:12px;color:var(--tx2);font-size:13px;padding:20px}
+.av-spin{width:30px;height:30px;border-radius:50%;border:3px solid var(--line);
+  border-top-color:var(--brand);animation:avGira .9s linear infinite}
+@keyframes avGira{to{transform:rotate(360deg)}}
+.av-etq{position:absolute;left:12px;top:12px;background:color-mix(in srgb, var(--panel) 78%, transparent);
+  border:1px solid var(--line);border-radius:99px;padding:4px 12px;font-size:12px;font-weight:650;
+  backdrop-filter:blur(6px);pointer-events:none}
+.av-pista{position:absolute;right:12px;bottom:10px;font-size:11px;color:var(--tx2);pointer-events:none;opacity:.8}
+.av-fila{display:flex;justify-content:space-between;align-items:center;gap:14px;
+  padding:11px 0;border-bottom:1px solid var(--line)}
+.av-fila:last-child{border-bottom:0}
+.av-n{font-weight:620;font-size:14px}
+.av-f{color:var(--tx2);font-size:12px;margin-top:2px;line-height:1.4}
+.av-v{font-weight:700;font-size:15px;white-space:nowrap;text-align:right;flex:0 0 auto}
+.av-v .tag{margin-right:0}
+.av-fila>div:first-child{min-width:0}
+.av-big{font-size:21px;font-weight:750;line-height:1.15;margin-top:2px}
+.av-grasa{background:var(--panel2);border:1px solid var(--line);border-radius:14px;padding:15px;margin-bottom:6px}
+.av-barra{position:relative;height:10px;border-radius:99px;background:var(--input);
+  border:1px solid var(--line);margin-top:13px}
+.av-ok{position:absolute;top:0;bottom:0;background:color-mix(in srgb, var(--ok) 32%, transparent);border-radius:99px}
+.av-marca{position:absolute;top:-5px;width:4px;height:19px;border-radius:3px;
+  transform:translateX(-2px);box-shadow:0 0 0 2px var(--panel2)}
+.av-campo{display:flex;flex-direction:column;gap:5px;font-size:13px;text-transform:none;
+  letter-spacing:0;color:var(--tx);margin:0}
+.av-campo span{color:var(--tx2);font-size:12px}
+.av-campo i{font-style:normal;opacity:.65}
+#avMezcla{width:100%;padding:0;height:26px;background:transparent;border:0}
+#avExtras{display:flex;flex-wrap:wrap;gap:6px}
+@media (max-width:620px){
+  .av-lienzo{height:min(54vh,380px);min-height:270px}
+  .av-v{font-size:14px}
+}
 </style>
 </head>
 <body>
@@ -728,6 +771,82 @@ table.tab td.num{text-align:right;font-variant-numeric:tabular-nums;white-space:
           <span class="tag" id="cuNotifEstado">—</span>
           <button class="pri sm" id="btnPermiso">Activar avisos</button>
         </div>
+      </div>
+    </section>
+
+    <!-- ============ GEMELO DIGITAL 3D ============ -->
+    <section id="tAvatar" class="hidden">
+      <div class="card">
+        <div class="row" style="justify-content:space-between;align-items:flex-start">
+          <div>
+            <h2 style="margin:0">Tu gemelo digital</h2>
+            <p class="muted" style="margin:4px 0 0">Cada contorno del modelo mide exactamente lo que mediste tú.
+              Arrastra para girarlo, pellizca para acercar.</p>
+          </div>
+          <button class="sm" id="avMedidas">Medir</button>
+        </div>
+
+        <div id="avLienzo" class="av-lienzo" style="margin-top:14px">
+          <div class="av-carga"><div class="av-spin"></div><div>Montando tu modelo…</div></div>
+        </div>
+        <div style="position:relative;margin-top:-34px;margin-bottom:12px;height:0">
+          <span class="av-etq" id="avEtiqueta" style="position:static;display:inline-block;margin-left:12px">Hoy</span>
+        </div>
+
+        <div class="row" id="avVistas" style="gap:6px;margin-top:22px">
+          <button class="sm on" data-v="frente">Frente</button>
+          <button class="sm" data-v="tres">3/4</button>
+          <button class="sm" data-v="perfil">Perfil</button>
+          <button class="sm" data-v="espalda">Espalda</button>
+        </div>
+
+        <div class="row" id="avCapa" style="gap:6px;margin-top:8px">
+          <button class="sm on" data-c="piel">Piel</button>
+          <button class="sm" data-c="musculo">Músculos</button>
+          <button class="sm" data-c="grasa">Mapa de grasa</button>
+        </div>
+        <div id="avLeyenda" class="muted" style="margin-top:8px;font-size:12px;line-height:1.5"></div>
+
+        <div style="border-top:1px solid var(--line);margin-top:14px;padding-top:14px">
+          <div class="l" style="margin-bottom:8px">Cómo te verás si cumples el plan</div>
+          <div class="row" id="avHoriz" style="gap:6px">
+            <button class="sm on" data-d="0">Hoy</button>
+            <button class="sm" data-d="30">30 días</button>
+            <button class="sm" data-d="90">90 días</button>
+            <button class="sm" data-d="180">180 días</button>
+          </div>
+          <div id="avMorph" class="hidden" style="margin-top:12px">
+            <input id="avMezcla" type="range" min="0" max="100" value="100">
+            <div class="row" style="gap:8px;margin-top:6px">
+              <button class="sm pri" id="avPlay">Ver el cambio</button>
+              <button class="sm" id="avComparar">Ver antes y después</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Composición corporal</h2>
+        <div id="avComp"></div>
+      </div>
+
+      <div class="card">
+        <h2>Simetría izquierda y derecha</h2>
+        <div id="avSim"></div>
+        <div style="margin-top:12px">
+          <div class="l" style="margin-bottom:6px">Marco óseo (afina la masa ósea y las articulaciones)</div>
+          <div id="avExtras"></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Cambio proyectado</h2>
+        <div id="avProy"></div>
+      </div>
+
+      <div class="card">
+        <h2>Datos de báscula</h2>
+        <div id="avBascula"></div>
       </div>
     </section>
 
@@ -1357,9 +1476,19 @@ function ok(res, msg){
    Al publicar una versión nueva: sube VERSION, pon la fecha y agrega
    su entrada arriba del todo en NOVEDADES.
    ===================================================================== */
-const VERSION = '3.3.1';
+const VERSION = '4.0.0';
 const FECHA_VERSION = '2026-09-05';
 const NOVEDADES = [
+  ['4.0.0', '2026-09-05', [
+    'Tu gemelo digital en 3D: pestaña Cuerpo → Gemelo 3D. El perímetro de cada parte del modelo es exactamente la medida que registraste.',
+    'Anatomía distinta para hombre y para mujer: proporciones, forma del tórax y reparto de grasa androide o ginoide, no una versión reducida del otro.',
+    'Composición corporal con fórmulas publicadas: grasa por el método de la Marina de EE. UU., agua por Watson, músculo por Lee, masa ósea corregida con tu muñeca. Cada dato dice de dónde sale.',
+    'Simulación a 30, 90 y 180 días con antes y después: reparte el cambio de peso entre grasa y músculo y lo traduce a centímetros zona por zona.',
+    'Tres capas: piel, músculos por grupo y mapa de dónde se te acumula la grasa.',
+    'Simetría izquierda y derecha, con qué hacer si un lado va por delante.',
+    'Dos medidas nuevas, muñeca y tobillo, que definen tu marco óseo.',
+    'Si tienes báscula de bioimpedancia, puedes escribir tus datos medidos y el motor deja de estimar.'
+  ]],
   ['3.3.1', '2026-09-05', [
     'El botón de armar la rutina ahora queda fijo abajo, siempre a la vista: eliges los días y los músculos y lo tienes ahí, sin bajar a buscarlo.',
     'La barra te dice al momento qué vas a armar: cuántos días, en cuáles caen y cuántos de descanso.',
@@ -1986,10 +2115,10 @@ const NAVG = [
   { k:'hoy',      n:'Hoy',      hijos:[['hoy','Resumen'], ['habitos','Mis hábitos']] },
   { k:'progreso', n:'Progreso', hijos:[['progreso','Progreso'], ['metas','Metas'], ['reporte','Reporte']] },
   { k:'gym',      n:'Gym',      hijos:[['gym','Gimnasio']] },
-  { k:'cuerpo',   n:'Cuerpo',   hijos:[['cuerpo','Mis medidas'], ['plan','Entrenador']] },
+  { k:'cuerpo',   n:'Cuerpo',   hijos:[['cuerpo','Mis medidas'], ['avatar','Gemelo 3D'], ['plan','Entrenador']] },
   { k:'dinero',   n:'Dinero',   hijos:[['finanzas','Finanzas']] }
 ];
-const TODAS = ['hoy','habitos','progreso','metas','gym','cuerpo','plan','finanzas','reporte'];
+const TODAS = ['hoy','habitos','progreso','metas','gym','cuerpo','avatar','plan','finanzas','reporte'];
 const grupoDe = (t) => (NAVG.find(g => g.hijos.some(h => h[0] === t)) || NAVG[0]).k;
 S.grupo = 'hoy';
 S.ultima = {};   // recuerda en qué subsección estabas de cada grupo
@@ -2007,6 +2136,7 @@ function mostrarTab(t, dir){
   if ((t === 'gym' || t === 'reporte') && !G.cargado) cargarGym();
   if ((t === 'finanzas' || t === 'reporte') && !F.cargado) cargarFinanzas();
   if ((t === 'cuerpo' || t === 'plan' || t === 'reporte') && !C.cargado) cargarCuerpo();
+  if (t === 'avatar') abrirAvatar();
   if (t === 'plan'){ if (!G.cargado) cargarGym();
                      if (!COACH.cargado) cargarPlan(); else pintarPlan180(); }
   if (t === 'reporte') setTimeout(() => pintarReporte(S.repTipo || 'diario'), 400);
@@ -2594,7 +2724,11 @@ const ZONAS = [
   {k:'muslo_izq',       n:'Muslo izquierdo',      ref:{hombre:57,  mujer:55},  px:{hombre:46, mujer:46},  ayuda:'A la mitad entre la cadera y la rodilla.'},
   {k:'muslo_der',       n:'Muslo derecho',        ref:{hombre:57,  mujer:55},  px:{hombre:46, mujer:46},  ayuda:'A la mitad entre la cadera y la rodilla.'},
   {k:'pantorrilla_izq', n:'Pantorrilla izquierda',ref:{hombre:38,  mujer:35},  px:{hombre:30, mujer:28},  ayuda:'En la parte más gruesa, de pie.'},
-  {k:'pantorrilla_der', n:'Pantorrilla derecha',  ref:{hombre:38,  mujer:35},  px:{hombre:30, mujer:28},  ayuda:'En la parte más gruesa, de pie.'}
+  {k:'pantorrilla_der', n:'Pantorrilla derecha',  ref:{hombre:38,  mujer:35},  px:{hombre:30, mujer:28},  ayuda:'En la parte más gruesa, de pie.'},
+  {k:'muneca_izq',      n:'Muñeca izquierda',     ref:{hombre:17,  mujer:15},  px:{hombre:14, mujer:12},  ayuda:'Justo debajo del hueso, en la parte más fina. Define tu marco óseo.'},
+  {k:'muneca_der',      n:'Muñeca derecha',       ref:{hombre:17,  mujer:15},  px:{hombre:14, mujer:12},  ayuda:'Justo debajo del hueso, en la parte más fina. Define tu marco óseo.'},
+  {k:'tobillo_izq',     n:'Tobillo izquierdo',    ref:{hombre:23,  mujer:21},  px:{hombre:18, mujer:16},  ayuda:'Por encima del hueso, en la parte más fina.'},
+  {k:'tobillo_der',     n:'Tobillo derecho',      ref:{hombre:23,  mujer:21},  px:{hombre:18, mujer:16},  ayuda:'Por encima del hueso, en la parte más fina.'}
 ];
 const ZONA = Object.fromEntries(ZONAS.map(z => [z.k, z]));
 
@@ -5355,11 +5489,16 @@ function abrirMedida(k){
   $('#dlgMedida').showModal();
 }
 $('#btnCancelMedida').onclick = () => $('#dlgMedida').close();
+function faltaV4(err){
+  return !!err && /medidas_zona_check|violates check constraint/i.test((err.message || '') + ' ' + (err.details || ''));
+}
 $('#btnSaveMedida').onclick = async () => {
   const v = Number($('#mdValor').value);
   if (!(v > 0 && v < 400)) return toast('Escribe una medida válida');
-  if (!ok(await sb.from('medidas').upsert(
-      { user_id:S.user.id, fecha:hoyISO(), zona:C.zona, valor:v }, { onConflict:'user_id,fecha,zona' }))) return;
+  const r = await sb.from('medidas').upsert(
+      { user_id:S.user.id, fecha:hoyISO(), zona:C.zona, valor:v }, { onConflict:'user_id,fecha,zona' });
+  if (faltaV4(r.error)) return toast('Falta correr esquema_v4 en Supabase para guardar esta medida');
+  if (!ok(r)) return;
   $('#dlgMedida').close(); await cargarCuerpo();
   toast(ZONA[C.zona].n + ': ' + v + ' cm');
 };
@@ -6997,6 +7136,1727 @@ $('#ddLimpiar').onclick = () => {
   if (d) d.grupos = [];
   $('#dlgDia').close(); pintarPlan180();
 };
+
+/* =====================================================================
+   AI BODY ENGINE · gemelo digital 3D
+   ---------------------------------------------------------------------
+   Todo lo que se ve aquí sale de tus medidas reales. El perímetro de
+   cada anillo del modelo es exactamente la circunferencia que mediste:
+   si tu cintura mide 85 cm, la cintura del muñeco mide 85 cm.
+   Lo que no mediste se estima por alometría y se marca como estimado.
+   ===================================================================== */
+
+const BODY = {
+  ren:null, esc:null, cam:null, luzDir:null, malla:null, mallaG:null, piso:null,
+  geoA:null, geoB:null, listo:false, cargando:false, fallo:false,
+  dias:0, comparar:false, capa:'piel', calidad:'auto',
+  az:0.35, el:0.06, dist:2.5, obj:null, sucio:true, raf:null,
+  animando:0, t0:0, promesa:null, ro:null
+};
+
+const THREE_URL = 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js';
+
+function cargarThree(){
+  if (window.THREE) return Promise.resolve(true);
+  if (BODY.promesa) return BODY.promesa;
+  BODY.promesa = new Promise((res) => {
+    const s = document.createElement('script');
+    s.src = (window.THREE_LOCAL || THREE_URL);
+    s.onload  = () => res(!!window.THREE);
+    s.onerror = () => res(false);
+    document.head.appendChild(s);
+  });
+  return BODY.promesa;
+}
+
+/* ---------------------------------------------------------------------
+   1. ANTROPOMETRIA
+   Referencias: persona de 178 cm / 75 kg (hombre) y 165 cm / 60 kg
+   (mujer). Lo que no está medido se escala desde ahí con exponentes
+   alométricos: los perímetros de tronco dependen mucho del peso, los de
+   extremidad dependen del peso y algo de la estatura.
+   --------------------------------------------------------------------- */
+const REF_CUERPO = {
+  hombre:{ alt:178, peso:75 },
+  mujer: { alt:165, peso:60 }
+};
+/* circunferencias de referencia en cm y exponente de peso */
+const REF_MED = {
+  cuello:      { hombre:38,  mujer:32,  ep:0.35 },
+  hombros:     { hombre:118, mujer:100, ep:0.45 },
+  pecho:       { hombre:100, mujer:88,  ep:0.50 },
+  cintura:     { hombre:85,  mujer:70,  ep:0.75 },
+  abdomen:     { hombre:90,  mujer:80,  ep:0.75 },
+  cadera:      { hombre:98,  mujer:100, ep:0.55 },
+  biceps:      { hombre:33,  mujer:27,  ep:0.45 },
+  antebrazo:   { hombre:29,  mujer:24,  ep:0.40 },
+  muslo:       { hombre:57,  mujer:55,  ep:0.50 },
+  pantorrilla: { hombre:38,  mujer:35,  ep:0.40 },
+  muneca:      { hombre:17,  mujer:15,  ep:0.18 },
+  tobillo:     { hombre:23,  mujer:21,  ep:0.22 }
+};
+
+function estimarMedida(k, sexo, peso, alt){
+  const r = REF_MED[k], b = REF_CUERPO[sexo] || REF_CUERPO.hombre;
+  if (!r) return null;
+  const fp = Math.pow(peso / b.peso, r.ep);
+  const fa = Math.pow(alt  / b.alt,  1 - r.ep * 0.8);
+  return r[sexo] * fp * fa;
+}
+
+/* devuelve el juego completo de medidas, marcando cuáles son reales */
+function antropometria(p, medidas){
+  const sexo = p.sexo === 'mujer' ? 'mujer' : 'hombre';
+  const peso = Number(p.peso_kg), alt = Number(p.estatura_cm);
+  const real = {}, orig = {};
+  (medidas || []).forEach(m => { real[m.zona] = Number(m.valor); });
+
+  const par = (base) => {
+    const i = real[base + '_izq'], d = real[base + '_der'];
+    if (i != null && d != null) return { v:(i + d) / 2, i:i, d:d, real:true };
+    if (i != null) return { v:i, i:i, d:i, real:true };
+    if (d != null) return { v:d, i:d, d:d, real:true };
+    const e = estimarMedida(base, sexo, peso, alt);
+    return { v:e, i:e, d:e, real:false };
+  };
+  const uno = (k) => {
+    if (real[k] != null) return { v:real[k], real:true };
+    return { v:estimarMedida(k, sexo, peso, alt), real:false };
+  };
+
+  const A = {
+    sexo:sexo, peso:peso, alt:alt,
+    cuello:uno('cuello'), hombros:uno('hombros'), pecho:uno('pecho'),
+    cintura:uno('cintura'), abdomen:uno('abdomen'), cadera:uno('cadera'),
+    biceps:par('biceps'), antebrazo:par('antebrazo'), muslo:par('muslo'),
+    pantorrilla:par('pantorrilla'), muneca:par('muneca'), tobillo:par('tobillo')
+  };
+  Object.keys(A).forEach(k => { if (A[k] && A[k].real !== undefined) orig[k] = A[k].real; });
+  A.medido = orig;
+  A.faltan = Object.keys(orig).filter(k => !orig[k]);
+  return A;
+}
+
+/* ---------------------------------------------------------------------
+   2. COMPOSICION CORPORAL
+   Fórmulas publicadas y validadas, cada una etiquetada con su origen.
+   --------------------------------------------------------------------- */
+function grasaMarina(sexo, cuello, cintura, cadera, alt){
+  if (!cuello || !cintura || !alt) return null;
+  if (sexo === 'hombre'){
+    const d = cintura - cuello;
+    if (d <= 1) return null;
+    const v = 495 / (1.0324 - 0.19077 * Math.log10(d) + 0.15456 * Math.log10(alt)) - 450;
+    return (v > 2 && v < 65) ? v : null;
+  }
+  if (!cadera) return null;
+  const d = cintura + cadera - cuello;
+  if (d <= 1) return null;
+  const v = 495 / (1.29579 - 0.35004 * Math.log10(d) + 0.22100 * Math.log10(alt)) - 450;
+  return (v > 5 && v < 70) ? v : null;
+}
+
+function composicion(p, medidas, ant){
+  if (!p || !p.sexo || !p.peso_kg || !p.estatura_cm) return null;
+  const A = ant || antropometria(p, medidas);
+  const sexo = A.sexo, peso = A.peso, alt = A.alt, altM = alt / 100;
+  const edad = edadDe(p.fecha_nacimiento) || 30;
+  const real = {}; (medidas || []).forEach(m => { real[m.zona] = Number(m.valor); });
+
+  // --- % de grasa ---
+  let grasa = null, fuenteGrasa = '';
+  if (real.grasa != null && real.grasa > 2 && real.grasa < 70){
+    grasa = real.grasa; fuenteGrasa = 'medido con báscula';
+  } else {
+    const nav = grasaMarina(sexo, A.cuello.v, A.cintura.v, A.cadera.v, alt);
+    if (nav != null && A.cuello.real && A.cintura.real && (sexo === 'hombre' || A.cadera.real)){
+      grasa = nav; fuenteGrasa = 'método de la Marina de EE. UU. (cuello, cintura' +
+        (sexo === 'mujer' ? ', cadera' : '') + ' y estatura)';
+    } else if (nav != null){
+      grasa = nav; fuenteGrasa = 'método de la Marina, con alguna medida estimada';
+    } else {
+      const imc0 = peso / (altM * altM);
+      grasa = 1.20 * imc0 + 0.23 * edad - 10.8 * (sexo === 'hombre' ? 1 : 0) - 5.4;
+      fuenteGrasa = 'fórmula de Deurenberg (solo IMC y edad, la menos precisa)';
+    }
+  }
+  grasa = Math.max(3, Math.min(65, grasa));
+
+  const grasaKg = peso * grasa / 100;
+  const magraKg = peso - grasaKg;
+
+  // --- músculo esquelético (Lee 2000, versión sin pliegues) ---
+  let musculoKg, fuenteMus;
+  if (real.musculo != null && real.musculo > 5 && real.musculo < 90){
+    musculoKg = real.musculo; fuenteMus = 'medido con báscula';
+  } else {
+    musculoKg = 0.244 * peso + 7.80 * altM - 0.098 * edad +
+                6.6 * (sexo === 'hombre' ? 1 : 0) - 3.3;
+    fuenteMus = 'ecuación de Lee (peso, estatura, edad y sexo)';
+  }
+  musculoKg = Math.max(10, Math.min(magraKg * 0.62, musculoKg));
+
+  // --- masa ósea: base por peso, corregida por el tamaño de tu marco (muñeca) ---
+  let huesoKg, fuenteHueso;
+  if (real.hueso != null && real.hueso > 1 && real.hueso < 8){
+    huesoKg = real.hueso; fuenteHueso = 'medido con báscula';
+  } else {
+    const base = peso * (sexo === 'hombre' ? 0.045 : 0.042);
+    const esp = estimarMedida('muneca', sexo, peso, alt);
+    const marco = A.muneca.real && esp ? Math.max(0.85, Math.min(1.15, A.muneca.v / esp)) : 1;
+    huesoKg = base * marco;
+    fuenteHueso = A.muneca.real
+      ? 'estimada por peso y tamaño de marco (tu muñeca)'
+      : 'estimada por peso (mide tu muñeca para afinarla)';
+  }
+
+  // --- agua corporal total (Watson) ---
+  let aguaL, fuenteAgua;
+  if (real.agua != null && real.agua > 25 && real.agua < 80){
+    aguaL = peso * real.agua / 100; fuenteAgua = 'medida con báscula';
+  } else {
+    aguaL = sexo === 'hombre'
+      ? 2.447 - 0.09516 * edad + 0.1074 * alt + 0.3362 * peso
+      : -2.097 + 0.1069 * alt + 0.2466 * peso;
+    fuenteAgua = 'fórmula de Watson (edad, estatura y peso)';
+  }
+  const aguaPct = 100 * aguaL / peso;
+
+  // --- grasa visceral: sin DEXA ni bioimpedancia no se mide. Proxy honesto ---
+  const cinAlt = A.cintura.v / alt;
+  const visc = cinAlt < 0.43 ? { n:'Muy bajo', c:'ok' }
+             : cinAlt < 0.50 ? { n:'Saludable', c:'ok' }
+             : cinAlt < 0.55 ? { n:'Elevado', c:'oro' }
+             : cinAlt < 0.60 ? { n:'Alto', c:'bad' }
+             : { n:'Muy alto', c:'bad' };
+
+  const imc = peso / (altM * altM);
+  const tmb = Math.round(10 * peso + 6.25 * alt - 5 * edad + (sexo === 'hombre' ? 5 : -161));
+  // índice de masa magra: separa "pesa mucho" de "tiene músculo"
+  const ffmi = magraKg / (altM * altM) + 6.1 * (1.8 - altM);
+
+  return {
+    sexo:sexo, peso:peso, alt:alt, edad:edad,
+    grasa:grasa, grasaKg:grasaKg, magraKg:magraKg,
+    musculoKg:musculoKg, huesoKg:huesoKg, aguaL:aguaL, aguaPct:aguaPct,
+    imc:imc, tmb:tmb, ffmi:ffmi, cinAlt:cinAlt, visceral:visc,
+    fuente:{ grasa:fuenteGrasa, musculo:fuenteMus, hueso:fuenteHueso, agua:fuenteAgua,
+             visceral:'índice cintura/estatura — la grasa visceral real solo se mide con DEXA o bioimpedancia' }
+  };
+}
+
+/* rangos sanos de grasa por sexo y edad (ACE / ACSM) */
+function rangoGrasa(sexo, edad){
+  if (sexo === 'hombre'){
+    if (edad < 40) return [8, 19];
+    if (edad < 60) return [11, 22];
+    return [13, 25];
+  }
+  if (edad < 40) return [21, 33];
+  if (edad < 60) return [23, 34];
+  return [24, 36];
+}
+
+/* ---------------------------------------------------------------------
+   3. SIMULACION A 30 / 90 / 180 DIAS
+   No es una animación bonita: es conservación de volumen. El cambio de
+   peso se reparte entre grasa y músculo según tu objetivo, tu
+   experiencia y tus días de gym; cada kilo se convierte en litros
+   (grasa 0,90 kg/L, músculo 1,06 kg/L), esos litros se reparten por
+   zonas con el patrón de tu sexo, y cada zona se vuelve a convertir en
+   centímetros de perímetro. Por eso la barriga baja antes que el gemelo.
+   --------------------------------------------------------------------- */
+const DENS_GRASA = 0.90;      // kg por litro
+const DENS_MUS   = 1.06;
+
+/* fracción de la estatura que ocupa el segmento de cada perímetro */
+const LARGO_SEG = {
+  cuello:0.050, pecho:0.130, cintura:0.070, abdomen:0.080, cadera:0.100,
+  biceps:0.160, antebrazo:0.140, muslo:0.260, pantorrilla:0.200
+};
+/* pares: el volumen se reparte entre los dos lados */
+const ES_PAR = { biceps:1, antebrazo:1, muslo:1, pantorrilla:1 };
+
+/* Coeficiente regional de depósito de grasa. La grasa subcutánea es una
+   CAPA, no un relleno: si su espesor cambia δ, el perímetro cambia 2πδ.
+   Estos coeficientes dicen dónde esa capa es más gruesa y dónde se mueve
+   antes. Por eso en el hombre baja primero el abdomen y en la mujer la
+   cadera y el muslo. */
+const K_GRASA = {
+  hombre:{ cuello:0.55, pecho:1.50, cintura:3.30, abdomen:3.60, cadera:1.20,
+           biceps:0.45, antebrazo:0.30, muslo:1.05, pantorrilla:0.30 },
+  mujer: { cuello:0.45, pecho:1.35, cintura:2.30, abdomen:2.55, cadera:2.40,
+           biceps:0.50, antebrazo:0.30, muslo:1.90, pantorrilla:0.45 }
+};
+/* lo mismo para el músculo: dónde se nota lo que ganas */
+const K_MUS = {
+  hombre:{ cuello:0.90, pecho:1.90, cintura:0.50, abdomen:0.40, cadera:0.90,
+           biceps:1.60, antebrazo:0.70, muslo:1.50, pantorrilla:0.80 },
+  mujer: { cuello:0.70, pecho:1.20, cintura:0.50, abdomen:0.40, cadera:1.60,
+           biceps:1.20, antebrazo:0.60, muslo:1.90, pantorrilla:0.85 }
+};
+const TECHO_MUS = { principiante:0.20, intermedio:0.10, avanzado:0.05 };
+
+/* mapea el grupo muscular que entrenas al perímetro donde se nota */
+const GRUPO_A_ZONA = {
+  pecho:'pecho', espalda:'pecho', hombro:'pecho', trapecio:'cuello',
+  biceps:'biceps', triceps:'biceps', antebrazo:'antebrazo',
+  pierna:'muslo', gluteo:'cadera', pantorrilla:'pantorrilla', abdomen:'cintura'
+};
+
+function proyectar(p, comp, A, dias){
+  if (!comp || !dias) return null;
+  const sem = dias / 7, sexo = comp.sexo;
+  const pl = planNutricion(p);
+  const exp = p.experiencia || 'principiante';
+  const diasGym = Number(p.dias_entreno_semana != null ? p.dias_entreno_semana : 4);
+  const entrena = diasGym >= 2;
+  const techo = (TECHO_MUS[exp] || 0.10) * (sexo === 'hombre' ? 1 : 0.5) * (entrena ? 1 : 0.15);
+
+  // --- cuánto peso cambia ---
+  let ritmo = 0;                                   // kg por semana, con signo
+  if (pl && pl.ritmoAplicado != null && !pl.yaLlegaste){
+    ritmo = (p.objetivo === 'bajar_grasa' ? -1 : 1) * pl.ritmoAplicado;
+  } else if (p.objetivo === 'bajar_grasa'){
+    ritmo = -comp.peso * 0.006;
+  } else if (p.objetivo === 'ganar_musculo'){
+    ritmo =  comp.peso * 0.003;
+  }
+  let dPeso = ritmo * sem;
+  // si pusiste peso objetivo, el cambio se detiene al llegar
+  if (p.peso_objetivo){
+    const meta = Number(p.peso_objetivo), falta = meta - comp.peso;
+    if ((dPeso < 0 && falta < 0 && dPeso < falta) || (dPeso > 0 && falta > 0 && dPeso > falta)) dPeso = falta;
+    if ((dPeso < 0 && falta >= 0) || (dPeso > 0 && falta <= 0)) dPeso = 0;
+  }
+
+  // --- reparto entre grasa y músculo ---
+  let dMus, dGrasa;
+  if (dPeso < -0.01){
+    // con proteína alta y entrenamiento de fuerza casi toda la pérdida es grasa
+    const fGrasa = Math.min(0.94, 0.74 + 0.030 * diasGym + (p.objetivo === 'bajar_grasa' ? 0.03 : 0));
+    if (entrena && exp === 'principiante' && diasGym >= 3){
+      dMus = Math.min(techo * sem * 0.5, Math.abs(dPeso) * 0.25);   // recomposición del novato
+    } else {
+      dMus = -(1 - fGrasa) * Math.abs(dPeso);
+    }
+    dGrasa = dPeso - dMus;
+  } else if (dPeso > 0.01){
+    dMus = Math.min(techo * sem, dPeso * 0.60);
+    dGrasa = dPeso - dMus;
+  } else {
+    dMus = entrena ? techo * sem * 0.5 : 0;        // mantener peso y recomponer
+    dGrasa = -dMus;
+  }
+  // no se puede perder más grasa de la que hay por encima del mínimo vital
+  const minGrasa = comp.peso * (sexo === 'hombre' ? 0.05 : 0.12);
+  if (comp.grasaKg + dGrasa < minGrasa){ dGrasa = minGrasa - comp.grasaKg; }
+
+  // --- reparto por zonas y conversión a centímetros ---
+  const kg = K_GRASA[sexo], km0 = K_MUS[sexo];
+  // el músculo va sobre todo a lo que entrenas
+  const foco = {};
+  (p.musculos_foco || []).forEach(g => { const z = GRUPO_A_ZONA[g]; if (z) foco[z] = (foco[z] || 0) + 1; });
+  const hayFoco = Object.keys(foco).length > 0;
+  const km = {};
+  Object.keys(km0).forEach(z => { km[z] = km0[z] * (foco[z] ? 1.55 : (hayFoco ? 0.72 : 1)); });
+
+  // superficie de cada rebanada del cuerpo: perímetro × largo × lados
+  let denG = 0, denM = 0, supTot = 0;
+  const sup = {};
+  Object.keys(LARGO_SEG).forEach(z => {
+    const L = LARGO_SEG[z] * A.alt, lados = ES_PAR[z] ? 2 : 1;
+    const Sz = (A[z] && A[z].v ? A[z].v : 0) * L * lados;
+    sup[z] = Sz; supTot += Sz;
+    denG += Sz * (kg[z] || 0);
+    denM += Sz * (km[z] || 0);
+  });
+  denG += supTot * 0.11 * 0.50;      // cabeza, manos y pies: también guardan grasa
+  if (denG <= 0) denG = 1; if (denM <= 0) denM = 1;
+  const dVg = dGrasa * 1000 / DENS_GRASA;      // cm3
+  const dVm = dMus   * 1000 / DENS_MUS;
+
+  const B = JSON.parse(JSON.stringify({
+    cuello:A.cuello, hombros:A.hombros, pecho:A.pecho, cintura:A.cintura,
+    abdomen:A.abdomen, cadera:A.cadera, biceps:A.biceps, antebrazo:A.antebrazo,
+    muslo:A.muslo, pantorrilla:A.pantorrilla, muneca:A.muneca, tobillo:A.tobillo
+  }));
+  B.sexo = A.sexo; B.alt = A.alt; B.peso = A.peso + dPeso;
+
+  const cambio = {};
+  Object.keys(LARGO_SEG).forEach(z => {
+    // cambio de espesor de la capa, y de ahí el perímetro: ΔC = 2πΔespesor
+    const dC = 2 * Math.PI * ( dVg * (kg[z] || 0) / denG + dVm * (km[z] || 0) / denM );
+    const aplicar = (c) => c == null ? c : Math.max(c * 0.62, c + dC);
+    if (B[z] && B[z].v != null){
+      const antes = B[z].v;
+      B[z].v = aplicar(B[z].v);
+      if (B[z].i != null) B[z].i = aplicar(B[z].i);
+      if (B[z].d != null) B[z].d = aplicar(B[z].d);
+      cambio[z] = B[z].v - antes;
+    }
+  });
+  // los hombros siguen al pecho: el deltoides crece con el torso
+  if (B.hombros && cambio.pecho) B.hombros.v = A.hombros.v + cambio.pecho * 1.15;
+
+  const pB = Object.assign({}, p, { peso_kg: B.peso });
+  const medB = [];
+  if (comp.fuente.grasa.indexOf('báscula') >= 0) medB.push({ zona:'grasa', valor: 100 * (comp.grasaKg + dGrasa) / B.peso });
+  const compB = composicion(pB, medB, B);
+  // forzamos la composición que acabamos de simular: es más fiel que
+  // volver a estimarla desde las medidas proyectadas
+  if (compB){
+    compB.grasaKg = comp.grasaKg + dGrasa;
+    compB.grasa = 100 * compB.grasaKg / B.peso;
+    compB.magraKg = B.peso - compB.grasaKg;
+    compB.musculoKg = comp.musculoKg + dMus;
+    compB.imc = B.peso / Math.pow(A.alt / 100, 2);
+    compB.cinAlt = B.cintura.v / A.alt;
+    compB.ffmi = compB.magraKg / Math.pow(A.alt/100, 2) + 6.1 * (1.8 - A.alt/100);
+  }
+  return { ant:B, comp:compB, dPeso:dPeso, dMus:dMus, dGrasa:dGrasa, dias:dias, cambio:cambio,
+           ritmo:ritmo, techo:techo, entrena:entrena };
+}
+
+/* ---------------------------------------------------------------------
+   4. ESQUELETO Y MALLA
+   El esqueleto usa proporciones antropométricas clásicas (Drillis y
+   Contini) sobre tu estatura real. Encima se montan anillos cuyo
+   perímetro es exactamente tu medida, y sobre esos anillos se modela
+   cada músculo por separado: nada deforma el cuerpo entero.
+   --------------------------------------------------------------------- */
+const PROP = {
+  hombre:{ acromion:0.818, biacromial:0.245, biiliaco:0.191, caderaY:0.530,
+           cintura:0.640, abdomen:0.593, pecho:0.740, axila:0.790, cuelloY:0.858,
+           rodilla:0.285, tobillo:0.045, codo:0.630, muneca:0.487, entrepierna:0.480 },
+  mujer: { acromion:0.812, biacromial:0.228, biiliaco:0.202, caderaY:0.525,
+           cintura:0.645, abdomen:0.588, pecho:0.730, axila:0.782, cuelloY:0.852,
+           rodilla:0.285, tobillo:0.045, codo:0.628, muneca:0.485, entrepierna:0.478 }
+};
+
+const GRUPOS3D = ['neutro','pecho','abdomen','oblicuo','dorsal','trapecio','lumbar','gluteo',
+                  'deltoides','biceps','triceps','antebrazo','cuadriceps','isquios','gemelo',
+                  'cuello','aductor'];
+const PAL3D = {
+  neutro:[0.80,0.75,0.70], pecho:[0.88,0.19,0.15], abdomen:[0.97,0.44,0.16],
+  oblicuo:[0.80,0.30,0.14], dorsal:[0.50,0.09,0.13], trapecio:[0.72,0.14,0.22],
+  lumbar:[0.38,0.06,0.10], gluteo:[0.60,0.11,0.19], deltoides:[1.00,0.58,0.13],
+  biceps:[0.93,0.28,0.14], triceps:[0.58,0.12,0.16], antebrazo:[0.85,0.42,0.20],
+  cuadriceps:[0.95,0.34,0.14], isquios:[0.46,0.08,0.13], gemelo:[0.78,0.20,0.18],
+  cuello:[0.66,0.16,0.24], aductor:[0.86,0.24,0.26]
+};
+
+const clamp01 = (x) => x < 0 ? 0 : x > 1 ? 1 : x;
+const gauss = (x, s) => Math.exp(-(x * x) / (2 * s * s));
+function vent(y, a, b){ return (y <= a || y >= b) ? 0 : Math.sin(Math.PI * (y - a) / (b - a)); }
+/* diferencia angular más corta */
+function dth(a, b){ let d = a - b; while (d > Math.PI) d -= 2 * Math.PI; while (d < -Math.PI) d += 2 * Math.PI; return d; }
+
+/* perímetro de una elipse (Ramanujan) */
+function perimElipse(a, b){
+  return Math.PI * (3 * (a + b) - Math.sqrt((3 * a + b) * (a + 3 * b)));
+}
+/* semiejes de una elipse de perímetro C y relación ancho/fondo r */
+function ejesDe(C, r){
+  const u = perimElipse(r, 1);        // perímetro con b = 1
+  const b = C / u;
+  return [r * b, b];
+}
+
+/* estado físico que gobierna la forma: definición, musculatura, grasa */
+function estadoFisico(comp){
+  const h = comp.sexo === 'hombre';
+  return {
+    sexo:comp.sexo,
+    defin: clamp01(h ? (22 - comp.grasa) / 14 : (31 - comp.grasa) / 13),
+    mus:   clamp01(h ? (comp.ffmi - 17.0) / 5.5 : (comp.ffmi - 14.0) / 4.5),
+    grasaN: clamp01(h ? (comp.grasa - 9) / 24 : (comp.grasa - 17) / 24)
+  };
+}
+
+/* =====================================================================
+   MODULACION MUSCULAR
+   Devuelve [multiplicador de radio, oclusión ambiental, grupo]
+   yf = altura en fracción de estatura · th = 0 al frente, PI a la espalda
+   ===================================================================== */
+function modTorso(yf, th, X){
+  const fr = Math.cos(th), lat = Math.abs(Math.sin(th));
+  const front = Math.max(0, fr), back = Math.max(0, -fr);
+  const D = X.defin, M = X.mus, F = X.grasaN, muj = X.sexo === 'mujer';
+  // grupo base por región anatómica; un músculo marcado lo sobreescribe
+  let g = 0;
+  if (yf > 0.842) g = 15;
+  else if (yf > 0.782) g = front > 0.30 ? 1 : 5;
+  else if (yf > 0.686) g = front > 0.30 ? 1 : (lat > 0.72 ? 4 : 4);
+  else if (yf > 0.548) g = front > 0.45 ? 2 : (lat > 0.60 ? 3 : 6);
+  else g = front > 0.35 ? 3 : 7;
+  let m = 0, ao = 0, best = 0.006;
+  const pon = (v, id) => { if (Math.abs(v) > best){ best = Math.abs(v); g = id; } };
+
+  /* --- pectoral --- */
+  const vPec = vent(yf, 0.686, 0.806);
+  if (vPec > 0){
+    const lobulo = 0.50 + 0.50 * gauss(Math.abs(th) - 0.58, 0.42);
+    const A = (muj ? 0.038 : 0.085) * (0.35 + 0.65 * M) * (0.55 + 0.45 * D);
+    const v = A * vPec * Math.pow(front, 1.25) * lobulo;
+    m += v; pon(v, 1);
+    const esternon = 0.42 * A * gauss(dth(th, 0), 0.14) * vent(yf, 0.690, 0.795);
+    m -= esternon; ao += esternon * 9;
+    const bajoPec = 0.40 * A * D * gauss(yf - 0.694, 0.017) * front;
+    m -= bajoPec; ao += bajoPec * 11;
+  }
+  /* --- pecho femenino --- */
+  if (muj){
+    const A = 0.055 + 0.035 * F + 0.020 * M;
+    const v = A * vent(yf, 0.678, 0.782) * Math.pow(front, 1.1) *
+              (0.30 + 0.70 * gauss(Math.abs(th) - 0.46, 0.36));
+    m += v; pon(v * 0.9, 1);
+    const surco = 0.35 * A * gauss(dth(th, 0), 0.13) * vent(yf, 0.690, 0.775);
+    m -= surco; ao += surco * 7;
+  }
+  /* --- abdomen: recto y línea alba --- */
+  const vAb = vent(yf, 0.548, 0.694);
+  if (vAb > 0){
+    const A = 0.030 * (0.30 + 0.70 * M) * (0.25 + 0.75 * D);
+    const ancho = gauss(Math.abs(th) - 0.30, 0.30);
+    const v = A * vAb * Math.pow(front, 1.5) * ancho;
+    m += v; pon(v, 2);
+    let sur = 0;
+    [0.583, 0.612, 0.641, 0.668].forEach(yk => { sur += gauss(yf - yk, 0.0062); });
+    const surcos = 0.030 * D * (0.3 + 0.7 * M) * sur * Math.pow(front, 1.6) * ancho;
+    m -= surcos; ao += surcos * 10;
+    const alba = 0.022 * D * gauss(dth(th, 0), 0.085) * vAb * front;
+    m -= alba; ao += alba * 12;
+  }
+  /* --- grasa abdominal: empuja hacia adelante y a los costados --- */
+  if (F > 0.02){
+    const barriga = (muj ? 0.055 : 0.085) * F * F * vent(yf, 0.528, 0.672) *
+                    (0.35 + 0.65 * Math.pow(front, 1.3));
+    m += barriga;
+    const flotador = 0.055 * F * F * vent(yf, 0.585, 0.668) * gauss(Math.abs(th) - 1.62, 0.55);
+    m += flotador;
+  }
+  /* --- oblicuo y serrato --- */
+  const vOb = vent(yf, 0.596, 0.712);
+  if (vOb > 0 && D > 0.15){
+    const A = 0.026 * D * (0.3 + 0.7 * M);
+    const v = A * vOb * gauss(Math.abs(th) - 1.30, 0.40);
+    m += v; pon(v, 3);
+    let dientes = 0;
+    for (let k = 0; k < 4; k++) dientes += gauss(yf - (0.640 + k * 0.019), 0.0055);
+    const dd = 0.014 * D * dientes * gauss(Math.abs(th) - 1.15, 0.28);
+    m -= dd; ao += dd * 9;
+  }
+  /* --- dorsal ancho: la V --- */
+  const vLat = vent(yf, 0.640, 0.812);
+  if (vLat > 0){
+    const A = (muj ? 0.045 : 0.075) * (0.30 + 0.70 * M);
+    const alto = clamp01((yf - 0.640) / 0.150);
+    const v = A * vLat * gauss(Math.abs(th) - (2.30 - 0.35 * alto), 0.52) * (0.45 + 0.55 * alto);
+    m += v; pon(v, 4);
+    const borde = 0.30 * A * D * gauss(Math.abs(th) - 1.62, 0.16) * vLat;
+    m -= borde; ao += borde * 8;
+  }
+  /* --- trapecio --- */
+  const vTr = vent(yf, 0.756, 0.868);
+  if (vTr > 0){
+    const A = (muj ? 0.045 : 0.080) * (0.30 + 0.70 * M);
+    const v = A * vTr * Math.pow(Math.max(0, -fr) * 0.7 + 0.3, 1.0) *
+              (0.40 + 0.60 * gauss(Math.abs(th) - 2.75, 0.75));
+    m += v; pon(v, 5);
+  }
+  /* --- erectores y surco de la columna --- */
+  const vEr = vent(yf, 0.520, 0.800);
+  if (vEr > 0){
+    const A = 0.040 * (0.30 + 0.70 * M);
+    const v = A * vEr * (gauss(dth(th, Math.PI) - 0.26, 0.20) + gauss(dth(th, Math.PI) + 0.26, 0.20)) * 0.6;
+    m += v; pon(v, 6);
+    const surco = 0.032 * (0.4 + 0.6 * D) * gauss(dth(th, Math.PI), 0.115) * vEr;
+    m -= surco; ao += surco * 12;
+  }
+  /* --- glúteo --- */
+  const vGl = vent(yf, 0.446, 0.562);
+  if (vGl > 0){
+    const A = (muj ? 0.195 : 0.135) * (0.35 + 0.45 * M + 0.35 * F);
+    const v = A * vGl * Math.pow(back, 1.15) * (0.45 + 0.55 * gauss(Math.abs(th) - 2.52, 0.55));
+    m += v; pon(v, 7);
+    const hendidura = 0.070 * gauss(dth(th, Math.PI), 0.105) * vent(yf, 0.452, 0.540);
+    m -= hendidura; ao += hendidura * 10;
+    const pliegue = 0.045 * gauss(yf - 0.458, 0.008) * back;
+    m -= pliegue; ao += pliegue * 9;
+  }
+  /* --- clavícula y hueco supraclavicular --- */
+  const vCl = vent(yf, 0.806, 0.848);
+  if (vCl > 0){
+    const cl = 0.030 * (0.3 + 0.7 * D) * vCl * front * gauss(Math.abs(th) - 0.62, 0.30);
+    m += cl; pon(cl * 0.7, 0);
+    const hueco = 0.026 * D * gauss(yf - 0.842, 0.009) * front * gauss(Math.abs(th) - 0.40, 0.28);
+    m -= hueco; ao += hueco * 12;
+  }
+  /* --- cuello: esternocleidomastoideo --- */
+  const vCu = vent(yf, 0.846, 0.900);
+  if (vCu > 0){
+    const A = 0.055 * (0.3 + 0.7 * M);
+    const v = A * vCu * gauss(Math.abs(th) - 0.75, 0.35);
+    m += v; pon(v, 15);
+  }
+  return [1 + m, ao, g];
+}
+
+function modBrazo(t, th, X, lado){
+  /* t: 0 hombro -> 1 muñeca. th=0 al frente. thOut = hacia afuera del cuerpo */
+  const out = lado > 0 ? Math.sin(th) : -Math.sin(th);   // + = hacia afuera
+  const fr = Math.cos(th);
+  const D = X.defin, M = X.mus, F = X.grasaN;
+  let g = t < 0.20 ? 8 : t < 0.58 ? (fr > 0 ? 9 : 10) : 11;
+  let m = 0, ao = 0, best = 0.006;
+  const pon = (v, id) => { if (Math.abs(v) > best){ best = Math.abs(v); g = id; } };
+
+  /* deltoides: tres haces */
+  const vDe = vent(t, -0.06, 0.26);
+  if (vDe > 0){
+    const A = 0.085 * (0.30 + 0.70 * M);
+    const ant = gauss(dth(th, lado > 0 ? 0.55 : -0.55), 0.55);
+    const med = gauss(out - 1, 0.60);
+    const pos = gauss(dth(th, lado > 0 ? 2.55 : -2.55), 0.55);
+    const v = A * vDe * (0.9 * ant + 1.0 * med + 0.8 * pos) * 0.6;
+    m += v; pon(v, 8);
+    const sep = 0.030 * D * vDe * (gauss(dth(th, lado > 0 ? 1.55 : -1.55), 0.10) +
+                                   gauss(dth(th, lado > 0 ? 2.05 : -2.05), 0.10));
+    m -= sep * 0.5; ao += sep * 7;
+    const insercion = 0.045 * D * gauss(t - 0.255, 0.030);
+    m -= insercion; ao += insercion * 9;
+  }
+  /* bíceps */
+  const vBi = vent(t, 0.185, 0.590);
+  if (vBi > 0){
+    const A = 0.090 * (0.30 + 0.70 * M) * (0.55 + 0.45 * D);
+    const v = A * vBi * Math.pow(Math.max(0, fr), 1.3) * gauss(t - 0.375, 0.16);
+    m += v; pon(v, 9);
+    const surco = 0.030 * D * vBi * (gauss(dth(th, lado > 0 ? 1.45 : -1.45), 0.13) +
+                                     gauss(dth(th, lado > 0 ? -1.45 : 1.45), 0.13));
+    m -= surco; ao += surco * 8;
+  }
+  /* tríceps: herradura */
+  const vTr = vent(t, 0.150, 0.610);
+  if (vTr > 0){
+    const A = 0.080 * (0.30 + 0.70 * M) * (0.50 + 0.50 * D);
+    const back = Math.max(0, -fr);
+    const v = A * vTr * Math.pow(back, 1.2) *
+              (0.45 + 0.55 * (gauss(dth(th, Math.PI) - 0.55, 0.40) + gauss(dth(th, Math.PI) + 0.55, 0.40)) * 0.6);
+    m += v; pon(v, 10);
+    const centro = 0.030 * D * gauss(dth(th, Math.PI), 0.16) * vent(t, 0.180, 0.500);
+    m -= centro; ao += centro * 8;
+  }
+  /* codo */
+  const vCo = vent(t, 0.560, 0.665);
+  if (vCo > 0){
+    m -= 0.045 * vCo * (0.4 + 0.6 * D); ao += 0.35 * vCo * D;
+    const olecranon = 0.055 * vCo * Math.max(0, -fr) * gauss(dth(th, Math.PI), 0.45);
+    m += olecranon;
+  }
+  /* antebrazo: braquiorradial y masa flexora */
+  const vAn = vent(t, 0.600, 0.960);
+  if (vAn > 0){
+    const A = 0.075 * (0.30 + 0.70 * M);
+    const v = A * vAn * gauss(t - 0.720, 0.12) * (0.50 + 0.50 * gauss(out - 0.75, 0.75));
+    m += v; pon(v, 11);
+    const tendones = 0.020 * D * vent(t, 0.850, 0.995) * Math.max(0, fr) *
+                     (gauss(dth(th, 0.30), 0.14) + gauss(dth(th, -0.30), 0.14));
+    m -= tendones; ao += tendones * 8;
+  }
+  /* grasa: suaviza todo */
+  if (F > 0.3) m *= (1 - 0.30 * (F - 0.3));
+  return [1 + m, ao, g];
+}
+
+function modPierna(t, th, X, lado){
+  /* t: 0 cadera -> 1 tobillo */
+  const out = lado > 0 ? Math.sin(th) : -Math.sin(th);
+  const fr = Math.cos(th), back = Math.max(0, -fr), front = Math.max(0, fr);
+  const D = X.defin, M = X.mus, F = X.grasaN, muj = X.sexo === 'mujer';
+  let g = t > 0.72 ? 14 : (fr > 0.10 ? 12 : (t < 0.45 && out < -0.72 ? 16 : 13));
+  let m = 0, ao = 0, best = 0.006;
+  const pon = (v, id) => { if (Math.abs(v) > best){ best = Math.abs(v); g = id; } };
+
+  /* cuádriceps: recto anterior, vasto lateral y vasto medial (la lágrima) */
+  const vQ = vent(t, 0.020, 0.700);
+  if (vQ > 0){
+    const A = 0.075 * (0.30 + 0.70 * M) * (0.55 + 0.45 * D);
+    const recto = gauss(dth(th, 0), 0.55) * gauss(t - 0.360, 0.24);
+    const lateral = gauss(out - 0.90, 0.55) * gauss(t - 0.300, 0.26);
+    const medial = gauss(out + 0.80, 0.45) * gauss(t - 0.560, 0.13) * (0.4 + 0.6 * D);
+    const v = A * vQ * front * (0.85 * recto + 1.0 * lateral) + A * 1.1 * medial;
+    m += v; pon(v, 12);
+    const surcoLat = 0.030 * D * gauss(out - 1.35, 0.16) * vent(t, 0.120, 0.620);
+    m -= surcoLat; ao += surcoLat * 8;
+  }
+  /* isquiotibiales */
+  const vI = vent(t, 0.040, 0.660);
+  if (vI > 0){
+    const A = 0.065 * (0.30 + 0.70 * M);
+    const v = A * vI * Math.pow(back, 1.2) *
+              (0.45 + 0.55 * (gauss(dth(th, Math.PI) - 0.50, 0.38) + gauss(dth(th, Math.PI) + 0.50, 0.38)) * 0.6);
+    m += v; pon(v, 13);
+    const centro = 0.028 * D * gauss(dth(th, Math.PI), 0.17) * vent(t, 0.120, 0.600);
+    m -= centro; ao += centro * 8;
+  }
+  /* aductor: cara interna */
+  const vAd = vent(t, -0.05, 0.500);
+  if (vAd > 0){
+    const A = (muj ? 0.070 : 0.055) * (0.30 + 0.50 * M + 0.20 * F);
+    const v = A * vAd * gauss(out + 1.05, 0.60);
+    m += v; pon(v * 0.8, 16);
+  }
+  /* cadera y cartuchera */
+  if (F > 0.02){
+    const cart = (muj ? 0.090 : 0.045) * F * F * vent(t, -0.02, 0.320) * gauss(out - 1.05, 0.70);
+    m += cart;
+  }
+  /* rodilla */
+  const vR = vent(t, 0.640, 0.780);
+  if (vR > 0){
+    m -= 0.055 * vR * (0.4 + 0.6 * D); ao += 0.30 * vR * D;
+    const rotula = 0.070 * vR * front * gauss(dth(th, 0), 0.55) * gauss(t - 0.706, 0.030);
+    m += rotula;
+  }
+  /* gemelos: dos cabezas, la interna más baja y más grande */
+  const vG = vent(t, 0.720, 0.925);
+  if (vG > 0){
+    const A = 0.100 * (0.30 + 0.70 * M);
+    const interna = gauss(out + 0.70, 0.50) * gauss(t - 0.815, 0.075);
+    const externa = gauss(out - 0.70, 0.50) * gauss(t - 0.788, 0.065);
+    const v = A * back * (1.05 * interna + 0.90 * externa);
+    m += v; pon(v, 14);
+    const centro = 0.028 * D * gauss(dth(th, Math.PI), 0.16) * vG;
+    m -= centro; ao += centro * 8;
+  }
+  /* tibia: cresta y tendón de Aquiles */
+  const vT = vent(t, 0.700, 1.000);
+  if (vT > 0){
+    const cresta = 0.028 * vT * gauss(dth(th, 0.18), 0.20);
+    m += cresta * 0.5;
+    const aquiles = 0.035 * vent(t, 0.880, 1.010) * back;
+    m -= aquiles; ao += aquiles * 7;
+    const maleolo = 0.055 * gauss(t - 0.985, 0.030) * (gauss(out - 1, 0.45) + gauss(out + 1, 0.45)) * 0.6;
+    m += maleolo;
+  }
+  if (F > 0.35) m *= (1 - 0.25 * (F - 0.35));
+  return [1 + m, ao, g];
+}
+
+/* =====================================================================
+   5. CONSTRUCCION DE LA MALLA
+   Cada pieza es un tubo generado por barrido: un camino de centros y,
+   en cada punto, un anillo cuyo perímetro se normaliza a tu medida real
+   DESPUES de aplicar el modelado muscular. Así el músculo cambia la
+   forma pero nunca miente sobre la circunferencia.
+   ===================================================================== */
+const CALIDADES = {
+  alta:  { torso:[60, 72], ext:[32, 44], cab:[32, 24], peq:[18, 14] },
+  media: { torso:[48, 56], ext:[26, 34], cab:[26, 20], peq:[16, 12] },
+  baja:  { torso:[38, 42], ext:[22, 28], cab:[20, 16], peq:[14, 10] }
+};
+
+function calidadAuto(){
+  const w = Math.min(window.innerWidth, window.innerHeight);
+  const nc = navigator.hardwareConcurrency || 4;
+  if (w < 380 && nc <= 4) return 'baja';
+  if (w < 820 || nc <= 6) return 'media';
+  return 'alta';
+}
+
+/* interpolación suave sin sobrepasar los valores de los nodos */
+function interpo(niv, t, k){
+  const n = niv.length;
+  if (t <= niv[0].t) return niv[0][k];
+  if (t >= niv[n-1].t) return niv[n-1][k];
+  let i = 0; while (i < n - 2 && niv[i+1].t < t) i++;
+  const p0 = niv[Math.max(0, i-1)], p1 = niv[i], p2 = niv[i+1], p3 = niv[Math.min(n-1, i+2)];
+  const u = (t - p1.t) / (p2.t - p1.t);
+  const v0 = p0[k], v1 = p1[k], v2 = p2[k], v3 = p3[k];
+  const m1 = (v2 - v0) * 0.5, m2 = (v3 - v1) * 0.5;
+  const u2 = u * u, u3 = u2 * u;
+  let v = (2*u3 - 3*u2 + 1) * v1 + (u3 - 2*u2 + u) * m1 +
+          (-2*u3 + 3*u2) * v2 + (u3 - u2) * m2;
+  const lo = Math.min(v1, v2), hi = Math.max(v1, v2);
+  return v < lo ? lo : v > hi ? hi : v;      // sin sobrepasos: nada de bultos falsos
+}
+
+/* construye un anillo de perímetro exacto C */
+function anilloPts(C, r, nRad, mod, arg){
+  const [a, b] = ejesDe(C, r);
+  const px = new Float64Array(nRad), pz = new Float64Array(nRad);
+  const ao = new Float64Array(nRad); const gr = new Uint8Array(nRad);
+  for (let j = 0; j < nRad; j++){
+    const th = j / nRad * Math.PI * 2;      // 0 = frente (+z)
+    let mm = 1, aa = 0, gg = 0;
+    if (mod){ const R = mod(th, arg); mm = R[0]; aa = R[1]; gg = R[2]; }
+    px[j] = Math.sin(th) * a * mm;
+    pz[j] = Math.cos(th) * b * mm;
+    ao[j] = aa; gr[j] = gg;
+  }
+  let P = 0;
+  for (let j = 0; j < nRad; j++){
+    const k = (j + 1) % nRad;
+    P += Math.hypot(px[k] - px[j], pz[k] - pz[j]);
+  }
+  const s = P > 0 ? C / P : 1;
+  for (let j = 0; j < nRad; j++){ px[j] *= s; pz[j] *= s; }
+  return { x:px, z:pz, ao:ao, g:gr };
+}
+
+/* ---------------------------------------------------------------------
+   Definición de las piezas del cuerpo a partir de tus medidas
+   --------------------------------------------------------------------- */
+function piezasCuerpo(A, X){
+  const H = A.alt, sexo = A.sexo, muj = sexo === 'mujer';
+  const P = PROP[sexo];
+  const cue = A.cuello.v, pec = A.pecho.v, cin = A.cintura.v, abd = A.abdomen.v,
+        cad = A.cadera.v, hom = A.hombros.v;
+  const bicI = A.biceps.i, bicD = A.biceps.d, antI = A.antebrazo.i, antD = A.antebrazo.d,
+        musI = A.muslo.i,  musD = A.muslo.d,  panI = A.pantorrilla.i, panD = A.pantorrilla.d,
+        munI = A.muneca.i, munD = A.muneca.d, tobI = A.tobillo.i, tobD = A.tobillo.d;
+
+  const rCad = muj ? 1.55 : 1.42, rAbd = muj ? 1.30 : 1.24, rCin = muj ? 1.28 : 1.32,
+        rPec = muj ? 1.36 : 1.44, rAxi = muj ? 1.50 : 1.58, rAcr = muj ? 1.70 : 1.80;
+
+  // el ancho de hombros sale de tu medida de hombros; el grosor del deltoides,
+  // de tu bíceps. Así las dos medidas mandan sobre lo que les corresponde.
+  const bia = P.biacromial * H;
+  const [aHom] = ejesDe(hom, 2.00);                   // semiancho total con deltoides
+  const anchoTot = Math.max(bia * 1.02, 2 * aHom);
+  const cDelt = (bicI + bicD) / 2 * 1.18;
+  const [aDelt] = ejesDe(cDelt, 0.90);
+  const xHom = Math.max(0.078 * H, Math.min(0.120 * H, anchoTot / 2 - aDelt * 0.92));
+
+  const zc = (yf) => H * ( 0.011 * gauss(yf - 0.618, 0.055)
+                         - 0.009 * gauss(yf - 0.778, 0.062)
+                         + 0.007 * gauss(yf - 0.868, 0.030) );
+
+  /* --- TRONCO --- */
+  const aAcr = Math.min(bia / 2, xHom + aDelt * 0.30);
+  const cAcr = perimElipse(aAcr, aAcr / rAcr);
+  const torso = [
+    { t:0.464, C:cad * 0.42, r:1.02 },
+    { t:0.482, C:cad * 0.84, r:1.26 },
+    { t:0.508, C:cad * 0.975,r:rCad * 0.98 },
+    { t:0.530, C:cad,        r:rCad },
+    { t:0.562, C:cad * 0.55 + abd * 0.45, r:(rCad + rAbd) / 2 },
+    { t:0.593, C:abd,        r:rAbd },
+    { t:0.640, C:cin,        r:rCin },
+    { t:0.700, C:cin + 0.42 * (pec - cin), r:1.30 },
+    { t:P.pecho, C:pec,      r:rPec },
+    { t:P.axila, C:pec * 0.975, r:rAxi },
+    { t:0.818, C:cAcr,       r:rAcr },
+    { t:0.845, C:cAcr * 0.71,r:1.55 },
+    { t:0.868, C:cue * 1.52, r:1.30 },
+    { t:0.890, C:cue * 1.05, r:1.10 },
+    { t:0.910, C:cue * 0.99, r:1.06 }
+  ].map(n => Object.assign(n, { y:n.t * H, x:0, z:zc(n.t) }));
+
+  /* --- BRAZOS --- */
+  const brazo = (lado, bic, ant, mun) => ([
+    { t:0.000, y:0.812, C:cDelt * 0.80, r:0.94, dx:0.92 },
+    { t:0.050, y:0.800, C:cDelt * 0.97, r:0.92, dx:0.98 },
+    { t:0.130, y:0.772, C:cDelt,        r:0.94, dx:1.02 },
+    { t:0.270, y:0.718, C:bic,          r:0.97, dx:1.06 },
+    { t:0.400, y:0.670, C:bic * 0.86,   r:0.98, dx:1.09 },
+    { t:0.490, y:P.codo,C:ant * 1.04,   r:1.08, dx:1.12 },
+    { t:0.570, y:0.600, C:ant,          r:0.98, dx:1.13 },
+    { t:0.720, y:0.536, C:ant * 0.72,   r:0.96, dx:1.14 },
+    { t:0.800, y:P.muneca, C:mun,        r:0.78, dx:1.15 },
+    { t:0.870, y:0.457, C:mun * 1.06,    r:0.60, dx:1.15 },
+    { t:0.940, y:0.427, C:mun * 0.98,    r:0.52, dx:1.16 },
+    { t:1.000, y:0.402, C:mun * 0.40,    r:0.48, dx:1.16 }
+  ]).map(n => Object.assign(n, {
+    y:n.y * H,
+    x:lado * xHom * n.dx,
+    z:H * (0.004 + 0.034 * Math.pow(Math.min(n.t / 0.8, 1), 1.6)) + zc(n.y)
+  }));
+
+  /* --- MANOS --- */
+  const mano = (lado, mun) => ([
+    { t:0.00, y:0.487, C:mun,        r:1.32 },
+    { t:0.28, y:0.456, C:mun * 1.20, r:2.20 },
+    { t:0.62, y:0.428, C:mun * 1.14, r:2.55 },
+    { t:1.00, y:0.392, C:mun * 0.50, r:2.90 }
+  ]).map(n => Object.assign(n, {
+    y:n.y * H, x:lado * xHom * 1.17, z:H * (0.034 + 0.010 * n.t)
+  }));
+
+  /* --- PIERNAS --- */
+  const xCad = (muj ? 0.062 : 0.058) * H, xTob = (muj ? 0.042 : 0.046) * H;
+  const pierna = (lado, mus, pan, tob) => ([
+    { t:0.00, y:0.548, C:mus * 0.80, r:1.00, dx:0.92 },
+    { t:0.08, y:0.500, C:mus * 1.13, r:1.02, dx:0.99 },
+    { t:0.18, y:0.462, C:mus * 1.08, r:1.03, dx:1.00 },
+    { t:0.30, y:0.408, C:mus,        r:1.04, dx:1.00 },
+    { t:0.50, y:0.336, C:mus * 0.84, r:1.05, dx:0.99 },
+    { t:0.70, y:P.rodilla, C:mus * 0.70, r:1.10, dx:0.96 },
+    { t:0.80, y:0.230, C:pan,        r:1.00, dx:0.93 },
+    { t:0.90, y:0.150, C:pan * 0.70, r:0.95, dx:0.90 },
+    { t:1.00, y:0.050, C:tob,        r:1.16, dx:0.88 }
+  ]).map(n => Object.assign(n, {
+    y:n.y * H,
+    x:lado * (xCad + (xTob - xCad) * n.t) * n.dx / 0.92 * 0.92,
+    z:H * (0.006 * gauss(n.t - 0.70, 0.16) - 0.004 * n.t)
+  }));
+
+  /* --- PIES --- */
+  const pie = (lado, tob) => ([
+    { t:0.00, y:0.052, z:-0.034, C:tob * 0.95, r:1.15 },
+    { t:0.24, y:0.030, z:-0.008, C:tob * 1.16, r:1.50 },
+    { t:0.55, y:0.021, z: 0.042, C:tob * 1.08, r:2.00 },
+    { t:0.82, y:0.016, z: 0.090, C:tob * 0.84, r:2.30 },
+    { t:1.00, y:0.013, z: 0.118, C:tob * 0.44, r:2.40 }
+  ]).map(n => Object.assign(n, {
+    y:n.y * H, z:n.z * H + zc(0.05), x:lado * xTob * 0.90
+  }));
+
+  /* --- CABEZA --- */
+  const cab = { cy:0.936 * H, rx:0.045 * H, ry:0.067 * H, rz:0.057 * H, z:zc(0.936) };
+
+  return { torso:torso, cab:cab, xHom:xHom, bia:bia, aDelt:aDelt, H:H,
+    brazos:[ { lado:1,  niv:brazo(1,  bicI, antI, munI) },
+             { lado:-1, niv:brazo(-1, bicD, antD, munD) } ],
+    manos:[  { lado:1,  niv:mano(1,  munI) }, { lado:-1, niv:mano(-1, munD) } ],
+    piernas:[{ lado:1,  niv:pierna(1,  musI, panI, tobI) },
+             { lado:-1, niv:pierna(-1, musD, panD, tobD) } ],
+    pies:[   { lado:1,  niv:pie(1,  tobI) }, { lado:-1, niv:pie(-1, tobD) } ]
+  };
+}
+
+/* ---------------------------------------------------------------------
+   Barrido genérico: convierte un camino de niveles en triángulos
+   --------------------------------------------------------------------- */
+function barrer(niv, nRad, nAnillos, mod, arg, dst, tapaAbajo, tapaArriba){
+  const base = dst.pos.length / 3;
+  const cen = [];
+  for (let i = 0; i < nAnillos; i++){
+    const t = i / (nAnillos - 1);
+    const T = niv[0].t + t * (niv[niv.length-1].t - niv[0].t);
+    cen.push([interpo(niv, T, 'x'), interpo(niv, T, 'y'), interpo(niv, T, 'z'), T]);
+  }
+  for (let i = 0; i < nAnillos; i++){
+    const c = cen[i], T = c[3];
+    const p = cen[Math.max(0, i-1)], q = cen[Math.min(nAnillos-1, i+1)];
+    let tx = q[0]-p[0], ty = q[1]-p[1], tz = q[2]-p[2];
+    let tl = Math.hypot(tx, ty, tz) || 1; tx/=tl; ty/=tl; tz/=tl;
+    // marco local: R = cross(ejeZ, T); si degenera, R = cross(ejeY, T)
+    let rx = -ty, ry = tx, rz = 0;
+    let rl = Math.hypot(rx, ry, rz);
+    if (rl < 0.15){ rx = tz; ry = 0; rz = -tx; rl = Math.hypot(rx, ry, rz) || 1; }
+    rx/=rl; ry/=rl; rz/=rl;
+    const fx = ty*rz - tz*ry, fy = tz*rx - tx*rz, fz = tx*ry - ty*rx;
+    const C = interpo(niv, T, 'C'), r = interpo(niv, T, 'r');
+    const an = anilloPts(C, r, nRad, mod, { t:T, i:i, arg:arg });
+    for (let j = 0; j < nRad; j++){
+      const ax = an.x[j], az = an.z[j];
+      dst.pos.push(c[0] + rx*ax + fx*az, c[1] + ry*ax + fy*az, c[2] + rz*ax + fz*az);
+      dst.ao.push(an.ao[j]); dst.gr.push(an.g[j]);
+    }
+  }
+  for (let i = 0; i < nAnillos - 1; i++){
+    for (let j = 0; j < nRad; j++){
+      const j2 = (j + 1) % nRad;
+      const a = base + i*nRad + j,   b = base + i*nRad + j2;
+      const c = base + (i+1)*nRad + j, d = base + (i+1)*nRad + j2;
+      dst.idx.push(a, c, b, b, c, d);
+    }
+  }
+  // tapas: en cúpula, nunca discos planos (un disco plano se ve como un corte)
+  const domo = (offAnillo, cA, cB, haciaArriba) => {
+    const NC = 3;
+    let tx = cB[0]-cA[0], ty = cB[1]-cA[1], tz = cB[2]-cA[2];
+    const tl = Math.hypot(tx, ty, tz) || 1; tx/=tl; ty/=tl; tz/=tl;
+    // radio medio del anillo para saber cuánto sobresale la cúpula
+    let rad = 0;
+    for (let j = 0; j < nRad; j++){
+      const o = (offAnillo + j) * 3;
+      rad += Math.hypot(dst.pos[o]-cB[0], dst.pos[o+1]-cB[1], dst.pos[o+2]-cB[2]);
+    }
+    rad /= nRad;
+    let prev = offAnillo;
+    for (let s = 1; s <= NC; s++){
+      const ang = (s / (NC + 1)) * Math.PI / 2;
+      const esc = Math.cos(ang), av = Math.sin(ang) * rad * 0.85;
+      const nuevo = dst.pos.length / 3;
+      for (let j = 0; j < nRad; j++){
+        const o = (offAnillo + j) * 3;
+        dst.pos.push(cB[0] + (dst.pos[o]  -cB[0])*esc + tx*av,
+                     cB[1] + (dst.pos[o+1]-cB[1])*esc + ty*av,
+                     cB[2] + (dst.pos[o+2]-cB[2])*esc + tz*av);
+        dst.ao.push(dst.ao[offAnillo + j] * 0.6); dst.gr.push(dst.gr[offAnillo + j]);
+      }
+      for (let j = 0; j < nRad; j++){
+        const j2 = (j+1) % nRad;
+        if (haciaArriba) dst.idx.push(prev+j, nuevo+j, prev+j2, prev+j2, nuevo+j, nuevo+j2);
+        else             dst.idx.push(prev+j, prev+j2, nuevo+j, prev+j2, nuevo+j2, nuevo+j);
+      }
+      prev = nuevo;
+    }
+    const ci = dst.pos.length / 3;
+    dst.pos.push(cB[0] + tx*rad*0.85, cB[1] + ty*rad*0.85, cB[2] + tz*rad*0.85);
+    dst.ao.push(0.2); dst.gr.push(dst.gr[offAnillo]);
+    for (let j = 0; j < nRad; j++){
+      const j2 = (j+1) % nRad;
+      if (haciaArriba) dst.idx.push(prev+j, ci, prev+j2);
+      else             dst.idx.push(prev+j, prev+j2, ci);
+    }
+  };
+  if (tapaAbajo)  domo(base, cen[1], cen[0], false);
+  if (tapaArriba) domo(base + (nAnillos-1)*nRad, cen[nAnillos-2], cen[nAnillos-1], true);
+}
+
+/* cabeza: elipsoide con mandíbula, nariz y orejas — sin cara, es un modelo clínico */
+function barrerCabeza(cab, nRad, nAnillos, dst){
+  const base = dst.pos.length / 3;
+  for (let i = 0; i < nAnillos; i++){
+    const v = i / (nAnillos - 1);
+    const phi = v * Math.PI;                       // 0 arriba
+    const sy = Math.cos(phi), sr = Math.sin(phi);
+    // mandíbula: estrecha abajo; cráneo: ancho arriba
+    const mand = 1 - 0.30 * clamp01((phi - 2.05) / 1.05);
+    const crane = 1 - 0.12 * clamp01((0.55 - phi) / 0.55);
+    for (let j = 0; j < nRad; j++){
+      const th = j / nRad * Math.PI * 2;
+      let mx = 1, mz = 1, ao = 0;
+      const fr = Math.cos(th);
+      // nariz y ceja
+      const nz = 0.16 * gauss(dth(th, 0), 0.20) * gauss(phi - 1.62, 0.16);
+      const ceja = 0.05 * gauss(dth(th, 0), 0.55) * gauss(phi - 1.28, 0.10);
+      // orejas
+      const or = 0.10 * (gauss(dth(th, 1.62), 0.16) + gauss(dth(th, -1.62), 0.16)) * gauss(phi - 1.62, 0.20);
+      const cuenca = 0.05 * (gauss(dth(th, 0.42), 0.16) + gauss(dth(th, -0.42), 0.16)) * gauss(phi - 1.42, 0.11);
+      ao += cuenca * 8;
+      const k = 1 + nz + ceja + or - cuenca;
+      const x = Math.sin(th) * cab.rx * sr * mand * crane * k;
+      const z = Math.cos(th) * cab.rz * sr * mand * k;
+      const y = cab.cy + sy * cab.ry;
+      dst.pos.push(x, y, cab.z + z); dst.ao.push(ao); dst.gr.push(0);
+    }
+  }
+  for (let i = 0; i < nAnillos - 1; i++){
+    for (let j = 0; j < nRad; j++){
+      const j2 = (j + 1) % nRad;
+      const a = base + i*nRad + j, b = base + i*nRad + j2;
+      const c = base + (i+1)*nRad + j, d = base + (i+1)*nRad + j2;
+      dst.idx.push(a, c, b, b, c, d);
+    }
+  }
+}
+
+/* ---------------------------------------------------------------------
+   Geometría completa
+   --------------------------------------------------------------------- */
+function construirGeo(A, comp, calidad){
+  const Q = CALIDADES[calidad] || CALIDADES.media;
+  const X = estadoFisico(comp);
+  const Z = piezasCuerpo(A, X);
+  const dst = { pos:[], idx:[], ao:[], gr:[] };
+
+  barrer(Z.torso, Q.torso[0], Q.torso[1],
+         (th, a) => modTorso(a.t, th, X), null, dst, true, true);
+
+  Z.brazos.forEach(b => barrer(b.niv, Q.ext[0], Q.ext[1],
+         (th, a) => modBrazo(a.t, th, X, b.lado), null, dst, true, true));
+  Z.piernas.forEach(p => barrer(p.niv, Q.ext[0], Q.ext[1],
+         (th, a) => modPierna(a.t, th, X, p.lado), null, dst, true, true));
+  Z.pies.forEach(p => barrer(p.niv, Q.peq[0], Q.peq[1], null, null, dst, true, true));
+  barrerCabeza(Z.cab, Q.cab[0], Q.cab[1], dst);
+
+  const g = new THREE.BufferGeometry();
+  g.setAttribute('position', new THREE.BufferAttribute(new Float32Array(dst.pos), 3));
+  g.setIndex(dst.idx.length > 65000 ? new THREE.BufferAttribute(new Uint32Array(dst.idx), 1)
+                                    : new THREE.BufferAttribute(new Uint16Array(dst.idx), 1));
+  g.userData.ao = new Float32Array(dst.ao);
+  g.userData.gr = new Uint8Array(dst.gr);
+  g.userData.alt = A.alt;
+  g.computeVertexNormals();
+  g.computeBoundingBox();
+  return g;
+}
+
+/* suaviza el color entre vértices vecinos: quita el escalonado de los
+   bordes entre músculos sin tocar la geometría */
+function suavizarColor(g, pasos){
+  const n = g.attributes.position.count, idx = g.index.array;
+  const col = g.attributes.color.array;
+  if (!g.userData.vec){
+    const vec = new Array(n); for (let i = 0; i < n; i++) vec[i] = [];
+    for (let k = 0; k < idx.length; k += 3){
+      const a = idx[k], b = idx[k+1], c = idx[k+2];
+      vec[a].push(b, c); vec[b].push(a, c); vec[c].push(a, b);
+    }
+    g.userData.vec = vec;
+  }
+  const vec = g.userData.vec;
+  for (let p = 0; p < (pasos || 1); p++){
+    const cp = col.slice();
+    for (let i = 0; i < n; i++){
+      const v = vec[i]; if (!v.length) continue;
+      let r = cp[i*3] * 1.2, gg = cp[i*3+1] * 1.2, bb = cp[i*3+2] * 1.2, w = 1.2;
+      for (let j = 0; j < v.length; j++){
+        const o = v[j] * 3; r += cp[o]; gg += cp[o+1]; bb += cp[o+2]; w++;
+      }
+      col[i*3] = r / w; col[i*3+1] = gg / w; col[i*3+2] = bb / w;
+    }
+  }
+  g.attributes.color.needsUpdate = true;
+}
+
+/* color por vértice según la capa elegida */
+function pintarVertices(g, capa, comp, tono){
+  const n = g.attributes.position.count;
+  const ao = g.userData.ao, gr = g.userData.gr;
+  const col = g.attributes.color ? g.attributes.color.array : new Float32Array(n * 3);
+  const TONOS = { clinico:[0.80,0.76,0.72], calido:[0.86,0.68,0.55],
+                  oscuro:[0.46,0.33,0.25], marmol:[0.90,0.89,0.87] };
+  const bse = TONOS[tono] || TONOS.clinico;
+  const pos = g.attributes.position.array;
+  const nor = g.attributes.normal ? g.attributes.normal.array : null;
+  const alt = g.userData.alt || 175;
+  const grasaN = clamp01((comp.grasa - (comp.sexo === 'hombre' ? 7 : 15)) / 24);
+  for (let i = 0; i < n; i++){
+    const s = Math.max(0.42, 1 - Math.min(0.58, ao[i] * 0.55));
+    let c;
+    if (capa === 'musculo'){
+      c = PAL3D[GRUPOS3D[gr[i]]] || PAL3D.neutro;
+      const s2 = Math.max(0.34, 1 - Math.min(0.66, ao[i] * 0.95));
+      col[i*3] = c[0] * s2; col[i*3+1] = c[1] * s2; col[i*3+2] = c[2] * s2;
+      continue;
+    } else if (capa === 'grasa'){
+      const yf = pos[i*3+1] / alt;
+      const frente = nor ? Math.max(0, nor[i*3+2]) : 0.5;
+      // el mapa sigue el patrón real de depósito de tu sexo:
+      // androide (abdomen) en el hombre, ginoide (cadera y muslo) en la mujer
+      const zonaF = comp.sexo === 'hombre'
+        ? (vent(yf, 0.52, 0.71) * (0.55 + 0.65 * frente) + vent(yf, 0.43, 0.57) * 0.40)
+        : (vent(yf, 0.38, 0.57) * 0.95 + vent(yf, 0.52, 0.69) * (0.35 + 0.45 * frente));
+      const q = clamp01(grasaN * (0.22 + 1.15 * zonaF));
+      c = [0.16 + 0.86 * q, 0.58 - 0.36 * q, 0.92 - 0.78 * q];
+      col[i*3] = c[0] * s; col[i*3+1] = c[1] * s; col[i*3+2] = c[2] * s;
+      continue;
+    } else {
+      c = bse;
+    }
+    col[i*3] = c[0] * s; col[i*3+1] = c[1] * s; col[i*3+2] = c[2] * s;
+  }
+  if (!g.attributes.color) g.setAttribute('color', new THREE.BufferAttribute(col, 3));
+  else g.attributes.color.needsUpdate = true;
+  if (capa !== 'piel') suavizarColor(g, 1);
+  return g;
+}
+
+/* =====================================================================
+   6. ESCENA: iluminación de tres puntos, entorno HDR y sombras
+   ===================================================================== */
+function entornoHDR(ren){
+  // entorno generado por código: cielo, horizonte y suelo. Da los
+  // reflejos suaves que hacen que la piel no parezca plástico.
+  const c = document.createElement('canvas'); c.width = 256; c.height = 128;
+  const g = c.getContext('2d');
+  const gr = g.createLinearGradient(0, 0, 0, 128);
+  gr.addColorStop(0.00, '#eef2f7');
+  gr.addColorStop(0.42, '#cfd7e2');
+  gr.addColorStop(0.52, '#8d95a1');
+  gr.addColorStop(1.00, '#2c3038');
+  g.fillStyle = gr; g.fillRect(0, 0, 256, 128);
+  // dos "ventanas" de luz para tener reflejos direccionales
+  g.globalAlpha = 0.85; g.fillStyle = '#ffffff';
+  g.beginPath(); g.ellipse(70, 34, 40, 20, 0, 0, 6.3); g.fill();
+  g.globalAlpha = 0.45;
+  g.beginPath(); g.ellipse(196, 46, 34, 16, 0, 0, 6.3); g.fill();
+  const tex = new THREE.CanvasTexture(c);
+  tex.mapping = THREE.EquirectangularReflectionMapping;
+  tex.colorSpace = THREE.SRGBColorSpace;
+  const pm = new THREE.PMREMGenerator(ren);
+  const env = pm.fromEquirectangular(tex).texture;
+  pm.dispose(); tex.dispose();
+  return env;
+}
+
+function crearEscena(cont){
+  const ren = new THREE.WebGLRenderer({ antialias:true, alpha:true, powerPreference:'high-performance' });
+  ren.setPixelRatio(Math.min(window.devicePixelRatio || 1, BODY.calidad === 'baja' ? 1.25 : 2));
+  ren.setSize(cont.clientWidth, cont.clientHeight, false);
+  ren.shadowMap.enabled = true;
+  ren.shadowMap.type = THREE.PCFSoftShadowMap;
+  ren.toneMapping = THREE.ACESFilmicToneMapping;
+  ren.toneMappingExposure = 1.02;
+  if ('outputColorSpace' in ren) ren.outputColorSpace = THREE.SRGBColorSpace;
+  cont.innerHTML = ''; cont.appendChild(ren.domElement);
+  ren.domElement.style.width = '100%'; ren.domElement.style.height = '100%';
+  ren.domElement.style.display = 'block'; ren.domElement.style.touchAction = 'none';
+
+  const esc = new THREE.Scene();
+  esc.environment = entornoHDR(ren);
+
+  const cam = new THREE.PerspectiveCamera(32, cont.clientWidth / Math.max(1, cont.clientHeight), 0.1, 60);
+
+  // luz principal
+  const key = new THREE.DirectionalLight(0xfff4e8, 2.5);
+  key.position.set(2.4, 3.6, 3.0);
+  key.castShadow = true;
+  key.shadow.mapSize.set(BODY.calidad === 'baja' ? 512 : 1024, BODY.calidad === 'baja' ? 512 : 1024);
+  key.shadow.camera.near = 0.5; key.shadow.camera.far = 14;
+  key.shadow.camera.left = -2.2; key.shadow.camera.right = 2.2;
+  key.shadow.camera.top = 3.0;  key.shadow.camera.bottom = -0.6;
+  key.shadow.bias = -0.0016; key.shadow.normalBias = 0.02;
+  esc.add(key);
+  // relleno frío por el lado opuesto
+  const fill = new THREE.DirectionalLight(0xc8dcff, 0.85);
+  fill.position.set(-3.0, 1.4, 1.6); esc.add(fill);
+  // contraluz en el color de la marca: separa la silueta del fondo
+  const rim = new THREE.DirectionalLight(0xff8a3d, 1.35);
+  rim.position.set(-1.2, 2.2, -3.4); esc.add(rim);
+  esc.add(new THREE.HemisphereLight(0xdfe8f5, 0x2a2622, 0.55));
+
+  // suelo: solo recibe sombra, no se ve
+  const piso = new THREE.Mesh(new THREE.CircleGeometry(3.2, 48),
+                              new THREE.ShadowMaterial({ opacity:0.34 }));
+  piso.rotation.x = -Math.PI / 2; piso.position.y = 0; piso.receiveShadow = true;
+  esc.add(piso);
+
+  BODY.ren = ren; BODY.esc = esc; BODY.cam = cam; BODY.luzDir = key; BODY.piso = piso;
+  return true;
+}
+
+function materialCuerpo(capa){
+  return new THREE.MeshStandardMaterial({
+    vertexColors:true,
+    roughness: capa === 'piel' ? 0.62 : 0.80,
+    metalness: 0.03,
+    envMapIntensity: capa === 'piel' ? 0.85 : 0.30,
+    flatShading:false
+  });
+}
+
+function ponerMalla(geo){
+  const esc = BODY.esc;
+  if (BODY.malla){ esc.remove(BODY.malla); BODY.malla.geometry.dispose(); BODY.malla.material.dispose(); }
+  const m = new THREE.Mesh(geo, materialCuerpo(BODY.capa));
+  m.castShadow = true; m.receiveShadow = true;
+  m.scale.setScalar(0.01);                    // el modelo está en centímetros
+  esc.add(m); BODY.malla = m;
+  encuadrar();
+}
+
+function ponerFantasma(geo){
+  const esc = BODY.esc;
+  if (BODY.mallaG){ esc.remove(BODY.mallaG); BODY.mallaG.geometry.dispose(); BODY.mallaG.material.dispose(); BODY.mallaG = null; }
+  if (!geo) return;
+  const mat = new THREE.MeshStandardMaterial({
+    color:0x9aa6b8, roughness:0.70, metalness:0.0, transparent:true, opacity:0.55,
+    depthWrite:false, side:THREE.DoubleSide });
+  const m = new THREE.Mesh(geo, mat);
+  m.scale.setScalar(0.01);
+  esc.add(m); BODY.mallaG = m;
+}
+
+function encuadrar(margen){
+  const g = BODY.malla && BODY.malla.geometry;
+  if (!g){ return; }
+  if (!g.boundingBox) g.computeBoundingBox();
+  const bb = g.boundingBox, e = BODY.malla.scale.x;
+  const alto = (bb.max.y - bb.min.y) * e, ancho = (bb.max.x - bb.min.x) * e;
+  const cy = (bb.max.y + bb.min.y) / 2 * e;
+  const fov = BODY.cam.fov * Math.PI / 180;
+  const aspecto = BODY.cam.aspect || 1;
+  const dV = (alto / 2) / Math.tan(fov / 2);
+  const dH = (ancho / 2) / Math.tan(fov / 2) / aspecto;
+  BODY.obj = new THREE.Vector3(0, cy, 0);
+  BODY.dist = Math.max(dV, dH) * (margen || 1.16);
+  colocarCamara();
+}
+
+function colocarCamara(){
+  const c = BODY.cam, o = BODY.obj || new THREE.Vector3(0, 0.9, 0);
+  const d = BODY.dist, e = BODY.el, a = BODY.az;
+  c.position.set(o.x + d * Math.cos(e) * Math.sin(a),
+                 o.y + d * Math.sin(e),
+                 o.z + d * Math.cos(e) * Math.cos(a));
+  c.lookAt(o);
+  pedirRender();
+}
+
+function pedirRender(){
+  BODY.sucio = true;
+  if (BODY.raf) return;
+  BODY.raf = requestAnimationFrame(bucle);
+}
+
+function bucle(ts){
+  BODY.raf = null;
+  if (!BODY.ren) return;
+  if (BODY.animando){
+    const t = Math.min(1, (ts - BODY.t0) / BODY.animDur);
+    const e = t < 0.5 ? 4*t*t*t : 1 - Math.pow(-2*t + 2, 3) / 2;   // suave a los dos lados
+    const v = BODY.animIda ? e : 1 - e;
+    aplicarMezcla(v);
+    const sl = $('#avMezcla'); if (sl) sl.value = Math.round(v * 100);
+    if (t >= 1){ BODY.animando = 0; }
+    BODY.sucio = true;
+  }
+  if (BODY.sucio){ BODY.ren.render(BODY.esc, BODY.cam); BODY.sucio = false; }
+  if (BODY.animando) BODY.raf = requestAnimationFrame(bucle);
+}
+
+/* mezcla entre la geometría de hoy (0) y la proyectada (1) */
+function aplicarMezcla(v){
+  const g = BODY.malla && BODY.malla.geometry;
+  if (!g || !BODY.geoA || !BODY.geoB) return;
+  const a = BODY.geoA, b = BODY.geoB, p = g.attributes.position.array;
+  for (let i = 0; i < p.length; i++) p[i] = a[i] + (b[i] - a[i]) * v;
+  g.attributes.position.needsUpdate = true;
+  g.computeVertexNormals();
+  BODY.mezcla = v;
+}
+
+/* ---------- control de cámara propio: arrastrar, rueda y pellizco ---------- */
+function controlCamara(el){
+  let act = false, px = 0, py = 0, pinch = 0;
+  const tocar = (e) => Array.from(e.touches || []);
+  el.addEventListener('pointerdown', (e) => {
+    if (e.pointerType === 'touch') return;
+    act = true; px = e.clientX; py = e.clientY; el.setPointerCapture(e.pointerId);
+  });
+  el.addEventListener('pointermove', (e) => {
+    if (!act) return;
+    BODY.az -= (e.clientX - px) * 0.0088;
+    BODY.el = Math.max(-0.85, Math.min(1.05, BODY.el + (e.clientY - py) * 0.0060));
+    px = e.clientX; py = e.clientY; colocarCamara();
+  });
+  const fin = () => { act = false; };
+  el.addEventListener('pointerup', fin); el.addEventListener('pointercancel', fin);
+  el.addEventListener('wheel', (e) => {
+    e.preventDefault();
+    BODY.dist = Math.max(1.0, Math.min(9, BODY.dist * (1 + Math.sign(e.deltaY) * 0.09)));
+    colocarCamara();
+  }, { passive:false });
+  el.addEventListener('touchstart', (e) => {
+    const t = tocar(e);
+    if (t.length === 1){ act = true; px = t[0].clientX; py = t[0].clientY; }
+    if (t.length === 2){ act = false; pinch = Math.hypot(t[0].clientX - t[1].clientX, t[0].clientY - t[1].clientY); }
+  }, { passive:true });
+  el.addEventListener('touchmove', (e) => {
+    const t = tocar(e);
+    if (t.length === 1 && act){
+      e.preventDefault();
+      BODY.az -= (t[0].clientX - px) * 0.0100;
+      BODY.el = Math.max(-0.85, Math.min(1.05, BODY.el + (t[0].clientY - py) * 0.0070));
+      px = t[0].clientX; py = t[0].clientY; colocarCamara();
+    } else if (t.length === 2 && pinch){
+      e.preventDefault();
+      const d = Math.hypot(t[0].clientX - t[1].clientX, t[0].clientY - t[1].clientY);
+      BODY.dist = Math.max(1.0, Math.min(9, BODY.dist * pinch / Math.max(1, d)));
+      pinch = d; colocarCamara();
+    }
+  }, { passive:false });
+  el.addEventListener('touchend', () => { act = false; pinch = 0; }, { passive:true });
+}
+
+/* =====================================================================
+   7. PANTALLA DEL GEMELO DIGITAL
+   ===================================================================== */
+const AV = { dias:0, capa:'piel', tono:'clinico', mezcla:0, comp:null, ant:null, pro:null, iniciado:false };
+const HORIZ = [0, 30, 90, 180];
+
+function avDatosListos(){
+  const p = S.perfil || {};
+  return !!(p.sexo && p.peso_kg && p.estatura_cm && p.fecha_nacimiento);
+}
+
+async function abrirAvatar(){
+  if (!C.cargado) await cargarCuerpo();
+  pintarAvatar(); avCalcular();
+  if (!avDatosListos()){
+    const c = $('#avLienzo');
+    if (c && !BODY.listo) c.innerHTML = '<div class="av-carga"><div style="font-weight:650">Todavía no sé cómo eres</div>' +
+      '<div class="muted" style="text-align:center;max-width:280px">Con tu sexo, fecha de nacimiento, estatura y peso ' +
+      'te construyo el modelo. Las medidas lo afinan después.</div></div>';
+    return;
+  }
+  if (BODY.fallo) return;
+  if (!BODY.listo && !BODY.cargando){
+    BODY.cargando = true;
+    const cont = $('#avLienzo');
+    cont.innerHTML = '<div class="av-carga"><div class="av-spin"></div><div>Montando tu modelo…</div></div>';
+    const ok3 = await cargarThree();
+    BODY.cargando = false;
+    if (!ok3 || !window.THREE){
+      BODY.fallo = true;
+      cont.innerHTML = '<div class="av-carga"><div style="font-weight:650">No pude cargar el motor 3D</div>' +
+        '<div class="muted" style="text-align:center;max-width:280px">Revisa tu conexión y vuelve a entrar. ' +
+        'Mientras tanto, en <b>Mis medidas</b> tienes el cuerpo en 2D con todo lo demás.</div></div>';
+      return;
+    }
+    BODY.calidad = (S.perfil && S.perfil.avatar_calidad && S.perfil.avatar_calidad !== 'auto')
+                   ? S.perfil.avatar_calidad : calidadAuto();
+    try{
+      crearEscena(cont);
+      controlCamara(BODY.ren.domElement);
+      BODY.listo = true;
+      if (window.ResizeObserver && !BODY.ro){
+        BODY.ro = new ResizeObserver(() => {
+          if (!BODY.ren) return;
+          const c = $('#avLienzo');
+          if (!c || !c.clientWidth) return;
+          BODY.ren.setSize(c.clientWidth, c.clientHeight, false);
+          BODY.cam.aspect = c.clientWidth / Math.max(1, c.clientHeight);
+          BODY.cam.updateProjectionMatrix();
+          if (BODY.malla) encuadrar(AV.comparar ? 1.42 : undefined); else pedirRender();
+        });
+        BODY.ro.observe(cont);
+      }
+    } catch(e){
+      console.error(e); BODY.fallo = true;
+      cont.innerHTML = '<div class="av-carga"><div style="font-weight:650">Tu navegador no tiene WebGL disponible</div>' +
+        '<div class="muted" style="text-align:center;max-width:280px">El resto de la app funciona igual. ' +
+        'En <b>Mis medidas</b> tienes el cuerpo en 2D.</div></div>';
+      return;
+    }
+  }
+  if (BODY.listo) avConstruir();
+}
+
+/* los números no dependen del 3D: se calculan y se pintan aunque el
+   motor no haya cargado o falte WebGL */
+function avCalcular(){
+  const p = S.perfil;
+  if (!avDatosListos()){
+    AV.ant = null; AV.comp = null; AV.pro = null;
+  } else {
+    const A = antropometria(p, C.medidas);
+    const comp = composicion(p, C.medidas, A);
+    AV.ant = A; AV.comp = comp;
+    AV.pro = (comp && AV.dias) ? proyectar(p, comp, A, AV.dias) : null;
+  }
+  pintarComposicion(); pintarSimetria(); pintarProyeccion();
+  return !!AV.comp;
+}
+
+function avConstruir(){
+  const hay = avCalcular();
+  if (!BODY.listo || !hay) return;
+  const A = AV.ant, comp = AV.comp;
+
+  const gA = construirGeo(A, comp, BODY.calidad);
+  BODY.geoA = gA.attributes.position.array.slice();
+  if (AV.pro && AV.pro.comp){
+    const gB = construirGeo(AV.pro.ant, AV.pro.comp, BODY.calidad);
+    BODY.geoB = gB.attributes.position.array.slice();
+    gB.dispose();
+  } else { BODY.geoB = null; }
+
+  pintarVertices(gA, AV.capa, comp, AV.tono);
+  ponerMalla(gA);
+  if (BODY.geoB) aplicarMezcla(AV.mezcla);
+  pedirRender();
+}
+
+const NOM_ZONA = { cuello:'Cuello', pecho:'Pecho', cintura:'Cintura', abdomen:'Abdomen',
+                   cadera:'Cadera y glúteo', biceps:'Bíceps', antebrazo:'Antebrazo',
+                   muslo:'Muslo', pantorrilla:'Pantorrilla', hombros:'Hombros',
+                   muneca:'Muñeca', tobillo:'Tobillo' };
+
+/* ---------- composición ---------- */
+function barraRango(v, lo, hi, min, max, color){
+  const q = (x) => Math.max(0, Math.min(100, 100 * (x - min) / (max - min)));
+  return '<div class="av-barra"><div class="av-ok" style="left:' + q(lo).toFixed(1) + '%;width:' +
+    (q(hi) - q(lo)).toFixed(1) + '%"></div>' +
+    '<div class="av-marca" style="left:' + q(v).toFixed(1) + '%;background:' + color + '"></div></div>';
+}
+
+function pintarComposicion(){
+  const c = $('#avComp'); if (!c) return;
+  const p = S.perfil || {};
+  if (!avDatosListos()){
+    c.innerHTML = '<p class="muted">Necesito tu sexo, fecha de nacimiento, estatura y peso. ' +
+      'Sin eso no hay nada que calcular, y prefiero no inventarlo.</p>' +
+      '<button class="pri" id="avPerfil" style="margin-top:10px">Cargar mis datos</button>';
+    const b = $('#avPerfil'); if (b) b.onclick = abrirPerfil;
+    return;
+  }
+  const k = AV.comp; if (!k) return;
+  const [lo, hi] = rangoGrasa(k.sexo, k.edad);
+  const colG = k.grasa < lo ? 'var(--oro)' : k.grasa <= hi ? 'var(--ok)' : 'var(--bad)';
+  const est = AV.ant.faltan.length;
+
+  const fila = (n, v, f) =>
+    '<div class="av-fila"><div><div class="av-n">' + n + '</div>' +
+    '<div class="av-f">' + esc(f) + '</div></div><div class="av-v">' + v + '</div></div>';
+
+  c.innerHTML =
+    '<div class="av-grasa">' +
+      '<div class="row" style="justify-content:space-between;align-items:baseline">' +
+        '<div><div class="l">Grasa corporal</div>' +
+        '<div style="font-size:30px;font-weight:750;line-height:1.1">' + k.grasa.toFixed(1).replace('.',',') + '%</div></div>' +
+        '<div style="text-align:right"><div class="l">Sano para ti</div>' +
+        '<div style="font-weight:650">' + lo + '% – ' + hi + '%</div></div>' +
+      '</div>' +
+      barraRango(k.grasa, lo, hi, Math.min(3, lo - 6), Math.max(45, hi + 12), colG) +
+      '<div class="av-f" style="margin-top:6px">' + esc(k.fuente.grasa) + '</div>' +
+    '</div>' +
+    fila('Masa grasa',      k.grasaKg.toFixed(1).replace('.',',') + ' kg', 'peso × % de grasa') +
+    fila('Masa magra',      k.magraKg.toFixed(1).replace('.',',') + ' kg', 'todo lo que no es grasa') +
+    fila('Músculo esquelético', k.musculoKg.toFixed(1).replace('.',',') + ' kg', k.fuente.musculo) +
+    fila('Masa ósea',       k.huesoKg.toFixed(1).replace('.',',') + ' kg', k.fuente.hueso) +
+    fila('Agua corporal',   k.aguaL.toFixed(1).replace('.',',') + ' L (' + k.aguaPct.toFixed(0) + '%)', k.fuente.agua) +
+    fila('IMC',             k.imc.toFixed(1).replace('.',','), 'peso ÷ estatura²  ·  no distingue músculo de grasa') +
+    fila('Índice de masa magra (FFMI)', k.ffmi.toFixed(1).replace('.',','),
+         'cuánto músculo tienes para tu estatura' + (k.sexo === 'hombre' ? ' · 22 es el techo natural' : ' · 19 es el techo natural')) +
+    fila('Metabolismo basal', k.tmb + ' kcal', 'Mifflin-St Jeor') +
+    '<div class="av-fila"><div><div class="av-n">Grasa visceral</div>' +
+      '<div class="av-f">' + esc(k.fuente.visceral) + '</div></div>' +
+      '<div class="av-v"><span class="tag ' + k.visceral.c + '">' + k.visceral.n + '</span></div></div>' +
+    (est ? '<p class="muted" style="margin:12px 0 0;font-size:13px">' +
+      est + (est === 1 ? ' medida está estimada' : ' medidas están estimadas') +
+      ' a partir de tu peso y estatura: ' +
+      AV.ant.faltan.map(x => esc((NOM_ZONA[x] || x).toLowerCase())).join(', ') +
+      '. Mídelas y el gemelo deja de aproximar.</p>' : '');
+}
+
+/* ---------- simetría ---------- */
+const PARES_SIM = [['biceps','Bíceps'], ['antebrazo','Antebrazo'], ['muslo','Muslo'], ['pantorrilla','Pantorrilla']];
+function pintarSimetria(){
+  const c = $('#avSim'); if (!c) return;
+  const A = AV.ant; if (!A){ c.innerHTML = ''; return; }
+  const filas = PARES_SIM.filter(([k]) => A[k] && A[k].real).map(([k, n]) => {
+    const i = A[k].i, d = A[k].d, med = (i + d) / 2;
+    const dif = Math.abs(i - d), pct = med > 0 ? 100 * dif / med : 0;
+    const est = pct < 2 ? ['Simétrico', 'ok'] : pct < 4 ? ['Leve', 'ok']
+              : pct < 7 ? ['Revisar', 'oro'] : ['Desequilibrio', 'bad'];
+    return '<div class="av-fila"><div><div class="av-n">' + n + '</div>' +
+      '<div class="av-f">Izq ' + i.toFixed(1).replace('.',',') + ' · Der ' + d.toFixed(1).replace('.',',') +
+      ' cm — ' + dif.toFixed(1).replace('.',',') + ' cm (' + pct.toFixed(1).replace('.',',') + '%)</div></div>' +
+      '<div class="av-v"><span class="tag ' + est[1] + '">' + est[0] + '</span></div></div>';
+  });
+  if (!filas.length){
+    c.innerHTML = '<p class="muted">Mide los dos lados de brazo, antebrazo, muslo y pantorrilla y aquí te digo ' +
+      'si estás compensando con un lado.</p>';
+    return;
+  }
+  const peor = PARES_SIM.filter(([k]) => A[k] && A[k].real)
+    .map(([k, n]) => ({ n:n, pct: 100 * Math.abs(A[k].i - A[k].d) / ((A[k].i + A[k].d) / 2) }))
+    .sort((a, b) => b.pct - a.pct)[0];
+  c.innerHTML = filas.join('') +
+    (peor && peor.pct >= 4
+      ? '<p class="muted" style="margin:12px 0 0;font-size:13px">Tu mayor diferencia está en ' +
+        esc(peor.n.toLowerCase()) + '. Empieza las series por el lado flojo y haz las mismas repeticiones ' +
+        'con el fuerte, no más. Con mancuerna o polea, nunca con barra, que la barra deja que el lado bueno tape al malo.</p>'
+      : '<p class="muted" style="margin:12px 0 0;font-size:13px">Hasta un 3% de diferencia entre lados es normal ' +
+        'y no hay que corregir nada.</p>');
+}
+
+/* ---------- proyección ---------- */
+
+function pintarProyeccion(){
+  const c = $('#avProy'); if (!c) return;
+  if (!AV.dias || !AV.pro || !AV.pro.comp){
+    c.innerHTML = '<p class="muted">Elige 30, 90 o 180 días arriba y aquí aparece el antes y el después, ' +
+      'zona por zona y en centímetros.</p>';
+    return;
+  }
+  const P = AV.pro, a = AV.comp, b = P.comp;
+  const sg = (x, u, d) => (x >= 0 ? '+' : '−') + Math.abs(x).toFixed(d == null ? 1 : d).replace('.',',') + (u || '');
+  const perdiendo = P.dPeso < -0.05;
+  // en la cintura y el abdomen bajar es ganar; en el resto, encoger mientras
+  // pierdes grasa no es malo, así que no lo pinto de rojo
+  const cl = (x, z) => {
+    if (Math.abs(x) < 0.05) return '';
+    const inverso = (z === 'cintura' || z === 'abdomen');
+    if (inverso) return x < 0 ? 'sube' : 'baja';
+    if (x > 0) return 'sube';
+    return perdiendo ? '' : 'baja';
+  };
+
+  const zonas = Object.keys(P.cambio).filter(z => NOM_ZONA[z] && Math.abs(P.cambio[z]) >= 0.05)
+    .sort((x, y) => Math.abs(P.cambio[y]) - Math.abs(P.cambio[x]));
+
+  c.innerHTML =
+    '<div class="grid g3" style="gap:8px">' +
+      '<div class="stat"><div class="l">Peso</div><div class="av-big">' + b.peso.toFixed(1).replace('.',',') + '</div>' +
+        '<div class="av-f">kg · ' + sg(P.dPeso) + '</div></div>' +
+      '<div class="stat"><div class="l">Grasa</div><div class="av-big">' + b.grasa.toFixed(1).replace('.',',') + '%</div>' +
+        '<div class="av-f">' + sg(P.dGrasa) + ' kg</div></div>' +
+      '<div class="stat"><div class="l">Músculo</div><div class="av-big">' + b.musculoKg.toFixed(1).replace('.',',') + '</div>' +
+        '<div class="av-f">kg · ' + sg(P.dMus, '', 2) + '</div></div>' +
+    '</div>' +
+    '<div style="margin-top:14px">' + zonas.map(z =>
+      '<div class="av-fila"><div><div class="av-n">' + NOM_ZONA[z] + '</div>' +
+      '<div class="av-f">' + AV.ant[z].v.toFixed(1).replace('.',',') + ' → ' +
+        P.ant[z].v.toFixed(1).replace('.',',') + ' cm</div></div>' +
+      '<div class="av-v ' + cl(P.cambio[z], z) + '">' +
+        sg(P.cambio[z], ' cm') + '</div></div>').join('') + '</div>' +
+    '<p class="muted" style="margin:14px 0 0;font-size:13px">' +
+      'Esto no es una promesa: es lo que da tu propio plan si lo cumples. Supone ' +
+      (P.ritmo === 0 ? 'que mantienes tu peso' :
+        (P.ritmo < 0 ? 'bajar' : 'subir') + ' ' + Math.abs(P.ritmo).toFixed(2).replace('.',',') + ' kg por semana') +
+      ', ' + (P.entrena ? 'entrenar ' + (S.perfil.dias_entreno_semana || 4) + ' días por semana' : 'sin entrenar') +
+      ' y un techo de ganancia muscular de ' + P.techo.toFixed(2).replace('.',',') + ' kg por semana, que es el ' +
+      'máximo real para tu sexo y tu experiencia. El reparto de centímetros sigue el patrón de depósito de grasa ' +
+      'de tu sexo, por eso ' + (AV.comp.sexo === 'hombre' ? 'el abdomen se mueve antes que el gemelo' :
+                                'la cadera y el muslo se mueven antes que el brazo') + '.</p>';
+}
+
+/* ---------- pintado de los controles y del panel de báscula ---------- */
+function pintarAvatar(){
+  $$('#avHoriz button').forEach(b => b.classList.toggle('on', Number(b.dataset.d) === AV.dias));
+  $$('#avCapa button').forEach(b => b.classList.toggle('on', b.dataset.c === AV.capa));
+  const m = $('#avMorph');
+  if (m) m.classList.toggle('hidden', !AV.dias);
+  const et = $('#avEtiqueta');
+  if (et) et.textContent = AV.comparar ? 'Izquierda: hoy · Derecha: en ' + AV.dias + ' días'
+    : !AV.dias ? 'Hoy'
+    : (AV.mezcla < 0.02 ? 'Hoy' : AV.mezcla > 0.98 ? 'En ' + AV.dias + ' días'
+       : 'Día ' + Math.round(AV.mezcla * AV.dias));
+  const sl0 = $('#avMezcla'); if (sl0) sl0.disabled = !!AV.comparar;
+  const ley = $('#avLeyenda');
+  if (ley){
+    if (AV.capa === 'musculo'){
+      const gs = [['pecho','Pectoral'], ['deltoides','Deltoides'], ['biceps','Bíceps'], ['triceps','Tríceps'],
+                  ['antebrazo','Antebrazo'], ['abdomen','Abdomen'], ['oblicuo','Oblicuo'], ['dorsal','Dorsal'],
+                  ['trapecio','Trapecio'], ['lumbar','Lumbar'], ['gluteo','Glúteo'], ['cuadriceps','Cuádriceps'],
+                  ['isquios','Isquios'], ['gemelo','Gemelo']];
+      ley.innerHTML = gs.map(([k, n]) => {
+        const c = PAL3D[k].map(x => Math.round(Math.min(1, x) * 255)).join(',');
+        return '<span style="display:inline-flex;align-items:center;gap:5px;margin:0 10px 4px 0">' +
+          '<i style="width:11px;height:11px;border-radius:3px;background:rgb(' + c + ');display:inline-block"></i>' + n + '</span>';
+      }).join('');
+    } else if (AV.capa === 'grasa'){
+      ley.innerHTML = '<span style="display:inline-block;width:120px;height:10px;border-radius:99px;' +
+        'background:linear-gradient(90deg,rgb(41,148,235),rgb(255,56,36));vertical-align:middle;margin-right:8px"></span>' +
+        'De azul (poca grasa) a rojo (donde más se te acumula). Sigue el patrón ' +
+        (AV.comp && AV.comp.sexo === 'mujer' ? 'ginoide: cadera y muslo primero.' : 'androide: abdomen y cintura primero.') +
+        ' No es una medición local: es dónde tu sexo deposita la grasa que ya sabemos que tienes.';
+    } else {
+      ley.innerHTML = '';
+    }
+  }
+  pintarBascula(); pintarExtras();
+}
+
+function pintarBascula(){
+  const c = $('#avBascula'); if (!c) return;
+  const ult = (z) => { const l = C.medidas.filter(x => x.zona === z); return l.length ? Number(l[l.length-1].valor) : ''; };
+  const campo = (id, n, u, v, ph) =>
+    '<label class="av-campo"><span>' + n + ' <i>' + u + '</i></span>' +
+    '<input id="' + id + '" type="number" step="0.1" inputmode="decimal" value="' + (v === '' ? '' : v) +
+    '" placeholder="' + ph + '"></label>';
+  c.innerHTML =
+    '<p class="muted" style="margin:0 0 12px">Si tienes báscula de bioimpedancia, escribe aquí lo que te marca y el ' +
+    'motor usa tus datos medidos en vez de las fórmulas. Si la dejas vacía, se estima igual que ahora.</p>' +
+    '<div class="grid g2">' +
+      campo('avBGrasa', 'Grasa', '%',  ult('grasa'),   '18,5') +
+      campo('avBMus',   'Músculo', 'kg', ult('musculo'), '34,0') +
+      campo('avBAgua',  'Agua', '%',   ult('agua'),    '55') +
+      campo('avBHueso', 'Hueso', 'kg', ult('hueso'),   '3,2') +
+    '</div>' +
+    '<button class="pri" id="avBGuardar" style="margin-top:12px">Guardar lo de hoy</button>';
+  $('#avBGuardar').onclick = guardarBascula;
+}
+
+async function guardarBascula(){
+  const leer = (id) => { const v = Number(String($(id).value).replace(',', '.')); return v > 0 ? v : null; };
+  const vals = { grasa:leer('#avBGrasa'), musculo:leer('#avBMus'), agua:leer('#avBAgua'), hueso:leer('#avBHueso') };
+  const filas = Object.keys(vals).filter(k => vals[k] != null)
+    .map(k => ({ user_id:S.user.id, fecha:hoyISO(), zona:k, valor:vals[k] }));
+  if (!filas.length) return toast('No escribiste ningún dato');
+  const r = await sb.from('medidas').upsert(filas, { onConflict:'user_id,fecha,zona' });
+  if (faltaTabla(r.error) || faltaV4(r.error)) return toast('Falta correr esquema_v4 en Supabase');
+  if (!ok(r, 'Datos de báscula guardados')) return;
+  await cargarCuerpo(); avConstruir(); pintarAvatar();
+}
+
+const EXTRAS = [['muneca_izq','Muñeca izq'], ['muneca_der','Muñeca der'],
+                ['tobillo_izq','Tobillo izq'], ['tobillo_der','Tobillo der']];
+function pintarExtras(){
+  const c = $('#avExtras'); if (!c) return;
+  c.innerHTML = EXTRAS.map(([k, n]) => {
+    const m = ultimaMedida(k);
+    return '<button class="sm" data-e="' + k + '">' + n + (m ? ': ' + Number(m.valor) + ' cm' : ' +') + '</button>';
+  }).join('');
+  c.querySelectorAll('[data-e]').forEach(b => b.onclick = () => abrirMedida(b.dataset.e));
+}
+
+/* ---------- eventos ---------- */
+$$('#avHoriz button').forEach(b => b.onclick = () => {
+  AV.dias = Number(b.dataset.d);
+  AV.mezcla = AV.dias ? 1 : 0;
+  const sl = $('#avMezcla'); if (sl) sl.value = AV.mezcla * 100;
+  pintarAvatar();
+  if (BODY.listo) avConstruir(); else avCalcular();
+  if (AV.dias && BODY.geoB){ BODY.animIda = true; BODY.animDur = 1400; BODY.t0 = performance.now(); BODY.animando = 1; pedirRender(); }
+});
+
+$$('#avCapa button').forEach(b => b.onclick = () => {
+  AV.capa = b.dataset.c;
+  pintarAvatar();
+  if (BODY.malla){
+    pintarVertices(BODY.malla.geometry, AV.capa, AV.comp, AV.tono);
+    BODY.malla.material.roughness = AV.capa === 'piel' ? 0.62 : 0.80;
+    BODY.malla.material.envMapIntensity = AV.capa === 'piel' ? 0.85 : 0.30;
+    BODY.malla.material.needsUpdate = true;
+    pedirRender();
+  }
+  if (S.user && sb) sb.from('perfiles').update({ avatar_capa:AV.capa }).eq('id', S.user.id).then(()=>{}, ()=>{});
+});
+
+$$('#avVistas button').forEach(b => b.onclick = () => {
+  const v = b.dataset.v;
+  BODY.az = v === 'frente' ? 0 : v === 'perfil' ? Math.PI / 2 : v === 'espalda' ? Math.PI : 0.62;
+  BODY.el = v === 'tres' ? 0.10 : 0.06;
+  $$('#avVistas button').forEach(x => x.classList.toggle('on', x === b));
+  if (BODY.listo) colocarCamara();
+});
+
+(function(){
+  const sl = $('#avMezcla');
+  if (sl) sl.oninput = () => {
+    AV.mezcla = Number(sl.value) / 100;
+    BODY.animando = 0;
+    aplicarMezcla(AV.mezcla); pedirRender();
+    const et = $('#avEtiqueta');
+    if (et) et.textContent = AV.mezcla < 0.02 ? 'Hoy' : AV.mezcla > 0.98 ? 'En ' + AV.dias + ' días'
+      : 'Día ' + Math.round(AV.mezcla * AV.dias);
+  };
+  const pl = $('#avPlay');
+  if (pl) pl.onclick = () => {
+    if (!BODY.geoB) return;
+    BODY.animIda = AV.mezcla < 0.5;
+    BODY.animDur = 1600; BODY.t0 = performance.now(); BODY.animando = 1;
+    pedirRender();
+    setTimeout(() => { AV.mezcla = BODY.animIda ? 1 : 0; pintarAvatar(); }, 1700);
+  };
+  const cp = $('#avComparar');
+  if (cp) cp.onclick = () => {
+    AV.comparar = !AV.comparar;
+    cp.classList.toggle('on', AV.comparar);
+    cp.textContent = AV.comparar ? 'Quitar el antes' : 'Ver antes y después';
+    if (!BODY.listo) return;
+    if (AV.comparar && BODY.geoB && AV.pro){
+      const gg = construirGeo(AV.ant, AV.comp, BODY.calidad);
+      ponerFantasma(gg);
+      const sep = ((BODY.malla.geometry.userData.alt || 175) / 100) * 0.20;
+      BODY.mallaG.position.x = -sep; BODY.malla.position.x = sep;
+      AV.mezcla = 1; const sl2 = $('#avMezcla'); if (sl2) sl2.value = 100;
+      aplicarMezcla(1);
+      BODY.az = 0; BODY.el = 0.05; encuadrar(1.42); pintarAvatar(); return;
+    } else {
+      ponerFantasma(null);
+      if (BODY.malla) BODY.malla.position.x = 0;
+      encuadrar();
+    }
+    colocarCamara(); pintarAvatar();
+  };
+  const gi = $('#avGirar');
+  if (gi) gi.onclick = () => { BODY.az += Math.PI / 2; colocarCamara(); };
+  const bm = $('#avMedidas');
+  if (bm) bm.onclick = () => mostrarTab('cuerpo');
+})();
+
 </script>
 </body>
 </html>
