@@ -125,15 +125,41 @@ nav button.on{background:var(--brand-soft);border-color:var(--brand);color:var(-
 .stat .n{font-size:26px;font-weight:700;line-height:1.1;font-variant-numeric:tabular-nums}
 .stat .l{font-size:11px;color:var(--tx2);text-transform:uppercase;letter-spacing:.5px;margin-top:4px}
 
-.hab{display:flex;gap:12px;align-items:flex-start;padding:13px;border:1px solid var(--line);
-  border-radius:var(--r);background:var(--panel2);margin-bottom:9px}
+.hab{display:flex;gap:11px;align-items:flex-start;padding:12px 13px;border:1px solid var(--line);
+  border-radius:var(--r);background:var(--panel2);margin-bottom:8px;transition:background .18s,border-color .18s}
 .hab.done{border-color:color-mix(in srgb, var(--ok) 45%, transparent);background:var(--ok-soft)}
-.chk{width:26px;height:26px;border-radius:50%;border:2px solid var(--line);background:transparent;
-  flex:0 0 26px;padding:0;display:grid;place-items:center;font-size:14px;color:transparent;margin-top:2px}
+/* el círculo NUNCA se deforma: tamaño fijo y el área táctil va por fuera */
+.chk{width:27px;height:27px;min-height:27px;border-radius:50%;border:2px solid var(--line);
+  background:transparent;flex:0 0 27px;padding:0;display:grid;place-items:center;font-size:14px;
+  color:transparent;margin-top:1px;position:relative;transition:transform .16s}
+.chk::after{content:'';position:absolute;inset:-10px;border-radius:50%}
+.chk:active{transform:scale(.88)}
 .hab.done .chk{background:var(--ok);border-color:var(--ok);color:var(--panel);font-weight:800}
-.hab .b{flex:1;min-width:0}
-.hab .t{font-weight:600}
-.hab.done .t{text-decoration:line-through;opacity:.75}
+.hab .b{flex:1;min-width:0;cursor:pointer}
+.hab .t{font-weight:600;font-size:14.5px;line-height:1.34;overflow-wrap:anywhere;
+  text-decoration-thickness:1.5px}
+.hab.done .t{text-decoration:line-through;opacity:.6}
+.hab-meta{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-top:5px}
+.hab-dat{font-size:11.5px;color:var(--tx2);line-height:1.3}
+.hab-disp{font-size:11.5px;color:var(--tx2);margin-top:4px;line-height:1.35;opacity:.92;
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.hab .det{flex:0 0 auto;width:30px;height:30px;min-height:30px;padding:0;border:0;background:transparent;
+  color:var(--tx2);font-size:21px;line-height:1;display:grid;place-items:center;border-radius:9px;
+  position:relative;margin-top:0;opacity:.7}
+.hab .det::after{content:'';position:absolute;inset:-8px}
+.hab .det:hover{background:var(--hover);opacity:1}
+/* cabecera de cada momento del día */
+.momento{display:flex;align-items:center;gap:10px;margin:18px 0 9px;font-size:11px;
+  letter-spacing:.13em;text-transform:uppercase;color:var(--tx2);font-weight:750}
+.momento::after{content:'';flex:1;height:1px;background:var(--line)}
+.momento i{font-style:normal;letter-spacing:0;text-transform:none;font-size:11.5px;
+  font-weight:650;opacity:.85;flex:0 0 auto}
+.momento.ok i{color:var(--ok)}
+.momento:first-child{margin-top:2px}
+/* agua: los botones siempre en una rejilla pareja */
+.agua-btns{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:14px}
+.agua-btns button{padding:9px 4px;white-space:nowrap;font-size:13px;overflow:hidden;text-overflow:ellipsis}
+.agua-btns .quitar{grid-column:1 / -1;background:transparent;color:var(--tx2);font-size:12.5px}
 .tag{display:inline-block;font-size:11px;padding:2px 8px;border-radius:99px;background:var(--chip);
   color:var(--tx2);border:1px solid var(--line);margin-right:5px}
 .tag.fire{background:var(--oro-soft);color:var(--oro-tx);border-color:color-mix(in srgb, var(--oro) 45%, transparent);font-weight:600}
@@ -273,6 +299,9 @@ nav#navG button{padding:9px 4px;font-size:13.5px;white-space:nowrap;text-align:c
   /* áreas táctiles de verdad: 44 px es el mínimo que se puede acertar con el pulgar */
   button,.sm,select,input[type=checkbox]{min-height:44px}
   button.sm{min-height:38px;padding:9px 14px;font-size:13px}
+  /* estos dos llevan su área táctil por fuera: si les pongo alto mínimo se deforman */
+  .chk{min-height:27px}
+  .hab .det{min-height:30px}
   input,select,textarea{font-size:16px;min-height:46px}   /* 16px evita el zoom automático de iOS */
 
   /* tipografía con aire */
@@ -299,9 +328,20 @@ nav#navG button{padding:9px 4px;font-size:13.5px;white-space:nowrap;text-align:c
   .wrap{padding-bottom:calc(96px + env(safe-area-inset-bottom))}
 }
 @media (max-width:380px){
-  .grid.g2,.grid.g4{grid-template-columns:1fr}
+  .grid.g2{grid-template-columns:1fr}
+  /* los cuatro números del día se quedan en dos columnas: apilarlos
+     obliga a un scroll enorme antes de llegar a los hábitos */
+  .grid.g4{grid-template-columns:1fr 1fr;gap:8px}
+  .stat{padding:11px 12px}
+  .stat .n{font-size:22px}
+  .stat .l{font-size:10px;letter-spacing:.3px}
   h2{font-size:16px}
   .card{padding:13px 12px}
+  /* la cabecera no se parte en dos alturas */
+  .hd{padding:9px 11px;gap:7px}
+  .hd .row button,.hd button{padding:8px 11px;font-size:12.5px;min-height:38px}
+  .marca .wm{font-size:16px}
+  .hdSub,#hdSub{font-size:11px}
 }
 
 /* ---------- PLAN · el entrenador ---------- */
@@ -525,6 +565,13 @@ table.tab td.num{text-align:right;font-variant-numeric:tabular-nums;white-space:
 @media (max-width:620px){
   .av-lienzo{height:min(54vh,380px);min-height:270px}
   .av-v{font-size:14px}
+  /* que el botón flotante no tape la última tarjeta */
+  .wrap{padding-bottom:calc(96px + env(safe-area-inset-bottom))}
+  /* el vaso ocupa menos y deja respirar al texto */
+  .agua-fila{gap:14px}
+  .vaso{width:96px}
+  .agua-fila>div:last-child{min-width:150px}
+  .agua-num{font-size:24px}
 }
 </style>
 </head>
@@ -1476,9 +1523,17 @@ function ok(res, msg){
    Al publicar una versión nueva: sube VERSION, pon la fecha y agrega
    su entrada arriba del todo en NOVEDADES.
    ===================================================================== */
-const VERSION = '4.0.0';
+const VERSION = '4.0.1';
 const FECHA_VERSION = '2026-09-05';
 const NOVEDADES = [
+  ['4.0.1', '2026-09-05', [
+    'La pantalla de Hoy respira: cada hábito ocupa un tercio menos y ahora caben siete en la pantalla del teléfono, no cuatro.',
+    'El círculo de marcar dejó de deformarse en el móvil. Sigue siendo fácil de acertar con el pulgar: el área táctil va por fuera del dibujo.',
+    'Se fue el botón "Detalle" y ahora toda la fila se toca para abrir el hábito. Queda una flecha discreta a la derecha.',
+    'Mañana, Tarde y Noche llevan su propio contador: 2 de 2, y se pone verde cuando cierras el bloque.',
+    'Los botones del agua siempre en una fila pareja, sin nombres cortados.',
+    'En pantallas de 360 px la cabecera ya no se parte en dos alturas y los cuatro números del día se quedan en dos columnas.'
+  ]],
   ['4.0.0', '2026-09-05', [
     'Tu gemelo digital en 3D: pestaña Cuerpo → Gemelo 3D. El perímetro de cada parte del modelo es exactamente la medida que registraste.',
     'Anatomía distinta para hombre y para mujer: proporciones, forma del tórax y reparto de grasa androide o ginoide, no una versión reducida del otro.',
@@ -1802,9 +1857,11 @@ function pintarHoy(){
   ['manana','tarde','noche'].forEach(mom => {
     const grupo = lista.filter(h => h.momento === mom);
     if (!grupo.length) return;
+    const listos = grupo.filter(h => { const r = regDe(h.id, f); return r && r.cumplido; }).length;
     const t = document.createElement('div');
-    t.className = 'muted'; t.style.margin = '14px 0 7px';
-    t.textContent = ({manana:'MAÑANA', tarde:'TARDE', noche:'NOCHE'})[mom];
+    t.className = 'momento' + (listos === grupo.length ? ' ok' : '');
+    t.innerHTML = ({manana:'Mañana', tarde:'Tarde', noche:'Noche'})[mom] +
+                  '<i>' + listos + ' de ' + grupo.length + '</i>';
     cont.appendChild(t);
 
     grupo.forEach(h => {
@@ -1812,22 +1869,27 @@ function pintarHoy(){
       const el = document.createElement('div');
       el.className = 'hab' + (done ? ' done' : '');
       el.innerHTML =
-        '<button class="chk">&#10003;</button>' +
-        '<div class="b"><div class="t"></div><div style="margin-top:5px">' +
-          '<span class="tag cat"></span>' +
-          (rc > 1 ? '<span class="tag fire">' + rc + ' días seguidos</span>' : '') +
-          '<span class="tag">+' + h.puntos + ' pts</span>' +
-          '<span class="tag">dif. ' + h.dificultad + '/10</span>' +
+        '<button class="chk" aria-label="Marcar como hecho">&#10003;</button>' +
+        '<div class="b" role="button" tabindex="0"><div class="t"></div>' +
+          '<div class="hab-meta">' +
+            (rc > 1 ? '<span class="tag fire" title="' + rc + ' días seguidos">' + rc + ' seguidos</span>' : '') +
+            '<span class="hab-dat"></span>' +
+          '</div>' +
+          (h.disparador ? '<div class="hab-disp"></div>' : '') +
         '</div>' +
-        (h.disparador ? '<div class="muted" style="margin-top:5px">Disparador: ' + h.disparador + '</div>' : '') +
-        '</div>' +
-        '<button class="sm gh det">Detalle</button>';
+        '<button class="det" aria-label="Ver detalle">&#8250;</button>';
       const meta = (h.meta_diaria > 1 || h.unidad !== 'vez') ? h.meta_diaria + ' ' + h.unidad : '';
       el.querySelector('.t').textContent = h.nombre +
         (meta && !h.nombre.toLowerCase().includes(h.unidad.toLowerCase()) ? '  ·  ' + meta : '');
-      el.querySelector('.cat').textContent = h.categoria;
+      el.querySelector('.hab-dat').textContent =
+        h.categoria + ' · +' + h.puntos + ' pts · dif. ' + h.dificultad + '/10';
+      if (h.disparador) el.querySelector('.hab-disp').textContent = '↳ ' + h.disparador;
       el.querySelector('.chk').onclick = () => alternar(h);
-      el.querySelector('.det').onclick = () => abrirRegistro(h);
+      const abrir = () => abrirRegistro(h);
+      el.querySelector('.det').onclick = abrir;
+      const cuerpo = el.querySelector('.b');
+      cuerpo.onclick = abrir;
+      cuerpo.onkeydown = (e) => { if (e.key === 'Enter' || e.key === ' '){ e.preventDefault(); abrir(); } };
       cont.appendChild(el);
     });
   });
@@ -6252,8 +6314,8 @@ function habitoAgua(){
 
 function porcionAgua(h){
   const u = (h.unidad || '').toLowerCase();
-  if (u.startsWith('l')) return [0.25, '1 vaso', 0.5, 'medio litro', 1, '1 litro'];
-  if (u === 'ml')        return [250, '1 vaso', 500, 'medio litro', 1000, '1 litro'];
+  if (u.startsWith('l')) return [0.25, '1 vaso', 0.5, '\u00BD litro', 1, '1 litro'];
+  if (u === 'ml')        return [250, '1 vaso', 500, '\u00BD litro', 1000, '1 litro'];
   return [1, '1 ' + (u || 'vez'), 2, '2', 3, '3'];
 }
 
@@ -6284,13 +6346,13 @@ function pintarAgua(){
         '<div class="agua-num">' + textoAgua(h, hecho) + ' <span class="muted" style="font-size:16px">de ' + textoAgua(h, meta) + '</span></div>' +
         '<div class="muted" style="margin-top:2px">' + (lleno ? '¡Meta cumplida! Tu cuerpo te lo agradece.'
           : 'Te faltan ' + textoAgua(h, meta - hecho) + ' · ' + Math.round(pct*100) + '% del día') + '</div>' +
-        '<div class="row" style="margin-top:12px">' +
-          '<button class="pri sm" data-agua="' + p1 + '">+ ' + n1 + '</button>' +
-          '<button class="sm" data-agua="' + p2 + '">+ ' + n2 + '</button>' +
-          '<button class="sm" data-agua="' + p3 + '">+ ' + n3 + '</button>' +
-          (hecho > 0 ? '<button class="gh sm" id="btnAguaMenos">− quitar</button>' : '') +
-        '</div>' +
       '</div>' +
+    '</div>' +
+    '<div class="agua-btns">' +
+      '<button class="pri sm" data-agua="' + p1 + '">+ ' + n1 + '</button>' +
+      '<button class="sm" data-agua="' + p2 + '">+ ' + n2 + '</button>' +
+      '<button class="sm" data-agua="' + p3 + '">+ ' + n3 + '</button>' +
+      (hecho > 0 ? '<button class="gh sm quitar" id="btnAguaMenos">− quitar lo último</button>' : '') +
     '</div>';
 
   c.querySelectorAll('[data-agua]').forEach(b =>
