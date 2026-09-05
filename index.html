@@ -202,6 +202,29 @@ dialog{background:var(--panel);color:var(--tx);border:1px solid var(--line);bord
   padding:20px;max-width:520px;width:calc(100% - 32px)}
 dialog::backdrop{background:rgba(0,0,0,.6)}
 
+/* ---------- terminos y condiciones ---------- */
+#dlgTerm{max-width:640px}
+#tmCuerpo{max-height:50vh;overflow-y:auto;margin-top:14px;outline:none;
+  border-top:1px solid var(--line);border-bottom:1px solid var(--line);
+  padding:14px 4px 14px 0;font-size:14.5px;line-height:1.6}
+#tmCuerpo h4{margin:20px 0 6px;font-size:15px;letter-spacing:.01em}
+#tmCuerpo h4:first-child{margin-top:0}
+#tmCuerpo p{margin:0 0 9px;color:var(--tx2)}
+#tmCuerpo ul{margin:0 0 9px;padding-left:20px;color:var(--tx2)}
+#tmCuerpo li{margin-bottom:5px}
+#tmCuerpo .clave{background:var(--panel2);border-left:3px solid var(--oro);
+  padding:10px 12px;margin:0 0 10px}
+#tmCuerpo .clave p:last-child{margin-bottom:0}
+#tmCuerpo .fin{text-align:center;color:var(--tx2);font-size:12.5px;
+  letter-spacing:.14em;text-transform:uppercase;margin:18px 0 0}
+#tmAviso{font-size:13px;margin-top:10px}
+#tmMarca{display:flex;gap:10px;align-items:flex-start;margin-top:10px;cursor:pointer;
+  font-size:14px;line-height:1.5;text-transform:none;letter-spacing:0;color:var(--tx)}
+#tmMarca span{text-transform:none;letter-spacing:0}
+#tmAceptar:disabled{opacity:.4;cursor:not-allowed}
+#tmMarca input{width:auto;min-height:0;margin:3px 0 0;flex:0 0 auto}
+#tmMarca.off{opacity:.45;cursor:default}
+
 /* ---------- vaso de agua ---------- */
 .agua-fila{display:flex;gap:20px;align-items:center;flex-wrap:wrap}
 .vaso-caja{flex:0 0 auto}
@@ -1380,10 +1403,30 @@ table.tab td.num{text-align:right;font-variant-numeric:tabular-nums;white-space:
 
     <p class="muted" style="text-align:center;letter-spacing:.16em;text-transform:uppercase;font-size:11px;margin-top:28px">
       Stricto · Mide. Mejora. Triunfa.<br>
-      <button class="gh sm" id="btnVersion" style="margin-top:8px;letter-spacing:.06em">versión</button></p>
+      <button class="gh sm" id="btnVersion" style="margin-top:8px;letter-spacing:.06em">versión</button>
+      <button class="gh sm" id="btnTerminos" style="margin-top:8px;letter-spacing:.06em">términos</button></p>
   </div>
 </div>
 
+
+<!-- ============ DIÁLOGO: términos y condiciones ============ -->
+<dialog id="dlgTerm">
+  <h2 id="tmTitulo" style="margin:0 0 2px">Antes de entrar</h2>
+  <div class="muted" id="tmSub" style="font-size:13px">—</div>
+  <div id="tmCuerpo" tabindex="-1"></div>
+  <div id="tmPie">
+    <div class="muted" id="tmAviso">Desplázate hasta el final para poder aceptar.</div>
+    <label id="tmMarca" for="tmCheck">
+      <input type="checkbox" id="tmCheck">
+      <span>He leído los términos, entiendo que STRICTO <b>no da consejo médico ni financiero</b>,
+            y los acepto.</span>
+    </label>
+    <div class="row" style="justify-content:flex-end;margin-top:14px;gap:8px">
+      <button class="sm" id="tmSalir">Salir</button>
+      <button class="pri" id="tmAceptar" disabled>Acepto</button>
+    </div>
+  </div>
+</dialog>
 
 <!-- DIALOGO PRESUPUESTOS -->
 <dialog id="dlgPresup">
@@ -2064,9 +2107,17 @@ function ok(res, msg){
    Al publicar una versión nueva: sube VERSION, pon la fecha y agrega
    su entrada arriba del todo en NOVEDADES.
    ===================================================================== */
-const VERSION = '5.1.0';
+const VERSION = '5.2.0';
 const FECHA_VERSION = '2026-09-05';
 const NOVEDADES = [
+  ['5.2.0', '2026-09-05', [
+    'Términos de uso: al entrar por primera vez hay que leerlos y aceptarlos. El botón de aceptar solo se habilita al llegar al final del texto.',
+    'Aviso de salud: queda escrito que los porcentajes de grasa, músculo y agua son estimaciones a partir de tus medidas, no mediciones clínicas, y que las rutinas no sustituyen a un profesional.',
+    'Aviso financiero: las proyecciones de patrimonio, deudas y jubilación salen de los datos y las tasas que tú registras. La app no es asesoría de inversión ni promete rendimientos.',
+    'Queda claro en las reglas que entrar al reto es gratis, que los premios los pone el organizador o su patrocinador, y que ningún plan de pago da ventaja en el marcador.',
+    'Tu aceptación se guarda con la fecha y la versión, y no se puede editar ni borrar. Si los términos cambian, se piden otra vez.',
+    'Puedes releerlos cuando quieras desde el botón «términos» al pie de la app.'
+  ]],
   ['5.1.0', '2026-09-05', [
     'Reto semanal con premios en el ranking del gimnasio: primero, segundo y tercero, con la cuenta atrás al domingo y tu posición en vivo.',
     'El marcador se rehizo para que el reto sea ganable de verdad: 35% crecer contra tu propia media de 4 semanas, 25% récords verificados, 20% días de la semana y 20% constancia.',
@@ -2250,6 +2301,198 @@ function pintarVersion(){
       '</ul></div>').join('');
 }
 
+/* =====================================================================
+   TÉRMINOS Y CONDICIONES
+   Se piden una vez por versión. Si cambias el texto, sube TERMINOS_VERSION
+   y a todo el mundo se le vuelve a pedir la próxima vez que entre.
+   La aceptación se guarda en la tabla 'aceptaciones' (esquema_v9), que
+   no se puede editar ni borrar: por eso sirve como prueba.
+   ===================================================================== */
+const TERMINOS_VERSION = '1.0';
+const TERMINOS_FECHA   = '5 de septiembre de 2026';
+
+const TERMINOS = [
+  { t:'Qué es STRICTO', p:[
+      'STRICTO es una aplicación personal de hábitos, entrenamiento, medidas corporales y finanzas. La opera una persona particular, no una empresa, y se ofrece tal como está.',
+      'Al crear tu cuenta y usarla aceptas estas condiciones. Si no estás de acuerdo con alguna, no uses la app: es la única forma de decir que no.'
+  ]},
+
+  { t:'Tu cuenta', p:[
+      'Necesitas tener 18 años o más. La app calcula composición corporal y propone cargas de entrenamiento, y eso no está pensado para menores.'
+  ], l:[
+      'Una cuenta por persona. Crear varias para aparecer más de una vez en el ranking es motivo de expulsión.',
+      'Tu contraseña es tuya. Si alguien entra con ella, lo que haga cuenta como tuyo.',
+      'Puedes borrar tu cuenta cuando quieras y con ella se van tus datos.'
+  ]},
+
+  { t:'Sobre salud y entrenamiento', clave:[
+      'STRICTO no es un médico, ni un nutricionista, ni un fisioterapeuta, y nada de lo que muestra es un diagnóstico ni una indicación médica.'
+  ], p:[
+      'Los porcentajes de grasa, masa muscular, agua y grasa visceral son estimaciones calculadas con fórmulas publicadas a partir de las medidas que tú escribes. No son mediciones: una cinta métrica mal puesta cambia el resultado, y ninguna fórmula reemplaza una prueba clínica.',
+      'Las rutinas, los pesos sugeridos, las calorías y el gemelo 3D son proyecciones matemáticas, no un plan aprobado por un profesional que te haya visto.',
+      'Antes de empezar o cambiar un programa de ejercicio o de alimentación, consulta a un profesional de la salud, sobre todo si tienes una lesión, una condición médica, estás embarazada o tomas algún medicamento. Si sientes dolor, mareo o falta de aire mientras entrenas, para y busca atención.'
+  ]},
+
+  { t:'Sobre dinero', clave:[
+      'STRICTO no es asesoría financiera ni de inversión, y no promete ningún rendimiento.'
+  ], p:[
+      'Las proyecciones de patrimonio, jubilación, deudas y devaluación se calculan con los datos y los supuestos que tú introduces, incluidas las tasas de cambio que tú registras a mano. Si un dato está mal, el resultado está mal.',
+      'Una simulación de escenarios muestra lo que pasaría si el futuro se pareciera al pasado que le diste. El futuro no tiene esa obligación. Las decisiones sobre tu dinero son tuyas y sus consecuencias también.',
+      'La app no se conecta a tus bancos, no mueve dinero y no ejecuta ninguna operación por ti.'
+  ]},
+
+  { t:'Tus datos', p:[
+      'Todo lo que registras se guarda en una base de datos de Supabase con una regla activa que hace que cada usuario solo pueda leer y escribir sus propias filas. Ni otros usuarios ni la app ven tus datos de otra persona.'
+  ], l:[
+      'Se guarda lo que tú escribes: hábitos, series, medidas, movimientos de dinero, cuentas y las tasas que registras.',
+      'El correo con el que entras lo administra Supabase para autenticarte.',
+      'No se venden tus datos, no se ceden a terceros con fines publicitarios y no hay rastreadores de terceros dentro de la app.',
+      'Si borras tu cuenta, tus filas se borran con ella. Las copias de seguridad pueden conservarlas un tiempo antes de rotar.'
+  ]},
+
+  { t:'El ranking y el reto', p:[
+      'Aparecer en el ranking es voluntario: se activa y se desactiva desde “Mi participación”. Mientras esté activo, los demás participantes ven el nombre o alias que elijas y cuatro números: tu crecimiento de volumen, tus récords de la semana, tus días entrenados y tu puntaje.'
+  ], l:[
+      'Nadie ve tus series, tus pesos por ejercicio, tus medidas ni nada de tu dinero. Nunca.',
+      'Entrar al reto semanal es gratis y no requiere ningún pago ni suscripción.',
+      'Los premios los aporta quien organiza el reto o su patrocinador. No salen de las suscripciones ni de aportes de los participantes: esto es una promoción, no una apuesta, y nadie arriesga dinero para competir.',
+      'Para optar a premio hay que cumplir los mínimos publicados en el reto: días entrenados, series registradas y semanas de antigüedad en la app.',
+      'Los registros que se salgan de lo plausible o que crezcan de forma anómala se marcan para revisión, y la organización puede pedir una comprobación antes de entregar un premio.',
+      'Inventar registros, usar varias cuentas o manipular el marcador descalifica de por vida, sin discusión.',
+      'La decisión sobre la entrega de un premio es de quien organiza el reto y es definitiva. Los impuestos que apliquen sobre un premio corren por cuenta de quien lo recibe.'
+  ]},
+
+  { t:'Lo que no puedes hacer', l:[
+      'Registrar datos falsos para subir en el marcador.',
+      'Usar un alias ofensivo, suplantar a otra persona o hacerte pasar por la organización.',
+      'Intentar entrar a los datos de otro usuario, o forzar los límites de tu plan por fuera de la app.',
+      'Automatizar el registro, revender el acceso o usar la app para un fin distinto del personal.'
+  ]},
+
+  { t:'Planes de pago', p:[
+      'Mientras la app esté en etapa de fundadores, todas las funciones son gratuitas. Cuando existan planes de pago, el precio, lo que incluye cada uno y la forma de cancelar se mostrarán antes de cobrar, y ninguna función que ya estabas usando gratis se te quitará sin avisarte antes.',
+      'Un plan de pago nunca dará ventaja dentro del ranking ni acceso a premios que los demás no tengan: el marcador se gana entrenando.'
+  ]},
+
+  { t:'El servicio se ofrece como está', p:[
+      'STRICTO se entrega sin garantía de que funcione sin fallos ni de que esté disponible todo el tiempo. Puede haber caídas, errores de cálculo y cambios de funciones. Se hace lo razonable para evitarlos, no se promete que no ocurran.',
+      'Guarda por tu cuenta lo que sea importante para ti. La app permite exportar tus reportes.'
+  ]},
+
+  { t:'Hasta dónde llega la responsabilidad', p:[
+      'En la medida en que la ley lo permita, quien opera STRICTO no responde por lesiones, pérdidas económicas, decisiones tomadas a partir de lo que muestra la app, ni por pérdida de datos.',
+      'Tú eres responsable de cómo entrenas, de cómo comes y de qué haces con tu dinero. La app te muestra números; las decisiones son tuyas.'
+  ]},
+
+  { t:'Cambios en estos términos', p:[
+      'Si estas condiciones cambian de forma relevante, se te pedirá aceptarlas otra vez al entrar, y quedará registrada la fecha y la versión que aceptaste. Puedes releerlas cuando quieras desde el pie de la app.'
+  ]},
+
+  { t:'Contacto y ley aplicable', p:[
+      'Para cualquier consulta, reclamo o para pedir que se borre tu cuenta, escribe a la dirección de contacto publicada en la app.',
+      'Estas condiciones se rigen por las leyes de la República Bolivariana de Venezuela. Si alguna cláusula resultara inválida, el resto sigue en pie.'
+  ]}
+];
+
+function pintarTerminos(){
+  $('#tmSub').textContent = 'Versión ' + TERMINOS_VERSION + ' · ' + TERMINOS_FECHA;
+  const html = TERMINOS.map(sec => {
+    let h = '<h4>' + esc(sec.t) + '</h4>';
+    if (sec.clave) h += '<div class="clave">' +
+      sec.clave.map(x => '<p><b>' + esc(x) + '</b></p>').join('') + '</div>';
+    if (sec.p) h += sec.p.map(x => '<p>' + esc(x) + '</p>').join('');
+    if (sec.l) h += '<ul>' + sec.l.map(x => '<li>' + esc(x) + '</li>').join('') + '</ul>';
+    return h;
+  }).join('');
+  $('#tmCuerpo').innerHTML = html +
+    '<p class="fin">Fin de los términos · versión ' + esc(TERMINOS_VERSION) + '</p>';
+}
+
+// Habilita el botón solo cuando de verdad llegó al final y marcó la casilla.
+function vigilarLectura(){
+  const caja = $('#tmCuerpo'), marca = $('#tmMarca'), chk = $('#tmCheck');
+  let leido = false;
+  const revisar = () => {
+    if (!leido && caja.scrollTop + caja.clientHeight >= caja.scrollHeight - 24){
+      leido = true;
+      marca.classList.remove('off');
+      chk.disabled = false;
+      $('#tmAviso').textContent = 'Ya puedes aceptar.';
+    }
+    $('#tmAceptar').disabled = !(leido && chk.checked);
+  };
+  caja.onscroll = revisar;
+  chk.onchange = revisar;
+  // Si el texto cabe entero sin desplazar (pantalla grande), ya está leído.
+  setTimeout(revisar, 60);
+}
+
+async function yaAcepto(){
+  // Nada aquí puede impedir entrar: si la consulta falla por lo que sea,
+  // se deja pasar. Un error revisando los términos no puede dejar a
+  // alguien fuera de su propia cuenta.
+  try {
+    const { data, error } = await sb.from('aceptaciones')
+      .select('version').eq('documento', 'terminos').eq('version', TERMINOS_VERSION);
+    if (error){
+      if (faltaTabla(error)) S.faltaTerminos = true;   // falta correr esquema_v9
+      else console.error(error);
+      return true;
+    }
+    return (data || []).length > 0;
+  } catch (e){ console.error(e); return true; }
+}
+
+function abrirTerminos(soloLectura){
+  const d = $('#dlgTerm');
+  pintarTerminos();
+  $('#tmTitulo').textContent = soloLectura ? 'Términos de uso' : 'Antes de entrar';
+  $('#tmPie').classList.toggle('hidden', !!soloLectura);
+  d.returnValue = '';
+  if (!d.open) d.showModal();
+  $('#tmCuerpo').scrollTop = 0;
+  if (soloLectura) return Promise.resolve(true);
+
+  $('#tmCheck').checked = false;
+  $('#tmCheck').disabled = true;
+  $('#tmMarca').classList.add('off');
+  $('#tmAceptar').disabled = true;
+  $('#tmAviso').textContent = 'Desplázate hasta el final para poder aceptar.';
+  vigilarLectura();
+
+  return new Promise(resolve => {
+    $('#tmAceptar').onclick = async () => {
+      $('#tmAceptar').disabled = true;
+      const { error } = await sb.from('aceptaciones')
+        .insert({ documento:'terminos', version: TERMINOS_VERSION });
+      if (error && !/duplicate|unique/i.test(error.message || '')){
+        $('#tmAceptar').disabled = false;
+        return toast('No se pudo guardar: ' + error.message);
+      }
+      d.close(); resolve(true);
+    };
+    $('#tmSalir').onclick = async () => {
+      d.close(); resolve(false);
+      await sb.auth.signOut(); location.reload();
+    };
+  });
+}
+
+// Sin aceptar no se entra. Escape y clic fuera no cierran nada.
+$('#dlgTerm').addEventListener('cancel', (e) => {
+  if (!$('#tmPie').classList.contains('hidden')) e.preventDefault();
+});
+
+async function revisarTerminos(){
+  if (await yaAcepto()) return true;
+  return await abrirTerminos(false);
+}
+
+$('#btnTerminos').onclick = () => abrirTerminos(true);
+$('#dlgTerm').addEventListener('close', () => {
+  if ($('#tmPie').classList.contains('hidden')) $('#tmPie').classList.remove('hidden');
+});
+
 function revisarVersion(){
   $('#btnVersion').textContent = 'versión ' + VERSION;
   const previa = leerLocal('stricto_version');
@@ -2345,6 +2588,7 @@ $('#btnOut').onclick = async () => { await sb.auth.signOut(); location.reload();
 async function entrar(user){
   S.user = user;
   $('#vLogin').classList.add('hidden');
+  try { if (!(await revisarTerminos())) return; } catch(e){ console.error(e); }  // sin aceptar no se entra
   const carga = $('#cargando');
   $('#cargaLogo').src = ICONO_APP || (document.querySelector('.marca .ico') || {}).src || '';
   carga.classList.remove('hidden');
@@ -11497,9 +11741,18 @@ function abrirReglas(puedeAceptar){
     '<h4>Antes de entregar</h4>' +
     '<p>Los tres primeros se revisan a mano. Si algo no cuadra, se pide una foto o un vídeo de una serie. ' +
       'No es desconfianza: es lo que hace que ganar signifique algo.</p>' +
+    '<h4>El premio</h4>' +
+    '<ul><li><b>Entrar es gratis</b> y no hace falta pagar ni suscribirse a nada.</li>' +
+      '<li>El premio lo pone quien organiza el reto o su patrocinador. <b>No sale del dinero de los participantes</b>: ' +
+        'esto es una promoción, no una apuesta.</li>' +
+      '<li>Ningún plan de pago da ventaja en el marcador ni premios aparte. Se gana entrenando.</li>' +
+      '<li>Un premio por persona al mes. Los impuestos que apliquen corren por cuenta de quien lo recibe.</li></ul>' +
     (C.reglas ? '<h4>Condiciones</h4><p>' + esc(C.reglas) + '</p>' : '') +
     '<p class="muted" style="font-size:12.5px">Tu nombre aparece en la tabla solo si activaste tu participación pública. ' +
-      'Nadie ve tus series ni tus pesos, solo el puntaje.</p>';
+      'Nadie ve tus series ni tus pesos, solo el puntaje. Aplican también los ' +
+      '<a href="#" id="rgTerm">términos de uso</a> de la app.</p>';
+  const lt = $('#rgTerm');
+  if (lt) lt.onclick = (e) => { e.preventDefault(); $('#dlgReglas').close(); abrirTerminos(true); };
   $('#rgAceptar').classList.toggle('hidden', !puedeAceptar);
   $('#dlgReglas').showModal();
 }
