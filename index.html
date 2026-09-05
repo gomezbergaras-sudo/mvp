@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>STRICTO</title>
 <meta name="theme-color" content="#0D1B2A">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -242,6 +242,68 @@ dialog::backdrop{background:rgba(0,0,0,.6)}
 @keyframes pulsoMus{0%{filter:brightness(1)}45%{filter:brightness(1.28) url(#brillo)}100%{filter:brightness(1)}}
 
 
+
+
+/* ---------- navegación en dos niveles ---------- */
+nav#navG{display:grid;grid-template-columns:repeat(5,1fr);gap:5px;max-width:940px;
+  margin:0 auto;padding:0 12px 8px;overflow:visible}
+nav#navG button{padding:9px 4px;font-size:13.5px;white-space:nowrap;text-align:center;
+  border-radius:10px;overflow:hidden;text-overflow:ellipsis}
+.subnav{display:flex;gap:6px;max-width:940px;margin:0 auto;padding:0 12px 10px;
+  overflow-x:auto;scrollbar-width:none}
+.subnav::-webkit-scrollbar{display:none}
+.subnav button{background:transparent;border:1px solid var(--line);color:var(--tx2);
+  padding:6px 13px;font-size:12.5px;white-space:nowrap;border-radius:999px}
+.subnav button.on{background:var(--brand-soft);border-color:var(--brand);color:var(--brand-tx);font-weight:650}
+@media (max-width:620px){
+  nav#navG{padding:0 8px 6px;gap:4px}
+  nav#navG button{font-size:12.5px;padding:10px 2px;min-height:42px}
+  .subnav{padding:0 8px 9px}
+  .subnav button{min-height:36px}
+}
+@media (max-width:360px){ nav#navG button{font-size:11.5px} }
+
+/* ================= MÓVIL: que todo se pueda tocar y nada se salga ================= */
+@media (max-width:620px){
+  /* nada se desborda horizontalmente, pase lo que pase */
+  html,body{overflow-x:hidden}
+  .card,.stat,.mini,.hallazgo,.bloque{max-width:100%}
+  .card *{min-width:0}
+
+  /* áreas táctiles de verdad: 44 px es el mínimo que se puede acertar con el pulgar */
+  button,.sm,select,input[type=checkbox]{min-height:44px}
+  button.sm{min-height:38px;padding:9px 14px;font-size:13px}
+  input,select,textarea{font-size:16px;min-height:46px}   /* 16px evita el zoom automático de iOS */
+
+  /* tipografía con aire */
+  h2{font-size:17px}
+  h3{font-size:15.5px}
+  .card{padding:15px 14px}
+  .grid.g2{grid-template-columns:1fr 1fr;gap:10px}
+  .grid.g4{grid-template-columns:1fr 1fr;gap:10px}
+
+  /* tablas: que se deslicen y avisen que hay más */
+  .tablaWrap{margin:0 -14px;padding:0 14px;
+    -webkit-mask-image:linear-gradient(to right,#000 88%,transparent);
+            mask-image:linear-gradient(to right,#000 88%,transparent)}
+  .tablaWrap:only-child{margin:0;padding:0}
+  table.tab{font-size:12.5px;min-width:300px}
+  table.tab th,table.tab td{padding:8px 8px}
+
+  .obst{grid-template-columns:26px 1fr;gap:10px}
+  .mini .v{font-size:18px}
+  .lista{padding-left:16px}
+  .lista li{margin-bottom:8px}
+
+  /* respetar la barra de gestos del iPhone */
+  .wrap{padding-bottom:calc(96px + env(safe-area-inset-bottom))}
+}
+@media (max-width:380px){
+  .grid.g2,.grid.g4{grid-template-columns:1fr}
+  h2{font-size:16px}
+  .card{padding:13px 12px}
+}
+
 /* ---------- PLAN · el entrenador ---------- */
 #plSecc button{font-size:12px;padding:7px 13px}
 #plCuerpo .card{margin-top:12px}
@@ -249,8 +311,9 @@ dialog::backdrop{background:rgba(0,0,0,.6)}
 .card.mala{border-left:3px solid var(--bad)}
 .et{font-family:var(--f-titulo);font-weight:700;text-transform:uppercase;letter-spacing:.16em;
     font-size:10.5px;color:var(--tx2)}
-.pill{display:inline-block;background:var(--panel2);border:1px solid var(--linea);border-radius:999px;
-      padding:3px 10px;font-size:11.5px;color:var(--tx2);white-space:nowrap}
+.pill{display:inline-block;background:var(--panel2);border:1px solid var(--line);border-radius:999px;
+      padding:4px 11px;font-size:11.5px;color:var(--tx2);white-space:nowrap;max-width:100%;
+      overflow:hidden;text-overflow:ellipsis;vertical-align:middle}
 .pill.libre{white-space:normal;border-radius:10px;text-align:left;line-height:1.4}
 .pill.ok{border-color:var(--ok);color:var(--ok)}
 .pill.bad{border-color:var(--bad);color:var(--bad)}
@@ -258,24 +321,71 @@ dialog::backdrop{background:rgba(0,0,0,.6)}
 .lista{margin:0;padding-left:18px}
 .lista li{margin-bottom:6px}
 .lista li::marker{color:var(--brand)}
-.fila2{display:flex;justify-content:space-between;gap:14px;align-items:flex-start;
-       padding:9px 0;border-bottom:1px solid var(--linea)}
+.fila2{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;
+       padding:10px 0;border-bottom:1px solid var(--line)}
 .fila2:last-child{border-bottom:none}
-.fila2 b{white-space:nowrap}
-.fila2 .muted{text-align:right;font-size:13px}
-.mini{background:var(--panel2);border:1px solid var(--linea);border-radius:10px;padding:10px 12px}
+.fila2>*{min-width:0}
+.fila2 .muted{font-size:13px;text-align:right}
+@media (max-width:620px){
+  .fila2{flex-direction:column;gap:4px}
+  .fila2 .muted,.fila2 .pill{text-align:left;align-self:flex-start}
+}
+.mini{background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:10px 12px}
 .mini .v{font-size:20px;font-weight:700;margin-top:2px}
-.bloque{border:1px solid var(--linea);border-radius:12px;padding:12px 14px;margin-bottom:10px}
+.bloque{border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin-bottom:10px}
 .bloque.activo{border-color:var(--brand);background:var(--panel2)}
 .bloque.hecho{opacity:.55}
-.obst{display:grid;grid-template-columns:30px 1fr;gap:12px;padding:12px 0;border-bottom:1px solid var(--linea)}
+
+
+/* ---------- botón de acción rápida ---------- */
+.fab{position:fixed;right:16px;bottom:calc(20px + env(safe-area-inset-bottom));z-index:40;
+  width:58px;height:58px;border-radius:50%;font-size:30px;line-height:1;font-weight:400;
+  background:linear-gradient(135deg,var(--brand),var(--brand2,var(--brand)));color:#08131F;
+  border:none;box-shadow:0 10px 28px rgba(0,0,0,.45),0 0 0 1px rgba(255,255,255,.12) inset;
+  display:flex;align-items:center;justify-content:center;padding:0;transition:transform .18s}
+.fab:active{transform:scale(.92)}
+.fab.oculto{display:none}
+.hoja{position:fixed;inset:0;z-index:50;display:flex;align-items:flex-end;justify-content:center}
+.hoja-fondo{position:absolute;inset:0;background:rgba(3,8,15,.6);backdrop-filter:blur(3px)}
+.hoja-caja{position:relative;width:100%;max-width:460px;background:var(--panel);
+  border:1px solid var(--line);border-bottom:none;border-radius:20px 20px 0 0;
+  padding:10px 16px calc(18px + env(safe-area-inset-bottom));
+  animation:subeHoja .28s cubic-bezier(.2,.8,.2,1)}
+@keyframes subeHoja{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.hoja-asa{width:40px;height:4px;border-radius:3px;background:var(--line);margin:2px auto 12px}
+.hoja-caja h3{margin:0 0 12px;font-size:16px}
+.hoja-caja .op{display:flex;align-items:center;gap:13px;width:100%;text-align:left;
+  background:var(--panel2);border:1px solid var(--line);border-radius:12px;
+  padding:13px 14px;margin-bottom:9px;min-height:56px;color:var(--tx)}
+.hoja-caja .op .e{font-size:22px;line-height:1}
+.hoja-caja .op b{display:block;font-size:14.5px}
+.hoja-caja .op span.d{font-size:12px;color:var(--tx2)}
+.hoja-caja>button.gh{width:100%;margin-top:4px}
+/* ---------- guía ---------- */
+#dlgGuia{max-width:400px}
+.guia-ic{font-size:38px;line-height:1;margin-bottom:10px}
+.guia-p{color:var(--tx2);font-size:14.5px;margin:0 0 4px}
+.puntos{display:flex;gap:5px;justify-content:center;margin:16px 0 4px}
+.puntos i{width:7px;height:7px;border-radius:50%;background:var(--line);display:block}
+.puntos i.on{background:var(--brand);width:20px;border-radius:4px}
+.vacio{text-align:center;padding:26px 12px 8px}
+.vacio .ic{font-size:40px;line-height:1;margin-bottom:12px;opacity:.9}
+.vacio h2{margin:0 0 8px;font-size:19px}
+.vacio p{margin:0 auto 18px;max-width:38ch;color:var(--tx2);font-size:14.5px}
+.vacio button{min-width:210px}
+@media (max-width:620px){ .vacio{padding:20px 4px 4px} .vacio button{min-width:0;width:100%} }
+.hallazgo{border-left:3px solid var(--oro);background:var(--panel2);border-radius:0 10px 10px 0;
+  padding:11px 13px;margin-bottom:9px}
+.hallazgo.grave{border-left-color:var(--bad)}
+.hallazgo:last-child{margin-bottom:0}
+.obst{display:grid;grid-template-columns:30px 1fr;gap:12px;padding:12px 0;border-bottom:1px solid var(--line)}
 .obst:last-child{border-bottom:none}
 .obst .n{font-family:var(--f-titulo);font-weight:800;font-size:20px;color:var(--brand);line-height:1}
 .tablaWrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
 table.tab{width:100%;border-collapse:collapse;font-size:13px;min-width:340px}
 table.tab th{text-align:left;font-family:var(--f-titulo);font-weight:700;text-transform:uppercase;
-  letter-spacing:.08em;font-size:10px;color:var(--tx2);padding:8px 10px;border-bottom:1px solid var(--linea);white-space:nowrap}
-table.tab td{padding:9px 10px;border-bottom:1px solid var(--linea);vertical-align:top}
+  letter-spacing:.08em;font-size:10px;color:var(--tx2);padding:8px 10px;border-bottom:1px solid var(--line);white-space:nowrap}
+table.tab td{padding:9px 10px;border-bottom:1px solid var(--line);vertical-align:top}
 table.tab tr:last-child td{border-bottom:none}
 table.tab td.num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
 
@@ -383,17 +493,14 @@ table.tab td.num{text-align:right;font-variant-numeric:tabular-nums;white-space:
         <button class="gh sm" id="btnOut">Salir</button>
       </div>
     </div>
-    <nav>
-      <button data-t="hoy" class="on">Hoy</button>
-      <button data-t="habitos">Hábitos</button>
-      <button data-t="progreso">Progreso</button>
-      <button data-t="metas">Metas semanales</button>
-      <button data-t="gym">Gym</button>
-      <button data-t="cuerpo">Cuerpo</button>
-      <button data-t="plan">Plan</button>
-      <button data-t="finanzas">Finanzas</button>
-      <button data-t="reporte">Reporte</button>
+    <nav id="navG">
+      <button data-g="hoy" class="on">Hoy</button>
+      <button data-g="progreso">Avance</button>
+      <button data-g="gym">Gym</button>
+      <button data-g="cuerpo">Cuerpo</button>
+      <button data-g="dinero">Dinero</button>
     </nav>
+    <div id="subNav" class="subnav hidden"></div>
   </header>
 
   <div class="wrap">
@@ -890,6 +997,31 @@ table.tab td.num{text-align:right;font-variant-numeric:tabular-nums;white-space:
 </dialog>
 
 
+
+<!-- BOTON DE ACCION RAPIDA -->
+<button id="fab" class="fab" aria-label="Acción rápida">+</button>
+<div id="hojaRapida" class="hoja hidden">
+  <div class="hoja-fondo"></div>
+  <div class="hoja-caja">
+    <div class="hoja-asa"></div>
+    <h3>¿Qué vas a registrar?</h3>
+    <div id="hojaAcciones"></div>
+    <button class="gh" id="cerrarHoja">Cancelar</button>
+  </div>
+</div>
+
+<!-- GUIA DE PRIMERA VEZ -->
+<dialog id="dlgGuia">
+  <div id="guiaCuerpo"></div>
+  <div class="row" style="justify-content:space-between;align-items:center;margin-top:6px">
+    <button class="gh sm" id="guiaSaltar">Saltar</button>
+    <div class="row" style="gap:8px">
+      <span class="muted" id="guiaPaso" style="font-size:12px"></span>
+      <button class="pri" id="guiaSig">Siguiente</button>
+    </div>
+  </div>
+</dialog>
+
 <!-- DIALOGO RECUPERACION -->
 <dialog id="dlgRecup">
   <h2>Cómo amaneciste</h2>
@@ -1151,9 +1283,17 @@ function ok(res, msg){
    Al publicar una versión nueva: sube VERSION, pon la fecha y agrega
    su entrada arriba del todo en NOVEDADES.
    ===================================================================== */
-const VERSION = '3.0.0';
+const VERSION = '3.1.0';
 const FECHA_VERSION = '2026-09-05';
 const NOVEDADES = [
+  ['3.1.0', '2026-09-05', [
+    'Navegación de cinco pestañas en vez de nueve: Hoy, Avance, Gym, Cuerpo y Dinero, con subsecciones dentro de cada una.',
+    'Botón flotante de acción rápida: registrar agua, marcar un hábito, anotar una serie, tu peso o cómo amaneciste sin navegar.',
+    'Guía de bienvenida la primera vez, con los datos mínimos al final.',
+    'Pantallas vacías que explican para qué sirve la sección y traen el botón que la arranca.',
+    'Arreglado el desbordamiento en el teléfono: las etiquetas ya no se salen de las tarjetas y las filas se apilan bien en pantallas angostas.',
+    'Botones y campos con área táctil de 44 px, texto de 16 px en los formularios para que iOS no haga zoom, y respeto por la barra de gestos del iPhone.'
+  ]],
   ['3.0.0', '2026-09-05', [
     'Pestaña Plan: tu entrenador dentro de la app, con siete secciones que salen de tus propios datos.',
     'Plan de 180 días en seis bloques mensuales, con metas de peso y de fuerza para cada uno.',
@@ -1352,6 +1492,9 @@ async function entrar(user){
   await revisarUso();
   arrancarRecordatorios();
   pintarEstadoNotif();
+  actualizarRapido();
+  pintarSubnav();
+  quizasGuia();
 }
 
 /* =====================================================================
@@ -1743,23 +1886,60 @@ function animarSeccion(sec, dir){
   });
 }
 
-$$('nav button').forEach(b => b.onclick = () => {
-  const antes = ORDEN_TABS.indexOf(S.tab), ahora = ORDEN_TABS.indexOf(b.dataset.t);
-  const dir = antes < 0 || ahora < 0 ? 0 : (ahora > antes ? 1 : -1);
-  $$('nav button').forEach(x => x.classList.remove('on')); b.classList.add('on');
-  S.tab = b.dataset.t;
-  ['hoy','habitos','progreso','metas','gym','cuerpo','plan','finanzas','reporte'].forEach(t => {
-    $('#t' + t.charAt(0).toUpperCase() + t.slice(1)).classList.toggle('hidden', t !== S.tab);
+/* ---------- navegación en dos niveles: 5 grupos, subsecciones dentro ---------- */
+const NAVG = [
+  { k:'hoy',      n:'Hoy',      hijos:[['hoy','Resumen'], ['habitos','Mis hábitos']] },
+  { k:'progreso', n:'Progreso', hijos:[['progreso','Progreso'], ['metas','Metas'], ['reporte','Reporte']] },
+  { k:'gym',      n:'Gym',      hijos:[['gym','Gimnasio']] },
+  { k:'cuerpo',   n:'Cuerpo',   hijos:[['cuerpo','Mis medidas'], ['plan','Entrenador']] },
+  { k:'dinero',   n:'Dinero',   hijos:[['finanzas','Finanzas']] }
+];
+const TODAS = ['hoy','habitos','progreso','metas','gym','cuerpo','plan','finanzas','reporte'];
+const grupoDe = (t) => (NAVG.find(g => g.hijos.some(h => h[0] === t)) || NAVG[0]).k;
+S.grupo = 'hoy';
+S.ultima = {};   // recuerda en qué subsección estabas de cada grupo
+
+function mostrarTab(t, dir){
+  S.tab = t;
+  S.grupo = grupoDe(t);
+  S.ultima[S.grupo] = t;
+  TODAS.forEach(x => {
+    const el = $('#t' + x.charAt(0).toUpperCase() + x.slice(1));
+    if (el) el.classList.toggle('hidden', x !== t);
   });
-  if ((S.tab === 'gym' || S.tab === 'reporte') && !G.cargado) cargarGym();
-  if ((S.tab === 'finanzas' || S.tab === 'reporte') && !F.cargado) cargarFinanzas();
-  if ((S.tab === 'cuerpo' || S.tab === 'reporte') && !C.cargado) cargarCuerpo();
-  if (S.tab === 'plan'){ if (!C.cargado) cargarCuerpo(); if (!G.cargado) cargarGym();
-                         if (!COACH.cargado) cargarPlan(); else pintarPlan180(); }
-  if (S.tab === 'reporte') setTimeout(() => pintarReporte(S.repTipo || 'diario'), 400);
-  animarSeccion($('#t' + S.tab.charAt(0).toUpperCase() + S.tab.slice(1)), dir);
+  $$('#navG button').forEach(b => b.classList.toggle('on', b.dataset.g === S.grupo));
+  pintarSubnav();
+  if ((t === 'gym' || t === 'reporte') && !G.cargado) cargarGym();
+  if ((t === 'finanzas' || t === 'reporte') && !F.cargado) cargarFinanzas();
+  if ((t === 'cuerpo' || t === 'plan' || t === 'reporte') && !C.cargado) cargarCuerpo();
+  if (t === 'plan'){ if (!G.cargado) cargarGym();
+                     if (!COACH.cargado) cargarPlan(); else pintarPlan180(); }
+  if (t === 'reporte') setTimeout(() => pintarReporte(S.repTipo || 'diario'), 400);
+  animarSeccion($('#t' + t.charAt(0).toUpperCase() + t.slice(1)), dir || 0);
+  actualizarRapido();
+}
+
+function pintarSubnav(){
+  const g = NAVG.find(x => x.k === S.grupo);
+  const sn = $('#subNav');
+  if (!g || g.hijos.length < 2){ sn.classList.add('hidden'); sn.innerHTML = ''; return; }
+  sn.classList.remove('hidden');
+  sn.innerHTML = g.hijos.map(h =>
+    '<button data-s="' + h[0] + '"' + (h[0] === S.tab ? ' class="on"' : '') + '>' + h[1] + '</button>').join('');
+  $$('#subNav button').forEach(b => b.onclick = () => {
+    const antes = TODAS.indexOf(S.tab), ahora = TODAS.indexOf(b.dataset.s);
+    mostrarTab(b.dataset.s, ahora > antes ? 1 : -1);
+  });
+}
+
+$$('#navG button').forEach(b => b.onclick = () => {
+  const g = NAVG.find(x => x.k === b.dataset.g);
+  const antes = NAVG.findIndex(x => x.k === S.grupo), ahora = NAVG.indexOf(g);
+  const destino = S.ultima[g.k] || g.hijos[0][0];
+  mostrarTab(destino, ahora > antes ? 1 : -1);
   b.animate([{transform:'scale(.94)'},{transform:'scale(1)'}], {duration:220, easing:'cubic-bezier(.2,.8,.2,1)'});
 });
+
 $('#btnAyer').onclick = () => { S.fecha = sumarDias(S.fecha, -1); pintarHoy(); pintarAgua(); };
 $('#btnHoyVolver').onclick = () => { S.fecha = hoyISO(); pintarHoy(); pintarAgua(); };
 
@@ -3484,10 +3664,34 @@ function datosPlan(){
 }
 
 function avisoFaltan(faltan){
-  return '<div class="card"><h2 style="margin-top:0">Antes de armar tu plan</h2>' +
-    '<p>Para no inventarme nada, necesito que completes: <b>' + faltan.join('</b>, <b>') + '</b>.</p>' +
-    '<p class="muted">Un entrenador que te arma un plan sin conocerte no es un entrenador, es una plantilla.</p>' +
-    '<div class="row"><button class="pri" onclick="abrirPerfil()">Completar mis datos</button></div></div>';
+  return '<div class="card">' + vacio('&#128203;', 'Cuéntame de ti primero',
+    'Me faltan <b>' + faltan.join('</b>, <b>') + '</b>. Con eso calculo tus calorías, armo tu rutina y fijo tus metas.',
+    'Completar mis datos', 'perfil',
+    'Son dos minutos. Un plan hecho sin conocerte no es un plan, es una plantilla.') + '</div>';
+}
+
+
+/* ---------- pantallas vacías: qué es, para qué sirve y por dónde empezar ---------- */
+function vacio(icono, titulo, texto, boton, accion, extra){
+  return '<div class="vacio">' +
+    '<div class="ic">' + icono + '</div>' +
+    '<h2>' + titulo + '</h2>' +
+    '<p>' + texto + '</p>' +
+    (boton ? '<button class="pri" data-vac="' + accion + '">' + boton + '</button>' : '') +
+    (extra ? '<div class="muted" style="font-size:12.5px;margin-top:12px">' + extra + '</div>' : '') +
+    '</div>';
+}
+function conectarVacios(cont){
+  $$((cont || '') + ' [data-vac]').forEach(b => b.onclick = () => {
+    const a = b.dataset.vac;
+    if (a === 'perfil') abrirPerfil();
+    else if (a === 'rutina'){ const x = $('#btnGenRutina'); if (x) x.click(); }
+    else if (a === 'recup') abrirRecup();
+    else if (a === 'gym') mostrarTab('gym');
+    else if (a === 'cuerpo') mostrarTab('cuerpo');
+    else if (a === 'hoy') mostrarTab('hoy');
+    else if (a === 'peso') abrirMedida('peso');
+  });
 }
 
 /* ---------- 1 · plan de 180 días ---------- */
@@ -3537,7 +3741,8 @@ function vistaRutina(){
   const {p, ejercicios} = datosPlan();
   const faltan = faltaParaPlan(p);
   if (faltan.length) return avisoFaltan(faltan);
-  if (!ejercicios.length) return '<div class="card"><p>Todavía no cargué los ejercicios. Abre la pestaña Gimnasio una vez y vuelve.</p></div>';
+  if (!ejercicios.length) return '<div class="card">' + vacio('&#127939;', 'Faltan los ejercicios',
+    'Abre la sección Gimnasio una vez para que cargue el catálogo y vuelve aquí.', 'Abrir Gimnasio', 'gym') + '</div>';
 
   const g = guiaRutina(p);
   const permite = (EQUIPO[p.equipo] || EQUIPO.gimnasio).permite;
@@ -3686,16 +3891,19 @@ function vistaDebiles(){
   const {p, series, ejercicios, medidas} = datosPlan();
   const d = puntosDebiles(p, series, ejercicios, medidas);
 
-  if (!d.hayDatos) return '<div class="card"><h2 style="margin-top:0">Sin entrenamientos que analizar</h2>' +
-    '<p>Registra tus series en la pestaña Gimnasio durante dos o tres semanas y aquí te diré qué grupo se está quedando atrás.</p>' +
-    '<p class="muted" style="margin-bottom:0">Y algo importante: no diagnostico lesiones ni analizo fotos. Eso es trabajo de un profesional que te vea en persona.</p></div>';
+  if (!d.hayDatos) return '<div class="card">' + vacio('&#127947;', 'Todavía no hay nada que analizar',
+    'Registra tus series en Gimnasio durante dos o tres semanas y aquí te diré qué grupo se está quedando atrás y qué hacer.',
+    'Ir a registrar series', 'gym',
+    'No diagnostico lesiones ni analizo fotos: eso es trabajo de alguien que te vea en persona.') + '</div>';
 
   const res = '<div class="card"><h2 style="margin-top:0">Últimas 4 semanas</h2>' +
     '<p class="muted" style="margin-top:0">' + d.sesiones + ' sesiones registradas.</p>' +
     (d.hallazgos.length
-      ? d.hallazgos.slice(0,6).map(h => '<div class="fila2"><div><b>' + h.que + '</b>' +
-          '<div class="muted" style="font-size:12px">' + h.por + '</div></div>' +
-          '<span class="pill ' + (h.sev>=2?'bad':'warn') + '">' + (h.exceso ? 'de más' : 'de menos') + '</span></div>').join('')
+      ? d.hallazgos.slice(0,6).map(h =>
+          '<div class="hallazgo ' + (h.sev>=2?'grave':'') + '">' +
+          '<span class="pill ' + (h.sev>=2?'bad':'warn') + '">' + (h.exceso ? 'Sobra volumen' : 'Falta volumen') + '</span>' +
+          '<div style="margin-top:6px"><b>' + h.que + '</b></div>' +
+          '<div class="muted" style="font-size:12.5px;margin-top:2px">' + h.por + '</div></div>').join('')
       : '<p>Ningún grupo se sale de rango. Tu reparto de volumen está equilibrado.</p>') + '</div>';
 
   const asi = d.asim.length ? '<div class="card"><h2 style="margin-top:0">Diferencias entre lados</h2>' +
@@ -3763,9 +3971,10 @@ function vistaRevision(){
   if (faltan.length) return avisoFaltan(faltan);
   const r = revisionSemanal(p, pl, medidas, series, ejercicios, COACH.recup, registros, habitos);
 
-  if (!r.hayDatos) return '<div class="card"><h2 style="margin-top:0">La semana pasada quedó vacía</h2>' +
-    '<p>No hay pesajes, ni sesiones, ni sueño registrado entre el ' + fechaCorta(r.iniAct) + ' y el ' + fechaCorta(r.finSem) + '.</p>' +
-    '<p class="muted" style="margin-bottom:0">No voy a inventarme una revisión. Registra esta semana y el lunes hablamos.</p></div>';
+  if (!r.hayDatos) return '<div class="card">' + vacio('&#128197;', 'La semana pasada quedó vacía',
+    'Entre el ' + fechaCorta(r.iniAct) + ' y el ' + fechaCorta(r.finSem) + ' no hubo pesajes, ni sesiones, ni sueño registrado.',
+    'Registrar mi peso', 'peso',
+    'No voy a inventarme una revisión. Registra esta semana y el lunes hablamos.') + '</div>';
 
   const flecha = (v, bueno) => v == null ? '' :
     '<span class="pill ' + (v === 0 ? '' : (bueno ? 'ok' : 'bad')) + '">' + (v > 0 ? '+' : '') + v + '</span>';
@@ -3812,6 +4021,7 @@ function pintarPlan180(){
   catch(e){ html = '<div class="card mala"><h2 style="margin-top:0">Algo falló al calcular</h2><p class="muted">' + esc(String(e && e.message || e)) + '</p></div>'; }
   cont.innerHTML = html;
   conectarPlan();
+  conectarVacios('#plCuerpo');
   $$('#plCuerpo .card').forEach((el,i) => {
     el.style.animation = 'entraCard .42s cubic-bezier(.2,.8,.2,1) ' + Math.min(i*55, 280) + 'ms both';
   });
@@ -6084,6 +6294,106 @@ $('#btnSaveRecup').onclick = async () => {
   $('#dlgRecup').close();
   await cargarPlan(); COACH.secc = 'recup'; pintarPlan180();
 };
+
+
+/* =====================================================================
+   BOTÓN DE ACCIÓN RÁPIDA
+   Lo que más se hace, a un toque, sin navegar.
+   Las opciones cambian según dónde estés.
+   ===================================================================== */
+function accionesRapidas(){
+  const a = [];
+  const hA = (typeof habitoAgua === 'function') ? habitoAgua() : null;
+  if (hA){
+    const p1 = porcionAgua(hA)[0];
+    a.push({ e:'&#128167;', t:'Un vaso de agua', d:'Suma ' + textoAgua(hA, p1) + ' a tu meta de hoy',
+             f: () => registrarAgua(p1) });
+  }
+  const pend = (S.habitos || []).filter(h => tocaHoy(h, S.fecha) && !(regDe(h.id, S.fecha) || {}).cumplido);
+  if (pend.length) a.push({ e:'&#9989;', t:'Marcar un hábito', d:'Te quedan ' + pend.length + ' para hoy',
+             f: () => { mostrarTab('hoy'); setTimeout(() => abrirRegistro(pend[0]), 260); } });
+  a.push({ e:'&#127947;', t:'Registrar una serie', d:'Peso y repeticiones del gimnasio',
+           f: () => { mostrarTab('gym'); setTimeout(() => { const el = $('#gyPeso'); if (el) el.focus(); }, 500); } });
+  a.push({ e:'&#9878;', t:'Anotar mi peso', d:'Es lo que alimenta la tendencia',
+           f: () => { mostrarTab('cuerpo'); setTimeout(() => abrirMedida('peso'), 300); } });
+  a.push({ e:'&#128564;', t:'Cómo amanecí', d:'Sueño, estrés y energía',
+           f: () => { mostrarTab('plan'); setTimeout(abrirRecup, 300); } });
+  return a;
+}
+
+function abrirRapido(){
+  const acc = accionesRapidas();
+  $('#hojaAcciones').innerHTML = acc.map((x,i) =>
+    '<button class="op" data-i="' + i + '"><span class="e">' + x.e + '</span>' +
+    '<span><b>' + x.t + '</b><span class="d">' + x.d + '</span></span></button>').join('');
+  $$('#hojaAcciones .op').forEach(b => b.onclick = () => {
+    cerrarRapido(); setTimeout(() => acc[Number(b.dataset.i)].f(), 120);
+  });
+  $('#hojaRapida').classList.remove('hidden');
+  actualizarRapido();
+}
+function cerrarRapido(){ $('#hojaRapida').classList.add('hidden'); actualizarRapido(); }
+function actualizarRapido(){
+  const f = $('#fab'); if (!f) return;
+  const hayDialogo = !!document.querySelector('dialog[open]');
+  const hayHoja = !$('#hojaRapida').classList.contains('hidden');
+  f.classList.toggle('oculto', !S.user || $('#vApp').classList.contains('hidden') || hayDialogo || hayHoja);
+}
+/* cualquier diálogo que se abra o cierre esconde o devuelve el botón */
+(function(){
+  const abrir = HTMLDialogElement.prototype.showModal, cerrar = HTMLDialogElement.prototype.close;
+  HTMLDialogElement.prototype.showModal = function(){ abrir.apply(this, arguments); actualizarRapido(); };
+  HTMLDialogElement.prototype.close     = function(){ cerrar.apply(this, arguments); actualizarRapido(); };
+})();
+
+$('#fab').onclick = abrirRapido;
+$('#cerrarHoja').onclick = cerrarRapido;
+$('.hoja-fondo').onclick = cerrarRapido;
+
+/* =====================================================================
+   GUÍA DE PRIMERA VEZ
+   Cinco pantallas cortas. Se puede saltar en cualquier momento.
+   ===================================================================== */
+const GUIA = [
+  { e:'&#128170;', t:'Esto no es otra app de hábitos',
+    p:'STRICTO no te felicita por marcar una casilla. Te dice todos los días si vas bien o si te estás mintiendo, con números.' },
+  { e:'&#128197;', t:'Hoy es tu pantalla del día',
+    p:'Ahí ves los hábitos que tocan, el vaso de agua llenándose y tus puntos. Es la única pantalla que necesitas ver a diario.' },
+  { e:'&#127947;', t:'Gym y Cuerpo llevan tu progreso',
+    p:'Registra tus series y la app compara cada semana con la anterior. En Cuerpo cargas tus medidas y la figura cambia contigo.' },
+  { e:'&#127919;', t:'El entrenador vive en Cuerpo → Entrenador',
+    p:'Te arma un plan de 180 días, tu rutina exacta, tus calorías y una revisión cada semana. Todo sale de lo que registres.' },
+  { e:'&#9989;', t:'Empecemos por tus datos',
+    p:'Sexo, edad, estatura, peso, tu objetivo, cuánta experiencia tienes y qué equipo usas. Dos minutos y ya puede calcularlo todo.',
+    b:'Cargar mis datos' }
+];
+let guiaI = 0;
+function pintarGuia(){
+  const g = GUIA[guiaI];
+  $('#guiaCuerpo').innerHTML = '<div class="guia-ic">' + g.e + '</div>' +
+    '<h2 style="margin:0 0 8px">' + g.t + '</h2><p class="guia-p">' + g.p + '</p>' +
+    '<div class="puntos">' + GUIA.map((x,i) => '<i class="' + (i===guiaI?'on':'') + '"></i>').join('') + '</div>';
+  $('#guiaSig').textContent = g.b || 'Siguiente';
+  $('#guiaPaso').textContent = (guiaI+1) + ' de ' + GUIA.length;
+}
+function abrirGuia(){ guiaI = 0; pintarGuia(); $('#dlgGuia').showModal(); }
+function cerrarGuia(abrirDatos){
+  try{ localStorage.setItem('stricto_guia', '1'); }catch(e){}
+  $('#dlgGuia').close();
+  if (abrirDatos) setTimeout(abrirPerfil, 220);
+}
+$('#guiaSaltar').onclick = () => cerrarGuia(false);
+$('#guiaSig').onclick = () => {
+  if (guiaI < GUIA.length - 1){ guiaI++; pintarGuia(); }
+  else cerrarGuia(true);
+};
+
+function quizasGuia(){
+  let vista = false;
+  try{ vista = localStorage.getItem('stricto_guia') === '1'; }catch(e){}
+  const nuevo = !S.perfil || !S.perfil.onboarding;
+  if (!vista && nuevo) setTimeout(abrirGuia, 900);
+}
 
 </script>
 </body>
