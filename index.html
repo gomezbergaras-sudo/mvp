@@ -2,6 +2,10 @@
 <html lang="es">
 <head>
 <meta charset="utf-8">
+<!-- Política de seguridad de contenido: si un dato de otro usuario lograra
+     inyectar código, esto le impide sacar nada fuera de Supabase. -->
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com data:; img-src 'self' data: blob:; connect-src https://*.supabase.co wss://*.supabase.co; base-uri 'none'; form-action 'none'; frame-ancestors 'none'">
+<meta name="referrer" content="strict-origin-when-cross-origin">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>STRICTO</title>
 <meta name="theme-color" content="#0D1B2A">
@@ -2005,9 +2009,14 @@ function ok(res, msg){
    Al publicar una versión nueva: sube VERSION, pon la fecha y agrega
    su entrada arriba del todo en NOVEDADES.
    ===================================================================== */
-const VERSION = '5.0.0';
+const VERSION = '5.0.1';
 const FECHA_VERSION = '2026-09-05';
 const NOVEDADES = [
+  ['5.0.1', '2026-09-05', [
+    'Seguridad: se corrigió una falla por la que el alias de otro usuario en el ranking del gimnasio podía ejecutar código en tu sesión. Era la más grave de la app y ya no existe.',
+    'Se escaparon 14 puntos donde texto tuyo o de otro usuario llegaba a la pantalla sin filtrar.',
+    'Se añadió una política de seguridad de contenido: aunque algo lograra colarse, no tiene por dónde sacar tus datos.'
+  ]],
   ['5.0.0', '2026-09-05', [
     'Copiloto: una pestaña nueva dentro de Dinero donde todos los módulos por fin colaboran.',
     'Diagnóstico con puntaje y seis medidas, cada una con la fórmula a la vista: tasa de ahorro, meses de autonomía, carga de deuda, exposición a devaluación, estabilidad del gasto y pagos fijos al día.',
@@ -2209,7 +2218,7 @@ function pintarTemas(){
     const b = document.createElement('button');
     b.className = 'tema' + (t.id === actual ? ' on' : '');
     b.innerHTML = '<div class="sw">' + t.sw.map(x => '<i style="background:' + x + '"></i>').join('') + '</div>' +
-      '<div style="font-weight:650">' + t.nombre + '</div><div class="muted">' + t.desc + '</div>';
+      '<div style="font-weight:650">' + esc(t.nombre) + '</div><div class="muted">' + esc(t.desc) + '</div>';
     b.onclick = () => { aplicarTema(t.id); pintarTemas(); };
     c.appendChild(b);
   });
@@ -2488,7 +2497,7 @@ function pintarMetas(){
     el.className = 'card';
     el.innerHTML =
       '<div class="row" style="justify-content:space-between"><div style="font-weight:600" class="tt"></div>' +
-      '<span class="tag">' + m.categoria + '</span></div>' +
+      '<span class="tag">' + esc(m.categoria) + '</span></div>' +
       (m.obstaculo ? '<div class="muted ob" style="margin-top:4px"></div>' : '') +
       '<div class="row" style="margin-top:10px">' +
       '<input type="range" min="0" max="100" step="10" value="' + (m.progreso || 0) + '" style="flex:1">' +
@@ -3046,7 +3055,7 @@ function pintarEjercicios(){
   }
   const ant = $('#gyEj').value;
   $('#gyEj').innerHTML = lista.map(e =>
-    '<option value="' + e.id + '">' + e.nombre + ' · ' + e.equipo.replace('_',' ') + '</option>').join('')
+    '<option value="' + esc(e.id) + '">' + esc(e.nombre) + ' · ' + esc(e.equipo.replace('_',' ')) + '</option>').join('')
     || '<option value="">(sin ejercicios en este grupo)</option>';
   if (lista.some(e => e.id === ant)) $('#gyEj').value = ant;
   $('#gyEj').onchange = pintarUltima;
@@ -3135,7 +3144,7 @@ function pintarComparativa(){
     '<div style="overflow-x:auto"><table class="datos">' +
     '<tr><th>Ejercicio</th><th>Esta semana</th><th>Anterior</th><th>Cambio</th><th>Mejor peso</th></tr>' +
     filas.map(f =>
-      '<tr><td>' + f.nombre + (f.pr ? ' <span class="tag fire">récord</span>' : '') + '</td>' +
+      '<tr><td>' + esc(f.nombre) + (f.pr ? ' <span class="tag fire">récord</span>' : '') + '</td>' +
       '<td>' + kg(f.va) + ' kg</td><td class="muted">' + kg(f.vb) + ' kg</td>' +
       '<td>' + flecha(f.dif) + '</td><td>' + (f.maxA ? f.maxA + ' kg' : '—') + '</td></tr>').join('') +
     '<tr class="total"><td>TOTAL</td><td>' + kg(totalA) + ' kg</td>' +
@@ -3157,7 +3166,7 @@ function pintarRanking(){
       const cr = Number(r.crecimiento);
       return '<tr' + (r.soy_yo ? ' class="yo"' : '') + '>' +
       '<td>' + medalla(r.posicion) + '</td>' +
-      '<td>' + r.nombre + (r.soy_yo ? ' <span class="tag yo">tú</span>' : '') + '</td>' +
+      '<td>' + esc(r.nombre) + (r.soy_yo ? ' <span class="tag yo">tú</span>' : '') + '</td>' +
       '<td style="font-weight:700">' + Number(r.puntaje).toFixed(1) + '</td>' +
       '<td class="' + (cr > 0 ? 'sube' : cr < 0 ? 'baja' : 'muted') + '">' +
         (cr > 0 ? '▲ +' : cr < 0 ? '▼ ' : '') + cr.toFixed(1) + '%</td>' +
@@ -4821,7 +4830,7 @@ function vistaPlan180(){
     P180.bloques.map(b =>
       '<div class="bloque' + (b.actual ? ' activo' : b.pasado ? ' hecho' : '') + '">' +
       '<div class="row" style="justify-content:space-between;align-items:baseline">' +
-        '<div><b>Mes ' + b.n + ' · ' + b.titulo + '</b>' +
+        '<div><b>Mes ' + b.n + ' · ' + esc(b.titulo) + '</b>' +
         (b.actual ? ' <span class="pill ok">vas aquí</span>' : '') + '</div>' +
         '<span class="muted" style="font-size:12px">' + b.mes + '</span></div>' +
       '<div class="muted" style="margin-top:6px"><b style="color:var(--tx)">Entreno:</b> ' + b.entreno + '</div>' +
@@ -4964,7 +4973,7 @@ function vistaRutina(){
   if (!COACH.rutina.length){
     const prev = generarRutina(p, ejercicios, focoActual());
     cuerpo += '<div class="card">' + vacio('&#128203;', 'Todavía no tienes rutina',
-      'Con lo que hay ahora te tocaría <b>' + prev.nombre + '</b>: ' + prev.filas.length +
+      'Con lo que hay ahora te tocaría <b>' + esc(prev.nombre) + '</b>: ' + prev.filas.length +
       ' ejercicios en ' + prev.dias + ' días. Elige músculos arriba si quieres otra cosa.',
       null, null,
       'La rutina se guarda para que la sigas semana a semana. Puedes rehacerla cuando quieras.') + '</div>';
@@ -5156,7 +5165,7 @@ function vistaDebiles(){
   } else if (d.bloque){
     const b = d.bloque;
     esp = '<div class="card"><h2 style="margin-top:0">Bloque de especialización sugerido</h2>' +
-      '<p>El candidato es <b>' + b.nombre.toLowerCase() + '</b>: de ' + b.seriesActual + ' a ' + b.seriesNuevo + ' series por semana, durante ' + b.semanas + ' semanas.</p>' +
+      '<p>El candidato es <b>' + esc(b.nombre.toLowerCase()) + '</b>: de ' + b.seriesActual + ' a ' + b.seriesNuevo + ' series por semana, durante ' + b.semanas + ' semanas.</p>' +
       '<ol class="lista">' + b.pasos.map(x => '<li>' + x + '</li>').join('') + '</ol>' +
       '<p class="muted">' + b.revision + '</p>' +
       '<div class="row"><button class="pri" id="btnAbrirEspec" data-g="' + b.grupo + '" data-s="' + b.semanas + '">Empezar el bloque</button></div></div>';
@@ -6855,7 +6864,7 @@ function pintarAgua(){
     '<div class="agua-fila">' +
       '<div class="vaso-caja">' + vasoSVG(pct) + '</div>' +
       '<div style="flex:1;min-width:190px">' +
-        '<h2 style="margin:0 0 6px">' + h.nombre + '</h2>' +
+        '<h2 style="margin:0 0 6px">' + esc(h.nombre) + '</h2>' +
         '<div class="agua-num">' + textoAgua(h, hecho) + ' <span class="muted" style="font-size:16px">de ' + textoAgua(h, meta) + '</span></div>' +
         '<div class="muted" style="margin-top:2px">' + (lleno ? '¡Meta cumplida! Tu cuerpo te lo agradece.'
           : 'Te faltan ' + textoAgua(h, meta - hecho) + ' · ' + Math.round(pct*100) + '% del día') + '</div>' +
@@ -7397,10 +7406,10 @@ function pintarMovimientos(){
     '<th>Fecha</th><th>Categoría</th><th>Detalle</th><th>Monto</th><th></th></tr>' +
     mv.map(m => '<tr data-id="' + m.id + '">' +
       '<td class="muted">' + m.fecha.slice(8,10) + '/' + m.fecha.slice(5,7) + '</td>' +
-      '<td>' + m.categoria + (m.fijo ? ' <span class="tag">fijo</span>' : '') +
+      '<td>' + esc(m.categoria) + (m.fijo ? ' <span class="tag">fijo</span>' : '') +
         (m.cuenta_id && cuentaDe(m.cuenta_id) ? '<br><span class="muted" style="font-size:11px">' +
           esc(cuentaDe(m.cuenta_id).nombre) + '</span>' : '') + '</td>' +
-      '<td class="muted">' + (m.descripcion || '—') + '</td>' +
+      '<td class="muted">' + esc(m.descripcion || '—') + '</td>' +
       '<td class="' + (m.tipo === 'ingreso' ? 'sube' : m.tipo === 'traspaso' ? 'muted' : '') + '">' +
         (m.tipo === 'ingreso' ? '+' : m.tipo === 'traspaso' ? '' : '−') + ' ' +
         plata(m.monto, m.moneda || monedaRef()) + '</td>' +
