@@ -74,7 +74,8 @@ input,select,textarea{font:inherit;background:var(--input);color:var(--tx);borde
 input:focus,select:focus,textarea:focus,button:focus-visible{outline:2px solid var(--brand);outline-offset:1px}
 label{display:block;font-size:12px;color:var(--tx2);margin:0 0 4px;text-transform:uppercase;letter-spacing:.4px}
 a{color:var(--brand-tx)}
-.wrap{max-width:940px;margin:0 auto;padding:16px 16px 64px}
+.wrap{max-width:940px;margin:0 auto;
+  padding:16px 16px calc(150px + env(safe-area-inset-bottom))}
 .card{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:18px;margin-bottom:14px}
 .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
 .grid{display:grid;gap:12px}
@@ -438,10 +439,61 @@ dialog::backdrop{background:rgba(0,0,0,.6)}
 
 
 /* ---------- navegación en dos niveles ---------- */
-nav#navG{display:grid;grid-template-columns:repeat(5,1fr);gap:5px;max-width:940px;
-  margin:0 auto;padding:0 12px 8px;overflow:visible}
-nav#navG button{padding:9px 4px;font-size:13.5px;white-space:nowrap;text-align:center;
-  border-radius:10px;overflow:hidden;text-overflow:ellipsis}
+/* =====================================================================
+   NAVEGACIÓN PRINCIPAL · barra de menisco
+   La pestaña activa no se desliza: la barra se derrite a su alrededor.
+   ===================================================================== */
+nav#navG{position:fixed;left:0;right:0;bottom:0;z-index:39;display:block;overflow:visible;
+  padding:0 14px calc(10px + env(safe-area-inset-bottom));
+  background:linear-gradient(180deg, rgba(0,0,0,0) 0%, var(--bg) 26%, var(--bg) 100%);
+  pointer-events:none}
+nav#navG .mn{max-width:520px;margin:0 auto;pointer-events:auto}
+#vApp.hidden ~ nav#navG{display:none}
+.mn{--mn-top:44px;--mn-alto:56px;
+  position:relative;height:calc(var(--mn-top) + var(--mn-alto) + 26px);touch-action:pan-y}
+.mn-svg{position:absolute;left:0;width:100%;overflow:visible;pointer-events:none;display:block}
+.mn-svg path{fill:var(--panel);stroke:var(--line);stroke-width:1.4;
+  transition:fill .3s ease, stroke .3s ease}
+.mn-svg .mn-sombra{fill:none;stroke:var(--c,#00E676);stroke-width:1.4;opacity:.26;
+  transition:stroke .22s ease}
+
+.mn-btns{position:absolute;left:0;right:0;top:var(--mn-top);height:var(--mn-alto);
+  display:grid;grid-template-columns:repeat(5,1fr);align-items:center;z-index:2}
+.mn-btns button{background:none;border:0;padding:0;min-height:var(--mn-alto);cursor:pointer;
+  display:flex;align-items:center;justify-content:center;color:var(--tx2);
+  transition:color .25s ease, opacity .25s ease;-webkit-tap-highlight-color:transparent}
+.mn-btns button svg{width:23px;height:23px;display:block}
+.mn-btns button:hover{color:var(--tx)}
+.mn-btns button.on{opacity:0;pointer-events:none}   /* su icono vive dentro de la perla */
+.mn-btns button:focus-visible{outline:2px solid var(--c,#00E676);outline-offset:-8px;border-radius:14px}
+
+.mn-perla{position:absolute;top:calc(var(--mn-top) - 32px);left:0;width:52px;height:52px;
+  border-radius:50%;display:flex;align-items:center;justify-content:center;z-index:3;cursor:grab;
+  background:radial-gradient(circle at 34% 28%, rgba(255,255,255,.42) 0%, rgba(255,255,255,0) 48%),
+             var(--c,#00E676);
+  box-shadow:0 0 0 5px var(--bg), 0 7px 20px -3px var(--c,#00E676), 0 0 34px -6px var(--c,#00E676);
+  transition:left .46s cubic-bezier(.34,1.4,.5,1), background .3s ease, box-shadow .3s ease,
+             transform .18s ease;
+  touch-action:none;-webkit-tap-highlight-color:transparent}
+.mn-perla.arrastrando{cursor:grabbing;transition:background .25s ease, box-shadow .25s ease,
+  transform .18s ease;transform:scale(1.07)}
+.mn-perla svg{width:24px;height:24px;color:#08130D;display:block}
+.mn-perla::after{content:"";position:absolute;inset:-13px;border-radius:50%}
+
+.mn-eti{position:absolute;top:calc(var(--mn-top) + 34px);left:0;width:104px;margin-left:-52px;
+  text-align:center;font-family:'Exo 2',system-ui,sans-serif;font-weight:700;font-size:11.5px;
+  letter-spacing:.13em;text-transform:uppercase;color:var(--c,#00E676);
+  pointer-events:none;z-index:3;white-space:nowrap;
+  transition:left .46s cubic-bezier(.34,1.4,.5,1), color .3s ease}
+
+@media (prefers-reduced-motion:reduce){
+  .mn-perla,.mn-eti{transition:background .2s ease, color .2s ease}
+}
+@media (max-width:620px){
+  nav#navG{padding:0 10px 2px}
+  .mn{--mn-top:42px}
+}
+}
 .subnav{display:flex;gap:6px;max-width:940px;margin:0 auto;padding:0 12px 10px;
   overflow-x:auto;scrollbar-width:none}
 .subnav::-webkit-scrollbar{display:none}
@@ -449,12 +501,9 @@ nav#navG button{padding:9px 4px;font-size:13.5px;white-space:nowrap;text-align:c
   padding:6px 13px;font-size:12.5px;white-space:nowrap;border-radius:999px}
 .subnav button.on{background:var(--brand-soft);border-color:var(--brand);color:var(--brand-tx);font-weight:650}
 @media (max-width:620px){
-  nav#navG{padding:0 8px 6px;gap:4px}
-  nav#navG button{font-size:12.5px;padding:10px 2px;min-height:42px}
   .subnav{padding:0 8px 9px}
   .subnav button{min-height:36px}
 }
-@media (max-width:360px){ nav#navG button{font-size:11.5px} }
 
 /* ================= MÓVIL: que todo se pueda tocar y nada se salga ================= */
 @media (max-width:620px){
@@ -546,8 +595,8 @@ nav#navG button{padding:9px 4px;font-size:13.5px;white-space:nowrap;text-align:c
 
 
 /* ---------- barra fija: armar la rutina ---------- */
-body.con-barra .wrap{padding-bottom:calc(120px + env(safe-area-inset-bottom))}
-.barra-accion{position:fixed;left:0;right:0;bottom:0;z-index:38;
+body.con-barra .wrap{padding-bottom:calc(260px + env(safe-area-inset-bottom))}
+.barra-accion{position:fixed;left:0;right:0;bottom:calc(118px + env(safe-area-inset-bottom));z-index:38;
   background:linear-gradient(to top,var(--bg) 62%,rgba(0,0,0,0));
   padding:16px 12px calc(14px + env(safe-area-inset-bottom));
   animation:subeBarra .26s cubic-bezier(.2,.8,.2,1)}
@@ -567,7 +616,7 @@ body.con-barra .wrap{padding-bottom:calc(120px + env(safe-area-inset-bottom))}
   .ba-caja button{padding:12px 18px;font-size:13.5px}
 }
 /* ---------- botón de acción rápida ---------- */
-.fab{position:fixed;right:16px;bottom:calc(20px + env(safe-area-inset-bottom));z-index:40;
+.fab{position:fixed;right:16px;bottom:calc(146px + env(safe-area-inset-bottom));z-index:41;
   width:58px;height:58px;border-radius:50%;font-size:30px;line-height:1;font-weight:400;
   background:linear-gradient(135deg,var(--brand),var(--brand2,var(--brand)));color:#08131F;
   border:none;box-shadow:0 10px 28px rgba(0,0,0,.45),0 0 0 1px rgba(255,255,255,.12) inset;
@@ -1059,13 +1108,7 @@ table.tab td.num{text-align:right;font-variant-numeric:tabular-nums;white-space:
         <button class="gh sm" id="btnOut">Salir</button>
       </div>
     </div>
-    <nav id="navG">
-      <button data-g="hoy" class="on">Hoy</button>
-      <button data-g="progreso">Avance</button>
-      <button data-g="gym">Gym</button>
-      <button data-g="cuerpo">Cuerpo</button>
-      <button data-g="dinero">Dinero</button>
-    </nav>
+    
     <div id="subNav" class="subnav hidden"></div>
   </header>
 
@@ -1780,6 +1823,23 @@ table.tab td.num{text-align:right;font-variant-numeric:tabular-nums;white-space:
 
 
 
+<nav id="navG" aria-label="Secciones principales">
+      <div class="mn" id="mn">
+        <svg class="mn-svg" id="mnSvg" aria-hidden="true">
+          <path id="mnRuta"></path><path id="mnBrillo" class="mn-sombra"></path>
+        </svg>
+        <div class="mn-btns" id="mnBtns">
+          <button data-g="hoy" class="on" aria-label="Hoy" title="Hoy"></button>
+          <button data-g="progreso" aria-label="Avance" title="Avance"></button>
+          <button data-g="gym" aria-label="Gym" title="Gym"></button>
+          <button data-g="cuerpo" aria-label="Cuerpo" title="Cuerpo"></button>
+          <button data-g="dinero" aria-label="Dinero" title="Dinero"></button>
+        </div>
+        <div class="mn-perla" id="mnPerla" role="presentation"></div>
+        <div class="mn-eti" id="mnEti">Hoy</div>
+      </div>
+    </nav>
+
 <!-- BARRA FIJA PARA ARMAR LA RUTINA -->
 <div id="barraRutina" class="barra-accion hidden">
   <div class="ba-caja">
@@ -2303,9 +2363,15 @@ function ok(res, msg){
    Al publicar una versión nueva: sube VERSION, pon la fecha y agrega
    su entrada arriba del todo en NOVEDADES.
    ===================================================================== */
-const VERSION = '5.3.0';
+const VERSION = '5.4.0';
 const FECHA_VERSION = '2026-09-05';
 const NOVEDADES = [
+  ['5.4.0', '2026-09-07', [
+    'Navegación nueva abajo: las cinco secciones son iconos y la activa sale en una perla de color; la barra se derrite a su alrededor en vez de deslizarse.',
+    'Cada sección tiene su color, del verde de la marca al dorado: Hoy, Avance, Gym, Cuerpo y Dinero.',
+    'La perla se puede arrastrar de un lado a otro y cae en la sección más cercana al soltarla.',
+    'Los botones quedaron al alcance del pulgar en el teléfono; el botón flotante y la barra de rutina subieron para no chocar con ellos.'
+  ]],
   ['5.3.0', '2026-09-07', [
     'Pantalla de entrada nueva: una tarjeta con panel deslizante que cambia entre entrar y crear cuenta sin recargar.',
     'Los campos tienen icono y se iluminan al escribir; el botón se bloquea mientras se procesa para que no lo toques dos veces.',
@@ -2860,6 +2926,7 @@ async function entrar(user){
   pintarEstadoNotif();
   actualizarRapido();
   pintarSubnav();
+  mnActualizar(false);
   quizasGuia();
 }
 
@@ -3280,7 +3347,8 @@ function mostrarTab(t, dir){
     const el = $('#t' + x.charAt(0).toUpperCase() + x.slice(1));
     if (el) el.classList.toggle('hidden', x !== t);
   });
-  $$('#navG button').forEach(b => b.classList.toggle('on', b.dataset.g === S.grupo));
+  $$('#mnBtns button').forEach(b => b.classList.toggle('on', b.dataset.g === S.grupo));
+  if (typeof mnActualizar === 'function') mnActualizar();
   pintarSubnav();
   if ((t === 'gym' || t === 'reporte') && !G.cargado) cargarGym();
   if ((t === 'finanzas' || t === 'copiloto' || t === 'reporte') && !F.cargado) cargarFinanzas();
@@ -3309,13 +3377,162 @@ function pintarSubnav(){
   });
 }
 
-$$('#navG button').forEach(b => b.onclick = () => {
-  const g = NAVG.find(x => x.k === b.dataset.g);
+/* =====================================================================
+   BARRA DE MENISCO
+   La barra es un <path> que se vuelve a dibujar cada vez que cambia la
+   pestaña: el borde de arriba se levanta y envuelve la perla. La perla
+   se puede arrastrar; al soltarla cae en la sección más cercana.
+   ===================================================================== */
+const MN_ICONOS = {
+  hoy:      '<path d="M4 11.4 12 4.8l8 6.6"/><path d="M6.6 10.3V19.2h10.8V10.3"/><path d="M10.2 19.2v-4.4h3.6v4.4"/>',
+  progreso: '<path d="M4 4.5v15h15.5"/><path d="M7.4 15.2l3.6-4.1 3 2.4 4.8-6.2"/>',
+  gym:      '<path d="M6.6 8v8M4 9.6v4.8M17.4 8v8M20 9.6v4.8"/><path d="M6.6 12h10.8"/>',
+  cuerpo:   '<circle cx="12" cy="6.4" r="2.9"/><path d="M5.8 20.4c0-3.6 2.8-6.3 6.2-6.3s6.2 2.7 6.2 6.3"/>',
+  dinero:   '<rect x="3.4" y="6.4" width="17.2" height="11.2" rx="2.6"/><circle cx="12" cy="12" r="2.5"/><path d="M6.6 12h.01M17.4 12h.01"/>'
+};
+const MN_COLOR = { hoy:'#00E676', progreso:'#4FDE7A', gym:'#8BD64F', cuerpo:'#BFCB40', dinero:'#D4AF37' };
+const MN_NOMBRE = { hoy:'Hoy', progreso:'Avance', gym:'Gym', cuerpo:'Cuerpo', dinero:'Dinero' };
+const MN_ORDEN = ['hoy','progreso','gym','cuerpo','dinero'];
+
+const mnSvg = (d) => '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" ' +
+                     'stroke-linecap="round" stroke-linejoin="round">' + d + '</svg>';
+
+/* Dibuja la barra con el montículo centrado en cx. */
+function mnRuta(W, H, R, cx, rn){
+  const d = rn * 0.42, g = rn * 1.05;
+  const x1 = Math.max(R, cx - rn - g), x2 = Math.min(W - R, cx + rn + g);
+  const ax = rn * 0.93;
+  return 'M0 ' + R + ' Q0 0 ' + R + ' 0' +
+         ' H ' + x1.toFixed(1) +
+         ' C ' + (x1 + g * 0.5).toFixed(1) + ' 0 ' + (cx - ax - rn * 0.16).toFixed(1) + ' ' + (-d * 0.42).toFixed(1) +
+           ' ' + (cx - ax).toFixed(1) + ' ' + (-d).toFixed(1) +
+         ' A ' + rn.toFixed(1) + ' ' + rn.toFixed(1) + ' 0 0 0 ' + (cx + ax).toFixed(1) + ' ' + (-d).toFixed(1) +
+         ' C ' + (cx + ax + rn * 0.16).toFixed(1) + ' ' + (-d * 0.42).toFixed(1) + ' ' + (x2 - g * 0.5).toFixed(1) + ' 0 ' +
+           x2.toFixed(1) + ' 0' +
+         ' H ' + (W - R) + ' Q' + W + ' 0 ' + W + ' ' + R +
+         ' V ' + (H - R) + ' Q' + W + ' ' + H + ' ' + (W - R) + ' ' + H +
+         ' H ' + R + ' Q0 ' + H + ' 0 ' + (H - R) + ' Z';
+}
+
+const MN = { W:0, H:56, R:26, rn:33, centros:[], x:0, arrastrando:false };
+
+function mnMedir(){
+  const cont = $('#mn'); if (!cont) return false;
+  const anchoNav = cont.getBoundingClientRect().width;
+  if (!anchoNav) return false;
+  MN.W = anchoNav;
+  MN.centros = MN_ORDEN.map((k, i) => anchoNav * (i + 0.5) / 5);
+  const svg = $('#mnSvg'), aire = MN.rn * 1.5;
+  const arriba = parseFloat(getComputedStyle(cont).getPropertyValue('--mn-top')) || 44;
+  svg.setAttribute('viewBox', '0 ' + (-aire) + ' ' + MN.W + ' ' + (MN.H + aire));
+  svg.setAttribute('height', MN.H + aire);
+  svg.style.top = (arriba - aire) + 'px';
+  return true;
+}
+
+/* Pinta la barra en la posición x (píxeles desde el borde izquierdo). */
+function mnPintar(x, clave){
+  if (!MN.W && !mnMedir()) return;
+  MN.x = x;
+  const dcam = mnRuta(MN.W, MN.H, MN.R, x, MN.rn);
+  $('#mnRuta').setAttribute('d', dcam);
+  $('#mnBrillo').setAttribute('d', dcam);
+  const perla = $('#mnPerla');
+  perla.style.left = (x - 26) + 'px';
+  if (clave){
+    const c = MN_COLOR[clave] || '#00E676';
+    $('#mn').style.setProperty('--c', c);
+    perla.innerHTML = mnSvg(MN_ICONOS[clave] || '');
+    const eti = $('#mnEti');
+    eti.textContent = MN_NOMBRE[clave] || '';
+    eti.style.left = Math.min(MN.W - 22, Math.max(22, x)) + 'px';
+  }
+}
+
+function mnActualizar(animar){
+  if (!mnMedir()) return;
+  const i = Math.max(0, MN_ORDEN.indexOf(S.grupo));
+  const perla = $('#mnPerla'), eti = $('#mnEti');
+  if (animar === false){
+    perla.style.transition = 'none'; eti.style.transition = 'none';
+    mnPintar(MN.centros[i], MN_ORDEN[i]);
+    perla.offsetHeight;                       // fuerza el repintado
+    perla.style.transition = ''; eti.style.transition = '';
+  } else {
+    mnPintar(MN.centros[i], MN_ORDEN[i]);
+  }
+}
+
+/* La barra viaja acompañando a la perla mientras esta se mueve sola. */
+function mnSeguir(destino){
+  const inicio = MN.x, t0 = performance.now(), dur = 460;
+  const rebote = (t) => { const c = 1.9; return 1 + 2.2 * Math.pow(t - 1, 3) + c * Math.pow(t - 1, 2); };
+  (function paso(ahora){
+    const t = Math.min(1, (ahora - t0) / dur);
+    const x = inicio + (destino - inicio) * rebote(t);
+    const dcam = mnRuta(MN.W, MN.H, MN.R, x, MN.rn);
+    $('#mnRuta').setAttribute('d', dcam); $('#mnBrillo').setAttribute('d', dcam);
+    MN.x = x;
+    if (t < 1) requestAnimationFrame(paso);
+  })(t0);
+}
+
+/* ---------- arrastrar la perla ---------- */
+(function(){
+  const perla = $('#mnPerla'); if (!perla) return;
+  let activo = false, movio = false;
+
+  perla.addEventListener('pointerdown', (e) => {
+    if (!mnMedir()) return;
+    activo = true; movio = false;
+    perla.setPointerCapture(e.pointerId);
+    perla.classList.add('arrastrando');
+    e.preventDefault();
+  });
+
+  perla.addEventListener('pointermove', (e) => {
+    if (!activo) return;
+    const r = $('#mn').getBoundingClientRect();
+    const x = Math.min(MN.W - 22, Math.max(22, e.clientX - r.left));
+    if (Math.abs(x - MN.x) > 3) movio = true;
+    const cerca = MN.centros.reduce((a, c, i) =>
+      Math.abs(c - x) < Math.abs(MN.centros[a] - x) ? i : a, 0);
+    mnPintar(x, MN_ORDEN[cerca]);
+  });
+
+  const soltar = (e) => {
+    if (!activo) return;
+    activo = false; perla.classList.remove('arrastrando');
+    try { perla.releasePointerCapture(e.pointerId); } catch(_){}
+    const i = MN.centros.reduce((a, c, k) =>
+      Math.abs(c - MN.x) < Math.abs(MN.centros[a] - MN.x) ? k : a, 0);
+    const destino = MN_ORDEN[i];
+    if (!movio || destino === S.grupo){ mnSeguir(MN.centros[i]); mnActualizar(); return; }
+    mnSeguir(MN.centros[i]);
+    mnIrAGrupo(destino);
+  };
+  perla.addEventListener('pointerup', soltar);
+  perla.addEventListener('pointercancel', soltar);
+})();
+
+function mnIrAGrupo(k){
+  const g = NAVG.find(x => x.k === k); if (!g) return;
   const antes = NAVG.findIndex(x => x.k === S.grupo), ahora = NAVG.indexOf(g);
-  const destino = S.ultima[g.k] || g.hijos[0][0];
-  mostrarTab(destino, ahora > antes ? 1 : -1);
-  b.animate([{transform:'scale(.94)'},{transform:'scale(1)'}], {duration:220, easing:'cubic-bezier(.2,.8,.2,1)'});
+  if (ahora === antes) return;
+  mostrarTab(S.ultima[g.k] || g.hijos[0][0], ahora > antes ? 1 : -1);
+}
+
+/* iconos y clics */
+$$('#mnBtns button').forEach(b => {
+  b.innerHTML = mnSvg(MN_ICONOS[b.dataset.g] || '');
+  b.onclick = () => {
+    const i = MN_ORDEN.indexOf(b.dataset.g);
+    if (MN.centros.length) mnSeguir(MN.centros[i]);
+    mnIrAGrupo(b.dataset.g);
+  };
 });
+
+addEventListener('resize', () => mnActualizar(false));
 
 $('#btnAyer').onclick = () => { S.fecha = sumarDias(S.fecha, -1); pintarHoy(); pintarAgua(); };
 $('#btnHoyVolver').onclick = () => { S.fecha = hoyISO(); pintarHoy(); pintarAgua(); };
