@@ -2719,9 +2719,14 @@ function ok(res, msg){
    Al publicar una versión nueva: sube VERSION, pon la fecha y agrega
    su entrada arriba del todo en NOVEDADES.
    ===================================================================== */
-const VERSION = '5.7.0';
+const VERSION = '5.7.1';
 const FECHA_VERSION = '2026-09-05';
 const NOVEDADES = [
+  ['5.7.1', '2026-09-07', [
+    'Arreglado: si subiste tu foto antes de que existiera la miniatura, el ranking te mostraba las iniciales. Ahora la app le genera la miniatura sola a partir de la foto que ya tenías, sin pedirte nada.',
+    'Tu propia foto se ve en el ranking aunque el servidor todavía no la tenga: la app ya la tiene cargada.',
+    'Si falta correr esquema_v11 en Supabase, el ranking lo dice debajo de la tabla en vez de mostrar iniciales sin explicación.'
+  ]],
   ['5.7.0', '2026-09-07', [
     'Dinero se rehizo: panel verde con tu foto, el saludo por la hora del día y el saldo grande con los decimales atenuados.',
     'Pastilla para elegir qué cuenta miras: cambia el saldo de arriba y filtra la lista de movimientos a esa cuenta.',
@@ -3323,6 +3328,7 @@ async function entrar(user){
   pintarSubnav();
   mnActualizar(false);
   pintarFoto();
+  rellenarMiniatura();
   quizasGuia();
 }
 
@@ -4387,6 +4393,9 @@ async function cargarGym(){
 
   const r = await sb.rpc('ranking_gym');
   G.ranking = r.error ? [] : (r.data || []);
+  // Si la función que responde es la vieja, no trae la columna de la foto.
+  G.rankSinFoto = !r.error && G.ranking.length > 0 &&
+                  !Object.prototype.hasOwnProperty.call(G.ranking[0], 'foto');
   if (r.error) console.warn('ranking:', r.error.message);
   await cargarConcurso();
 
@@ -4532,7 +4541,9 @@ function pintarComparativa(){
 
 /* Miniatura del ranking: la foto si la hay, si no las iniciales sobre un
    color estable sacado del propio nombre. Nunca queda un hueco. */
-function avatarChip(nombre, foto){
+function avatarChip(nombre, foto, soyYo){
+  // Tu propia foto la tienes cargada aquí: no hace falta esperar al servidor.
+  if (!foto && soyYo && S.perfil) foto = S.perfil.avatar_mini || S.perfil.avatar || null;
   if (foto && /^data:image\//.test(foto))
     return '<img class="rk-foto" src="' + esc(foto) + '" alt="" loading="lazy">';
   const ini = inicialesDe(nombre, '');
@@ -4559,7 +4570,7 @@ function pintarRanking(){
                   : r.revisar ? ' <span class="tag oro">en revisión</span>' : '';
       return '<tr' + (r.soy_yo ? ' class="yo"' : '') + (r.elegible === false ? ' style="opacity:.65"' : '') + '>' +
       '<td>' + medalla(r.posicion) + '</td>' +
-      '<td class="rk-td"><span class="rk-quien">' + avatarChip(r.nombre, r.foto) +
+      '<td class="rk-td"><span class="rk-quien">' + avatarChip(r.nombre, r.foto, r.soy_yo) +
         '<span class="rk-nom">' + esc(r.nombre) +
         (r.soy_yo ? ' <span class="tag yo">tú</span>' : '') + (hayCon ? marca : '') +
         '</span></span></td>' +
@@ -4570,7 +4581,9 @@ function pintarRanking(){
       (hayCon ? '<td>' + (r.semanas != null ? r.semanas : '—') + '</td>' : '') +
       '<td class="muted">' + Math.round(Number(r.volumen)).toLocaleString('es') + ' kg</td></tr>';
     }).join('') +
-    '</table></div>';
+    '</table></div>' +
+    (G.rankSinFoto ? '<p class="muted" style="margin:10px 0 0;font-size:12.5px">' +
+      'Para que salgan las fotos de los demás falta correr <b>esquema_v11.txt</b> en Supabase.</p>' : '');
 }
 
 /* ---------- registrar serie ---------- */
@@ -11308,6 +11321,43 @@ function pintarHero(){
   $('#icIngreso').innerHTML  = svgIco('flechaSube');
   $('#icTraspaso').innerHTML = svgIco('cambio');
   $('#icMas').innerHTML      = svgIco('puntos');
+}
+
+/* Quien subió su foto antes de que existiera la miniatura no tiene una.
+   Se le genera aquí, una sola vez, a partir de la foto que ya está
+   guardada. Sin pedirle nada y sin volver a subir el archivo. */
+function miniDesde(url){
+  return new Promise((listo, falla) => {
+    const img = new Image();
+    img.onerror = () => falla(new Error('no se pudo leer la foto guardada'));
+    img.onload = () => {
+      const lado = Math.min(img.width, img.height);
+      const cx = (img.width - lado) / 2, cy = (img.height - lado) / 2;
+      const c = document.createElement('canvas');
+      c.width = c.height = AJ_MINI;
+      const g = c.getContext('2d');
+      g.imageSmoothingQuality = 'high';
+      g.drawImage(img, cx, cy, lado, lado, 0, 0, AJ_MINI, AJ_MINI);
+      let q = 0.72, u = c.toDataURL('image/jpeg', q);
+      while (u.length > AJ_MINI_PESO && q > 0.35){ q -= 0.1; u = c.toDataURL('image/jpeg', q); }
+      listo(u.length > AJ_MINI_PESO ? null : u);
+    };
+    img.src = url;
+  });
+}
+
+async function rellenarMiniatura(){
+  const P = S.perfil;
+  if (!P || !P.avatar || P.avatar_mini) return;
+  try {
+    const mini = await miniDesde(P.avatar);
+    if (!mini) return;
+    const { error } = await sb.from('perfiles')
+      .upsert({ id: S.user.id, avatar_mini: mini }, { onConflict:'id' });
+    if (error) return;                       // sin esquema_v11 todavía: se reintenta al entrar
+    P.avatar_mini = mini;
+    if (G.cargado) { await cargarGym(); }
+  } catch (e){ /* que nunca estorbe la carga */ }
 }
 
 $('#fiOjo').onclick = () => { guardarLocal('fi_oculto', saldoOculto() ? '0' : '1'); pintarHero(); };
