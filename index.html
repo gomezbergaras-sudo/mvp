@@ -440,6 +440,30 @@ dialog::backdrop{background:rgba(0,0,0,.6)}
 
 
 /* ---------- navegación en dos niveles ---------- */
+/* placas de marca */
+.ic.mk{font-family:'Exo 2',system-ui,sans-serif;font-weight:800;font-size:13.5px;
+  letter-spacing:.01em;line-height:1;text-transform:uppercase;
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.12)}
+
+/* foto en la tabla del ranking */
+/* la columna necesita sitio: sin esto el nombre se parte letra por letra
+   y la tabla, que ya se desplaza sola, no tiene por qué estrujarla */
+.rk-td{min-width:158px}
+.rk-quien{display:flex;align-items:center;gap:9px;min-width:0}
+.rk-foto{flex:0 0 30px;width:30px;height:30px;border-radius:50%;object-fit:cover;display:block;
+  border:1px solid var(--line)}
+.rk-ini{display:flex;align-items:center;justify-content:center;border:0;
+  font-family:'Exo 2',system-ui,sans-serif;font-weight:800;font-size:12px;color:#0A0F14;
+  letter-spacing:.02em}
+.rk-nom{min-width:0;line-height:1.3;overflow-wrap:normal;word-break:normal}
+.rk-nom .tag{white-space:nowrap;margin-left:2px}
+@media (max-width:620px){
+  .rk-td{min-width:142px}
+  .rk-foto{flex-basis:26px;width:26px;height:26px}
+  .rk-ini{font-size:11px}
+  .rk-quien{gap:7px}
+}
+
 /* =====================================================================
    AJUSTES
    ===================================================================== */
@@ -1713,8 +1737,9 @@ table.tab td.num{text-align:right;font-variant-numeric:tabular-nums;white-space:
         </div>
       </div>
       <input type="file" id="ajArchivo" accept="image/png,image/jpeg,image/webp" hidden>
-      <p class="muted aj-nota" id="ajFotoNota">Toca la foto para cambiarla. Se guarda solo en tu perfil:
-         nadie más la ve, ni siquiera en el ranking.</p>
+      <p class="muted aj-nota" id="ajFotoNota">Toca la foto para cambiarla. Si participas en el ranking,
+         los demás ven una miniatura junto a tu nombre; la foto completa no sale de tu perfil.
+         Si apagas tu participación, deja de verse.</p>
 
       <div class="aj-grupo">Cuenta</div>
       <div class="aj-lista">
@@ -2564,9 +2589,18 @@ function ok(res, msg){
    Al publicar una versión nueva: sube VERSION, pon la fecha y agrega
    su entrada arriba del todo en NOVEDADES.
    ===================================================================== */
-const VERSION = '5.5.0';
+const VERSION = '5.6.0';
 const FECHA_VERSION = '2026-09-05';
 const NOVEDADES = [
+  ['5.6.0', '2026-09-07', [
+    'El ranking muestra la foto de quien participa. Quien no tenga foto sale con sus iniciales sobre un color propio, nunca un hueco.',
+    'Se guarda una miniatura aparte de 64 px para eso: es lo único que ven los demás. Tu foto completa sigue sin salir de tu perfil.',
+    'Si apagas «Aparecer en el ranking», tu foto deja de verse en el acto.',
+    'Términos actualizados a la versión 1.1 por ese cambio: al entrar se piden otra vez y arriba dice qué cambió.',
+    'Dinero reconoce tus bancos y tus suscripciones: Banco de Venezuela, Banesco, Mercantil, Provincial, Binance, AirTM, Zelle, PayPal, Netflix, Spotify, Movistar, Inter y unas sesenta más, cada una con su placa de color.',
+    'Las que no estén en la lista igual reciben una placa con un color estable sacado de su propio nombre.',
+    'El color de la letra en cada placa se elige por contraste real, y si ningún color de letra alcanza, se ajusta el fondo hasta que se lea.'
+  ]],
   ['5.5.0', '2026-09-07', [
     'Sexta sección: Ajustes. Ahí se juntó todo lo que estaba repartido — perfil, moneda, tema, recordatorios, ranking, términos y cerrar sesión.',
     'Foto de perfil: la eliges del teléfono, la app la recorta a cuadrado y la reduce a 256 px antes de guardarla. Sale en ajustes y en la cabecera.',
@@ -2789,8 +2823,8 @@ function pintarVersion(){
    La aceptación se guarda en la tabla 'aceptaciones' (esquema_v9), que
    no se puede editar ni borrar: por eso sirve como prueba.
    ===================================================================== */
-const TERMINOS_VERSION = '1.0';
-const TERMINOS_FECHA   = '5 de septiembre de 2026';
+const TERMINOS_VERSION = '1.1';
+const TERMINOS_FECHA   = '7 de septiembre de 2026';
 
 const TERMINOS = [
   { t:'Qué es STRICTO', p:[
@@ -2825,6 +2859,7 @@ const TERMINOS = [
   { t:'Tus datos', p:[
       'Todo lo que registras se guarda en una base de datos de Supabase con una regla activa que hace que cada usuario solo pueda leer y escribir sus propias filas. Ni otros usuarios ni la app ven tus datos de otra persona.'
   ], l:[
+      'Tu foto de perfil es opcional. Si la pones, se guarda en dos tamaños: la grande solo la ves tú, y una miniatura que se muestra en el ranking únicamente mientras tu participación esté activa.',
       'Se guarda lo que tú escribes: hábitos, series, medidas, movimientos de dinero, cuentas y las tasas que registras.',
       'El correo con el que entras lo administra Supabase para autenticarte.',
       'No se venden tus datos, no se ceden a terceros con fines publicitarios y no hay rastreadores de terceros dentro de la app.',
@@ -2835,6 +2870,7 @@ const TERMINOS = [
       'Aparecer en el ranking es voluntario: se activa y se desactiva desde “Mi participación”. Mientras esté activo, los demás participantes ven el nombre o alias que elijas y cuatro números: tu crecimiento de volumen, tus récords de la semana, tus días entrenados y tu puntaje.'
   ], l:[
       'Nadie ve tus series, tus pesos por ejercicio, tus medidas ni nada de tu dinero. Nunca.',
+      'Si tienes foto de perfil y participas en el ranking, junto a tu nombre se muestra una miniatura de esa foto. La foto completa no sale de tu perfil, y si apagas tu participación la miniatura deja de verse de inmediato.',
       'Entrar al reto semanal es gratis y no requiere ningún pago ni suscripción.',
       'Los premios los aporta quien organiza el reto o su patrocinador. No salen de las suscripciones ni de aportes de los participantes: esto es una promoción, no una apuesta, y nadie arriesga dinero para competir.',
       'Para optar a premio hay que cumplir los mínimos publicados en el reto: días entrenados, series registradas y semanas de antigüedad en la app.',
@@ -2875,6 +2911,11 @@ const TERMINOS = [
   ]}
 ];
 
+const TERMINOS_CAMBIO =
+  'Qué cambió en esta versión: si activas tu participación en el ranking y tienes foto de perfil, ' +
+  'ahora se muestra una miniatura tuya junto a tu nombre. Antes la foto no se veía en ningún lado. ' +
+  'La foto completa sigue siendo solo tuya, y apagando tu participación la miniatura desaparece.';
+
 function pintarTerminos(){
   $('#tmSub').textContent = 'Versión ' + TERMINOS_VERSION + ' · ' + TERMINOS_FECHA;
   const html = TERMINOS.map(sec => {
@@ -2885,7 +2926,10 @@ function pintarTerminos(){
     if (sec.l) h += '<ul>' + sec.l.map(x => '<li>' + esc(x) + '</li>').join('') + '</ul>';
     return h;
   }).join('');
-  $('#tmCuerpo').innerHTML = html +
+  const aviso = TERMINOS_CAMBIO
+    ? '<div class="clave" style="margin-bottom:14px"><p><b>' + esc(TERMINOS_CAMBIO) + '</b></p></div>'
+    : '';
+  $('#tmCuerpo').innerHTML = aviso + html +
     '<p class="fin">Fin de los términos · versión ' + esc(TERMINOS_VERSION) + '</p>';
 }
 
@@ -3585,8 +3629,10 @@ function mostrarTab(t, dir){
    el borrado de cuenta.
    ===================================================================== */
 
-const AJ_MAX = 256;          // lado máximo de la foto en píxeles
-const AJ_PESO = 190000;      // tope de la data URL; el servidor corta en 400 000
+const AJ_MAX  = 256;         // lado de la foto tuya
+const AJ_PESO = 190000;      // tope de esa data URL; el servidor corta en 400 000
+const AJ_MINI = 64;          // lado de la miniatura que ven los demás en el ranking
+const AJ_MINI_PESO = 20000;  // tope de la miniatura; el servidor corta en 40 000
 
 function inicialesDe(nombre, correo){
   const t = (nombre || '').trim() || (correo || '').trim();
@@ -3620,15 +3666,21 @@ function encogerImagen(archivo){
       img.onload = () => {
         const lado = Math.min(img.width, img.height);
         const cx = (img.width - lado) / 2, cy = (img.height - lado) / 2;
-        const c = document.createElement('canvas');
-        c.width = c.height = AJ_MAX;
-        const g = c.getContext('2d');
-        g.imageSmoothingQuality = 'high';
-        g.drawImage(img, cx, cy, lado, lado, 0, 0, AJ_MAX, AJ_MAX);
-        let q = 0.84, url = c.toDataURL('image/jpeg', q);
-        while (url.length > AJ_PESO && q > 0.4){ q -= 0.1; url = c.toDataURL('image/jpeg', q); }
-        if (url.length > AJ_PESO) return falla(new Error('No se pudo comprimir lo suficiente.'));
-        listo(url);
+        // dos tamaños: la tuya de 256 y la miniatura de 64 que ve el ranking
+        const hacer = (px, tope, q0) => {
+          const c = document.createElement('canvas');
+          c.width = c.height = px;
+          const g = c.getContext('2d');
+          g.imageSmoothingQuality = 'high';
+          g.drawImage(img, cx, cy, lado, lado, 0, 0, px, px);
+          let q = q0, url = c.toDataURL('image/jpeg', q);
+          while (url.length > tope && q > 0.35){ q -= 0.1; url = c.toDataURL('image/jpeg', q); }
+          return url.length > tope ? null : url;
+        };
+        const grande = hacer(AJ_MAX, AJ_PESO, 0.84);
+        const mini   = hacer(AJ_MINI, AJ_MINI_PESO, 0.72);
+        if (!grande || !mini) return falla(new Error('No se pudo comprimir lo suficiente.'));
+        listo({ grande: grande, mini: mini });
       };
       img.src = lector.result;
     };
@@ -3636,18 +3688,22 @@ function encogerImagen(archivo){
   });
 }
 
-async function guardarAvatar(url){
+async function guardarAvatar(par){
+  const url  = par ? par.grande : null;
+  const mini = par ? par.mini   : null;
   if (!S.perfil) S.perfil = { id: S.user.id };
-  const antes = S.perfil.avatar || null;
-  S.perfil.avatar = url; pintarFoto();
-  const { error } = await sb.from('perfiles').upsert({ id: S.user.id, avatar: url }, { onConflict:'id' });
+  const antes = S.perfil.avatar || null, antesM = S.perfil.avatar_mini || null;
+  S.perfil.avatar = url; S.perfil.avatar_mini = mini; pintarFoto();
+  const { error } = await sb.from('perfiles')
+    .upsert({ id: S.user.id, avatar: url, avatar_mini: mini }, { onConflict:'id' });
   if (error){
-    S.perfil.avatar = antes; pintarFoto();
+    S.perfil.avatar = antes; S.perfil.avatar_mini = antesM; pintarFoto();
     if (faltaTabla(error) || /avatar/i.test(error.message || ''))
-      return toast('Antes tienes que correr esquema_v10.txt en Supabase');
+      return toast('Antes tienes que correr esquema_v10.txt y esquema_v11.txt en Supabase');
     return toast('No se pudo guardar: ' + error.message);
   }
   toast(url ? 'Foto actualizada' : 'Foto quitada');
+  if (G.cargado) cargarGym();          // que la tabla del ranking se entere
 }
 
 /* ---------- pintar la pantalla ---------- */
@@ -4334,6 +4390,16 @@ function pintarComparativa(){
     '</table></div>';
 }
 
+/* Miniatura del ranking: la foto si la hay, si no las iniciales sobre un
+   color estable sacado del propio nombre. Nunca queda un hueco. */
+function avatarChip(nombre, foto){
+  if (foto && /^data:image\//.test(foto))
+    return '<img class="rk-foto" src="' + esc(foto) + '" alt="" loading="lazy">';
+  const ini = inicialesDe(nombre, '');
+  return '<span class="rk-foto rk-ini" style="background:' + colorDeTexto(nombre) + '">' +
+         esc(ini) + '</span>';
+}
+
 function pintarRanking(){
   pintarConcurso();
   const c = $('#gyRank');
@@ -4353,7 +4419,10 @@ function pintarRanking(){
                   : r.revisar ? ' <span class="tag oro">en revisión</span>' : '';
       return '<tr' + (r.soy_yo ? ' class="yo"' : '') + (r.elegible === false ? ' style="opacity:.65"' : '') + '>' +
       '<td>' + medalla(r.posicion) + '</td>' +
-      '<td>' + esc(r.nombre) + (r.soy_yo ? ' <span class="tag yo">tú</span>' : '') + (hayCon ? marca : '') + '</td>' +
+      '<td class="rk-td"><span class="rk-quien">' + avatarChip(r.nombre, r.foto) +
+        '<span class="rk-nom">' + esc(r.nombre) +
+        (r.soy_yo ? ' <span class="tag yo">tú</span>' : '') + (hayCon ? marca : '') +
+        '</span></span></td>' +
       '<td style="font-weight:700">' + Number(r.puntaje).toFixed(1) + '</td>' +
       '<td class="' + (cr > 0 ? 'sube' : cr < 0 ? 'baja' : 'muted') + '">' +
         (cr > 0 ? '▲ +' : cr < 0 ? '▼ ' : '') + cr.toFixed(1) + '%</td>' +
@@ -10718,6 +10787,151 @@ const ICO = {
   huella:   '<path d="M12 4c-3 0-5 2-5 5 0 4-1 5-1 5M12 4c3 0 5 2 5 5 0 4 1 5 1 5M12 8v6M9.5 20c1-1.5 1.5-3.5 1.5-6M14.5 20c-1-1.5-1.5-3.5-1.5-6"/>',
   punto:    '<circle cx="12" cy="12" r="7"/><path d="M12 9v6M9 12h6"/>'
 };
+/* =====================================================================
+   PLACAS DE MARCA
+   Bancos, billeteras y suscripciones se reconocen por el nombre y salen
+   con una placa del color de la marca y su inicial.
+   No se incrustan los logotipos reales a propósito: son marcas
+   registradas de terceros y meterlas en una app que va a la Play Store
+   es un problema que no hace falta tener. Además la política de
+   seguridad de la app bloquea imágenes de fuera, así que un logo traído
+   de internet ni siquiera cargaría. Color + inicial se reconoce igual de
+   rápido, pesa cero y funciona sin internet.
+   ===================================================================== */
+const MARCAS = [
+  // ---- bancos de Venezuela ----
+  { c:'#D6212C', t:'BDV', r:/banco de venezuela|\bbdv\b|bancoven/i },
+  { c:'#00953B', t:'BN',  r:/banesco/i },
+  { c:'#0B4EA2', t:'MC',  r:/mercantil/i },
+  { c:'#0A2C63', t:'PR',  r:/provincial|bbva/i },
+  { c:'#00539B', t:'BNC', r:/\bbnc\b|banco nacional de cr/i },
+  { c:'#00A0AF', t:'BM',  r:/bancamiga/i },
+  { c:'#E4002B', t:'BP',  r:/banplus/i },
+  { c:'#F08000', t:'BC',  r:/bancaribe/i },
+  { c:'#8A1538', t:'BV',  r:/banco bicentenario|bicentenario/i },
+  { c:'#00629B', t:'BS',  r:/banco del sur|\bdel sur\b|bancrecer|sofitasa|exterior/i },
+  { c:'#6B21A8', t:'PM',  r:/pago m[oó]vil|pagom[oó]vil/i },
+
+  // ---- billeteras y cripto ----
+  { c:'#F0B90B', t:'BI',  r:/binance/i },
+  { c:'#12B886', t:'AI',  r:/air ?tm/i },
+  { c:'#4A2CE2', t:'ZI',  r:/zinli/i },
+  { c:'#6D1ED4', t:'ZE',  r:/zelle/i },
+  { c:'#0070BA', t:'PP',  r:/paypal|pay ?pal/i },
+  { c:'#9FE870', t:'WI',  r:/\bwise\b|transferwise/i },
+  { c:'#00D54B', t:'CA',  r:/cash ?app/i },
+  { c:'#2775CA', t:'US',  r:/usdt|tether|\busdc\b/i },
+  { c:'#F7931A', t:'BT',  r:/bitcoin|\bbtc\b/i },
+  { c:'#627EEA', t:'ET',  r:/ethereum|\beth\b/i },
+  { c:'#00B2A9', t:'RE',  r:/\breserve\b|\brsv\b/i },
+  { c:'#0EA5E9', t:'WA',  r:/\bwally\b/i },
+
+  // ---- streaming y suscripciones ----
+  { c:'#E50914', t:'NE',  r:/netflix/i },
+  { c:'#1DB954', t:'SP',  r:/spotify/i },
+  { c:'#113CCF', t:'DI',  r:/disney/i },
+  { c:'#6E28D9', t:'MA',  r:/\bhbo\b|\bmax\b(?! ?imo)/i },
+  { c:'#00A8E1', t:'PV',  r:/prime video|amazon prime|\bprime\b/i },
+  { c:'#FF9900', t:'AM',  r:/amazon/i },
+  { c:'#FF0000', t:'YT',  r:/youtube/i },
+  { c:'#1D1D1F', t:'AP',  r:/apple|icloud|itunes|app store/i },
+  { c:'#00A4EF', t:'MS',  r:/microsoft|office ?365|onedrive|xbox/i },
+  { c:'#4285F4', t:'GO',  r:/google|gmail|drive|\bgoogle one\b/i },
+  { c:'#EC1C24', t:'AD',  r:/adobe|photoshop|illustrator/i },
+  { c:'#10A37F', t:'GP',  r:/chatgpt|openai/i },
+  { c:'#D97757', t:'CL',  r:/claude|anthropic/i },
+  { c:'#7D2AE8', t:'CV',  r:/canva/i },
+  { c:'#1877F2', t:'ME',  r:/facebook|instagram|\bmeta\b|whatsapp/i },
+  { c:'#5865F2', t:'DC',  r:/discord/i },
+  { c:'#FF4500', t:'CR',  r:/crunchyroll/i },
+  { c:'#7C3AED', t:'PL',  r:/pluto|plex/i },
+
+  // ---- servicios de Venezuela ----
+  { c:'#019DF4', t:'MO',  r:/movistar/i },
+  { c:'#E30613', t:'DG',  r:/digitel/i },
+  { c:'#009640', t:'MN',  r:/movilnet/i },
+  { c:'#0069B4', t:'CN',  r:/cantv|aba\b/i },
+  { c:'#00A8E0', t:'IN',  r:/\binter\b|intercable/i },
+  { c:'#E11D48', t:'NU',  r:/netuno/i },
+  { c:'#F59E0B', t:'CE',  r:/corpoelec|electricidad|\bluz\b/i },
+  { c:'#0EA5E9', t:'HI',  r:/hidro|agua|aguas de/i },
+  { c:'#16A34A', t:'GA',  r:/\bgas\b|pdvsa gas/i },
+  { c:'#DC2626', t:'FT',  r:/farmatodo|farmacia|locatel/i },
+  { c:'#EA580C', t:'YU',  r:/yummy|pedidosya|pedidos ya|rappi|delivery/i },
+  { c:'#1A1A1A', t:'UB',  r:/\buber\b|ridery|cabify|didi/i },
+  { c:'#0891B2', t:'SE',  r:/seguro|p[oó]liza|hcm/i },
+  { c:'#7C3AED', t:'GY',  r:/gimnas|\bgym\b|crossfit|entrenad/i },
+  { c:'#B45309', t:'AL',  r:/alquiler|arriendo|renta|condominio/i },
+  { c:'#0F766E', t:'CO',  r:/colegio|universidad|matr[ií]cula|escuela/i },
+  { c:'#334155', t:'EF',  r:/efectivo|caja chica|\bcash\b/i }
+];
+
+/* Color estable a partir del texto: la misma cuenta siempre sale igual,
+   y dos cuentas distintas casi nunca coinciden. */
+function colorDeTexto(t){
+  let h = 0; const x = String(t || '');
+  for (let i = 0; i < x.length; i++) h = (h * 31 + x.charCodeAt(i)) >>> 0;
+  const tono = h % 360;
+  const sat  = 52 + (h >> 9) % 18;      // 52–70%
+  const luz  = 58 + (h >> 17) % 12;     // 58–70% → texto oscuro encima
+  return 'hsl(' + tono + ' ' + sat + '% ' + luz + '%)';
+}
+
+/* Elige tinta clara u oscura por contraste real (WCAG), no a ojo.
+   Un verde medio como el de Spotify parece claro y no lo es: con letra
+   blanca da 2.4 de contraste, con letra oscura da 7.7. */
+function luminancia(r, g, b){
+  const c = [r, g, b].map(v => { v /= 255;
+    return v <= 0.04045 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4); });
+  return 0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2];
+}
+function contraste(L1, L2){
+  return (Math.max(L1, L2) + 0.05) / (Math.min(L1, L2) + 0.05);
+}
+/* Devuelve el fondo y la tinta de la placa con contraste garantizado.
+   Hay colores de marca —un rojo medio, un morado— donde NI la letra
+   blanca NI la oscura llegan a ser legibles. En esos se corrige el fondo
+   lo justo para que la letra se lea, sin dejar de reconocerse la marca. */
+function placaColores(color){
+  const m = /^#([0-9a-f]{6})$/i.exec(color);
+  if (!m) return { fondo: color, tinta: '#0A0F14' };   // los hsl que genero son claros
+  const n = parseInt(m[1], 16);
+  let r = n >> 16 & 255, g = n >> 8 & 255, b = n & 255;
+  let L = luminancia(r, g, b);
+  const tinta = contraste(L, 1.0) >= contraste(L, 0.0055) ? '#FFFFFF' : '#0A0F14';
+  const meta = tinta === '#FFFFFF' ? 1.0 : 0.0055;
+  for (let i = 0; i < 16 && contraste(L, meta) < 4.2; i++){
+    if (tinta === '#FFFFFF'){                    // oscurecer hacia el negro
+      r = Math.round(r * 0.88); g = Math.round(g * 0.88); b = Math.round(b * 0.88);
+    } else {                                     // aclarar hacia el blanco
+      r = Math.round(r + (255 - r) * 0.12);
+      g = Math.round(g + (255 - g) * 0.12);
+      b = Math.round(b + (255 - b) * 0.12);
+    }
+    L = luminancia(r, g, b);
+  }
+  return { fondo: 'rgb(' + r + ',' + g + ',' + b + ')', tinta: tinta };
+}
+
+function marcaDe(nombre){
+  const t = String(nombre || '').trim();
+  if (!t) return null;
+  const m = MARCAS.find(x => x.r.test(t));
+  if (m) return { color:m.c, letras:m.t };
+  const p = t.replace(/[^\p{L}\p{N} ]/gu, ' ').split(/\s+/).filter(Boolean);
+  const letras = ((p[0] || '?')[0] + (p[1] ? p[1][0] : (p[0] || '')[1] || '')).toUpperCase();
+  return { color: colorDeTexto(t), letras: letras };
+}
+
+/* La placa. Si no reconoce la marca igual devuelve algo: nunca un hueco. */
+function placaMarca(nombre, respaldo){
+  const m = marcaDe(nombre);
+  if (!m) return '<span class="ic">' + svgIco(respaldo || 'punto') + '</span>';
+  const c = placaColores(m.color);
+  return '<span class="ic mk" style="background:' + c.fondo + ';color:' + c.tinta + '">' +
+         esc(m.letras) + '</span>';
+}
+
 function svgIco(k){
   return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" ' +
          'stroke-linecap="round" stroke-linejoin="round">' + (ICO[k] || ICO.punto) + '</svg>';
@@ -10891,7 +11105,7 @@ function pintarPagos(){
     }
     const estado = cls === 'listo' ? ' pagado' : (cls === 'vence' ? ' hoy' : '');
     html += '<button class="pg' + estado + '" data-p="' + p.id + '">' +
-      '<span class="ic">' + svgIco(icoDeCat(p.categoria)) + '</span>' +
+      placaMarca(p.nombre, icoDeCat(p.categoria)) +
       '<span class="tx"><b>' + esc(p.nombre) + '</b><span class="' + cls + '">' + esc(txt) + '</span></span>' +
       '<span class="mo"><b>' + esc(plata(p.monto, monedaPago(p))) + '</b><span>' +
         (FREC_N[p.frecuencia] || 'Mensual') + '</span></span>' +
@@ -11354,7 +11568,7 @@ function pintarCuentas(){
       : aBs(s, x.moneda, hoyISO());
     const otraM = x.moneda === 'VES' ? ref : 'VES';
     return '<button class="cu" data-c="' + x.id + '">' +
-      '<span class="ic">' + svgIco(ICO_CUENTA[x.tipo] || 'banco') + '</span>' +
+      placaMarca(x.nombre, ICO_CUENTA[x.tipo] || 'banco') +
       '<span class="tx"><b>' + esc(x.nombre) + '</b>' +
         '<span>' + esc(TIPO_CUENTA[x.tipo] || 'Cuenta') + ' · ' + esc(MON[x.moneda] ? MON[x.moneda].n : x.moneda) + '</span></span>' +
       '<span class="mo"><b class="' + (s < 0 ? 'baja' : '') + '">' + esc(plata(s, x.moneda)) + '</b>' +
