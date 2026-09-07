@@ -440,6 +440,16 @@ dialog::backdrop{background:rgba(0,0,0,.6)}
 
 
 /* ---------- navegación en dos niveles ---------- */
+/* contraseña nueva */
+.cl-campo{position:relative}
+.cl-campo input{padding-right:44px}
+.cl-ver{position:absolute;right:6px;bottom:4px;width:34px;height:34px;padding:0;border:0;
+  background:none;color:var(--tx2);cursor:pointer;display:flex;align-items:center;justify-content:center}
+.cl-ver svg{width:17px;height:17px}
+.cl-fuerza{height:5px;border-radius:3px;background:var(--panel2);overflow:hidden}
+.cl-fuerza i{display:block;height:100%;width:0;border-radius:3px;background:var(--bad);
+  transition:width .25s ease, background .25s ease}
+
 /* placas de marca */
 .ic.mk{font-family:'Exo 2',system-ui,sans-serif;font-weight:800;font-size:13.5px;
   letter-spacing:.01em;line-height:1;text-transform:uppercase;
@@ -1240,6 +1250,7 @@ table.tab td.num{text-align:right;font-variant-numeric:tabular-nums;white-space:
             <button class="lg-btn" id="btnUp">Crear mi cuenta</button>
             <div id="authErr2" class="lg-err" role="status" aria-live="polite"></div>
             <div class="lg-enlaces">
+              <button class="lg-enlace hidden" id="btnReenviar">No llegó el correo. <b>Reenviar</b></button>
               <button class="lg-enlace lg-mov" data-ir="entrar">¿Ya tienes cuenta? <b>Entra aquí</b></button>
             </div>
           </div>
@@ -1916,7 +1927,7 @@ table.tab td.num{text-align:right;font-variant-numeric:tabular-nums;white-space:
       <div class="aj-lista">
         <button class="aj-fila" id="ajClave">
           <span class="aj-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="10.5" width="16" height="10.5" rx="2.5"/><path d="M8 10.5V7a4 4 0 0 1 8 0v3.5"/></svg></span>
-          <span class="aj-tx">Cambiar contraseña<small>Te llega un correo con el enlace</small></span>
+          <span class="aj-tx">Cambiar contraseña<small>La cambias aquí mismo, sin salir</small></span>
           <span class="aj-flecha">›</span>
         </button>
         <button class="aj-fila" id="ajTerm">
@@ -2309,6 +2320,29 @@ table.tab td.num{text-align:right;font-variant-numeric:tabular-nums;white-space:
   <div class="row" style="margin-top:16px;justify-content:flex-end">
     <button class="sm" id="rgCerrar">Cerrar</button>
     <button class="pri" id="rgAceptar">Acepto y participo</button>
+  </div>
+</dialog>
+
+<!-- ============ DIÁLOGO: contraseña nueva ============ -->
+<dialog id="dlgClave">
+  <h3 id="clTitulo" style="margin:0 0 2px">Contraseña nueva</h3>
+  <p class="muted" id="clSub" style="margin:0 0 14px;font-size:13px">
+     Escríbela dos veces para que no quede un dedazo guardado.</p>
+  <div class="grid">
+    <div class="cl-campo">
+      <label>Contraseña nueva</label>
+      <input id="clUno" type="password" autocomplete="new-password" placeholder="Mínimo 8 caracteres">
+      <button class="cl-ver" id="clVer" type="button" aria-label="Ver u ocultar la contraseña"></button>
+    </div>
+    <div><label>Repítela</label>
+      <input id="clDos" type="password" autocomplete="new-password" placeholder="La misma"></div>
+    <div class="cl-fuerza"><i id="clBarra"></i></div>
+    <div class="muted" id="clPista" style="font-size:12.5px;min-height:18px">&nbsp;</div>
+    <div class="lg-err" id="clErr" role="status" aria-live="polite"></div>
+    <div class="row" style="justify-content:flex-end;gap:8px">
+      <button class="gh" id="clCerrar">Cancelar</button>
+      <button class="pri" id="clGuardar">Guardar contraseña</button>
+    </div>
   </div>
 </dialog>
 
@@ -2719,9 +2753,16 @@ function ok(res, msg){
    Al publicar una versión nueva: sube VERSION, pon la fecha y agrega
    su entrada arriba del todo en NOVEDADES.
    ===================================================================== */
-const VERSION = '5.7.1';
+const VERSION = '5.8.0';
 const FECHA_VERSION = '2026-09-05';
 const NOVEDADES = [
+  ['5.8.0', '2026-09-07', [
+    'Recuperar la contraseña quedó completo: el enlace del correo ahora abre una pantalla donde escribes la nueva y entras con ella. Antes el correo llegaba pero no había dónde cambiarla.',
+    'Barra de fuerza mientras la escribes, hay que repetirla, y un ojo para verla si no confías en el teclado.',
+    'Cambiar la contraseña desde Ajustes ya no da la vuelta por el correo: como ya estás dentro, se cambia ahí mismo.',
+    'Al crear una cuenta, si el correo de confirmación no llega hay un botón para reenviarlo.',
+    'Más mensajes en español: enlace caducado, contraseña repetida, contraseña muy común, demasiados intentos.'
+  ]],
   ['5.7.1', '2026-09-07', [
     'Arreglado: si subiste tu foto antes de que existiera la miniatura, el ranking te mostraba las iniciales. Ahora la app le genera la miniatura sola a partir de la foto que ya tenías, sin pedirte nada.',
     'Tu propia foto se ve en el ranking aunque el servidor todavía no la tenga: la app ya la tiene cargada.',
@@ -2959,6 +3000,92 @@ function pintarVersion(){
       '<ul style="margin:8px 0 0;padding-left:18px" class="muted">' +
         n[2].map(x => '<li style="margin-bottom:3px">' + x + '</li>').join('') +
       '</ul></div>').join('');
+}
+
+/* =====================================================================
+   CONTRASEÑAS
+   Crear cuenta ya existía. Lo que faltaba era la otra mitad de
+   "olvidé mi contraseña": el correo llega con un enlace que devuelve a
+   la app, pero no había ninguna pantalla donde escribir la nueva. Así
+   que el usuario volvía, entraba con una sesión temporal y se iba sin
+   haber cambiado nada.
+   ===================================================================== */
+let CL_RECUPERANDO = false;
+
+function fuerzaClave(v){
+  let p = 0;
+  if (v.length >= 8) p++;
+  if (v.length >= 12) p++;
+  if (/[a-z]/.test(v) && /[A-Z]/.test(v)) p++;
+  if (/\d/.test(v)) p++;
+  if (/[^A-Za-z0-9]/.test(v)) p++;
+  if (/^(\d+|[a-z]+)$/i.test(v)) p = Math.min(p, 1);        // solo letras o solo números
+  return Math.min(p, 4);
+}
+const CL_TEXTO  = ['Muy débil', 'Débil', 'Aceptable', 'Buena', 'Fuerte'];
+const CL_COLOR  = ['var(--bad)', 'var(--bad)', 'var(--oro)', 'var(--ok)', 'var(--ok)'];
+
+function pintarFuerza(){
+  const v = $('#clUno').value;
+  const f = v ? fuerzaClave(v) : 0;
+  $('#clBarra').style.width = (v ? (f + 1) * 20 : 0) + '%';
+  $('#clBarra').style.background = CL_COLOR[f];
+  $('#clPista').textContent = !v ? '' :
+    CL_TEXTO[f] + (v.length < 8 ? ' · le faltan ' + (8 - v.length) + ' caracteres' : '');
+}
+$('#clUno').oninput = pintarFuerza;
+$('#clVer').onclick = () => {
+  const i = $('#clUno');
+  i.type = i.type === 'password' ? 'text' : 'password';
+  $('#clVer').innerHTML = i.type === 'password' ? OJO_ABIERTO : OJO_CERRADO;
+};
+
+function abrirCambioClave(obligatorio){
+  CL_RECUPERANDO = !!obligatorio;
+  $('#clTitulo').textContent = obligatorio ? 'Elige tu contraseña nueva' : 'Cambiar la contraseña';
+  $('#clSub').textContent = obligatorio
+    ? 'Llegaste desde el correo de recuperación. Escribe la nueva y ya entras con ella.'
+    : 'Escríbela dos veces para que no quede un dedazo guardado.';
+  $('#clUno').value = ''; $('#clDos').value = '';
+  $('#clUno').type = 'password'; $('#clVer').innerHTML = OJO_ABIERTO;
+  $('#clErr').textContent = ''; pintarFuerza();
+  $('#clCerrar').classList.toggle('hidden', !!obligatorio);
+  const d = $('#dlgClave');
+  if (!d.open) d.showModal();
+  setTimeout(() => $('#clUno').focus(), 120);
+}
+$('#clCerrar').onclick = () => $('#dlgClave').close();
+$('#dlgClave').addEventListener('cancel', (e) => { if (CL_RECUPERANDO) e.preventDefault(); });
+
+$('#clGuardar').onclick = async () => {
+  const err = $('#clErr'), a = $('#clUno').value, b = $('#clDos').value;
+  err.classList.remove('lg-ok');
+  if (a.length < 8) return err.textContent = 'La contraseña necesita al menos 8 caracteres.';
+  if (a !== b)      return err.textContent = 'Las dos no coinciden.';
+  if (fuerzaClave(a) < 1) return err.textContent = 'Esa es muy fácil de adivinar. Mezcla letras y números.';
+  $('#clGuardar').disabled = true;
+  const { error } = await sb.auth.updateUser({ password: a });
+  $('#clGuardar').disabled = false;
+  if (error) return err.textContent = traducirAuth(error.message);
+
+  limpiarHash();
+  $('#dlgClave').close();
+  if (CL_RECUPERANDO){
+    CL_RECUPERANDO = false;
+    toast('Contraseña cambiada. Ya estás dentro.');
+    const { data } = await sb.auth.getSession();
+    if (data && data.session && !S.user) entrar(data.session.user);
+  } else toast('Contraseña cambiada');
+};
+
+/* El enlace del correo vuelve con los datos en el # de la dirección.
+   Si se quedan ahí, al recargar se dispara todo otra vez. */
+function limpiarHash(){
+  if (location.hash) history.replaceState(null, '', location.pathname + location.search);
+}
+function hashDiceRecuperar(){
+  const h = location.hash || '';
+  return /type=recovery/.test(h);
 }
 
 /* =====================================================================
@@ -3223,7 +3350,25 @@ function arrancar(){
     sb = window.supabase.createClient(url, key);
     $('#cfgBox').classList.add('hidden');
     $('#authBox').classList.remove('hidden');
-    sb.auth.getSession().then(({data}) => { if (data.session) entrar(data.session.user); });
+
+    // Se escucha ANTES de pedir la sesión: el enlace del correo de
+    // recuperación llega en la misma carga y no se puede perder.
+    const recuperar = hashDiceRecuperar();
+    if (typeof sb.auth.onAuthStateChange === 'function'){
+      sb.auth.onAuthStateChange((evento, sesion) => {
+        if (evento === 'PASSWORD_RECOVERY') return abrirCambioClave(true);
+        if (evento === 'SIGNED_IN' && sesion && !S.user && !CL_RECUPERANDO && !hashDiceRecuperar()){
+          limpiarHash(); entrar(sesion.user);
+        }
+      });
+    }
+
+    sb.auth.getSession().then(({data}) => {
+      if (!data.session) return;
+      if (recuperar || hashDiceRecuperar()) return abrirCambioClave(true);
+      limpiarHash();
+      if (!S.user) entrar(data.session.user);
+    });
   }
 }
 
@@ -3256,12 +3401,16 @@ $('#btnUp').onclick = async () => {
   if (!correo) return err.textContent = 'Escribe tu correo.';
   if (clave.length < 8) return err.textContent = 'La contraseña necesita al menos 8 caracteres.';
   $('#btnUp').disabled = true;
-  const { data, error } = await sb.auth.signUp({ email: correo, password: clave });
+  const { data, error } = await sb.auth.signUp({ email: correo, password: clave,
+    options: { emailRedirectTo: location.href.split('#')[0] } });
   $('#btnUp').disabled = false;
   if (error) return err.textContent = traducirAuth(error.message);
   if (!data.session){
     err.classList.add('lg-ok');
-    return err.textContent = 'Cuenta creada. Confirma el correo y vuelve a entrar.';
+    err.textContent = 'Cuenta creada. Te mandamos un correo para confirmarla.';
+    $('#btnReenviar').classList.remove('hidden');
+    $('#btnReenviar').dataset.correo = correo;
+    return;
   }
   entrar(data.user);
 };
@@ -3284,6 +3433,17 @@ document.querySelectorAll('.lg-mov').forEach(b => {
 ['upEmail','upPass'].forEach(id => { const e = $('#' + id); if (e)
   e.onkeydown = (ev) => { if (ev.key === 'Enter') $('#btnUp').click(); }; });
 
+/* ---------- reenviar el correo de confirmación ---------- */
+$('#btnReenviar').onclick = async () => {
+  const err = $('#authErr2'), correo = $('#btnReenviar').dataset.correo || $('#upEmail').value.trim();
+  if (!correo) return;
+  $('#btnReenviar').disabled = true;
+  const { error } = await sb.auth.resend({ type:'signup', email: correo });
+  setTimeout(() => { $('#btnReenviar').disabled = false; }, 30000);   // sin martillear el servidor
+  err.classList.toggle('lg-ok', !error);
+  err.textContent = error ? traducirAuth(error.message) : 'Te lo mandamos otra vez. Revisa también el spam.';
+};
+
 /* ---------- recuperar contraseña ---------- */
 $('#btnOlvide').onclick = async () => {
   const err = $('#authErr');
@@ -3293,7 +3453,7 @@ $('#btnOlvide').onclick = async () => {
   const { error } = await sb.auth.resetPasswordForEmail(correo, { redirectTo: location.href.split('#')[0] });
   if (error) return err.textContent = traducirAuth(error.message);
   err.classList.add('lg-ok');
-  err.textContent = 'Te enviamos un correo para cambiar la contraseña.';
+  err.textContent = 'Te enviamos el correo. Abre el enlace desde este mismo teléfono.';
 };
 
 /* Los mensajes de Supabase vienen en inglés */
@@ -3304,7 +3464,11 @@ function traducirAuth(m){
   if (/User already registered/i.test(t))  return 'Ese correo ya tiene cuenta. Entra en vez de crearla.';
   if (/Password should be at least/i.test(t)) return 'La contraseña es muy corta.';
   if (/Unable to validate email|invalid format/i.test(t)) return 'Ese correo no parece válido.';
-  if (/rate limit|too many/i.test(t))      return 'Demasiados intentos. Espera un minuto.';
+  if (/rate limit|too many|after \d+ seconds/i.test(t)) return 'Demasiados intentos. Espera un minuto.';
+  if (/New password should be different/i.test(t)) return 'Esa ya es tu contraseña actual. Elige otra.';
+  if (/session|Auth session missing|expired/i.test(t)) return 'El enlace del correo caducó. Pide otro desde «¿Olvidaste tu contraseña?».';
+  if (/should be at least|too short/i.test(t)) return 'La contraseña es muy corta.';
+  if (/weak|pwned|compromised/i.test(t))   return 'Esa contraseña es muy común. Elige otra.';
   if (/Failed to fetch|NetworkError/i.test(t)) return 'Sin conexión. Revisa tu internet.';
   return t;
 }
@@ -3932,13 +4096,8 @@ $('#ajNotif').onchange = async (e) => {
   toast(v ? 'Recordatorios activados' : 'Recordatorios apagados');
 };
 
-$('#ajClave').onclick = async () => {
-  const correo = S.user && S.user.email;
-  if (!correo) return toast('No hay correo en la sesión');
-  const { error } = await sb.auth.resetPasswordForEmail(correo,
-    { redirectTo: location.href.split('#')[0] });
-  toast(error ? traducirAuth(error.message) : 'Te enviamos el correo para cambiarla');
-};
+/* Ya está dentro: no hace falta darle la vuelta por el correo. */
+$('#ajClave').onclick = () => abrirCambioClave(false);
 
 /* Borrar la cuenta: dos confirmaciones y hay que escribir la palabra. */
 $('#ajBorrar').onclick = async () => {
