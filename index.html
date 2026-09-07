@@ -475,6 +475,66 @@ dialog::backdrop{background:rgba(0,0,0,.6)}
 }
 
 /* =====================================================================
+   CUESTIONARIO DE BIENVENIDA
+   ===================================================================== */
+#vOnb{position:fixed;inset:0;z-index:55;background:var(--bg);overflow-y:auto}
+.onb{max-width:560px;margin:0 auto;min-height:100dvh;display:flex;flex-direction:column;
+  padding:14px 18px calc(18px + env(safe-area-inset-bottom))}
+.onb-cab{display:flex;align-items:center;gap:12px;padding:6px 0 14px}
+.onb-atras{width:38px;height:38px;flex:0 0 38px;padding:0;border-radius:50%;cursor:pointer;
+  border:1px solid var(--line);background:var(--panel);color:var(--tx);
+  display:flex;align-items:center;justify-content:center}
+.onb-atras svg{width:18px;height:18px}
+.onb-atras[disabled]{opacity:.35;cursor:default}
+.onb-barra{flex:1;height:6px;border-radius:4px;background:var(--panel2);overflow:hidden}
+.onb-barra i{display:block;height:100%;width:0;border-radius:4px;background:var(--brand);
+  transition:width .3s cubic-bezier(.3,1,.5,1)}
+.onb-salta{background:none;border:0;color:var(--tx2);font-size:13px;cursor:pointer;
+  padding:8px 4px;min-height:38px}
+
+.onb-cuerpo{flex:1;padding:14px 0 20px;outline:none}
+.onb-tit{font-family:var(--f-titulo);font-weight:800;font-size:clamp(23px,6vw,30px);
+  line-height:1.14;margin:0 0 8px;text-wrap:balance;
+  text-transform:none;letter-spacing:-.01em}
+.onb-tit::before{display:none}
+.onb-des{color:var(--tx2);font-size:14.5px;line-height:1.55;margin:0 0 20px;max-width:46ch}
+.onb-bloque{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--brand-tx);
+  font-weight:750;margin-bottom:10px}
+
+.onb-chips{display:flex;flex-wrap:wrap;gap:9px}
+.onb-chip{padding:11px 15px;min-height:46px;border-radius:14px;cursor:pointer;
+  border:1.5px solid var(--line);background:var(--panel);color:var(--tx);
+  font-size:14.5px;font-family:inherit;text-align:left;line-height:1.3;
+  transition:border-color .15s, background .15s;-webkit-tap-highlight-color:transparent}
+.onb-chip small{display:block;color:var(--tx2);font-size:12px;margin-top:2px}
+.onb-chip:hover{border-color:var(--tx2)}
+.onb-chip.on{border-color:var(--brand);background:var(--brand-soft);color:var(--brand-tx);font-weight:650}
+.onb-chip.on small{color:var(--brand-tx);opacity:.85}
+.onb-chips.col{flex-direction:column}
+.onb-chips.col .onb-chip{width:100%}
+
+.onb-campos{display:grid;gap:13px}
+.onb-campos.dos{grid-template-columns:1fr 1fr}
+.onb-nota{margin-top:16px;padding:13px 15px;border-radius:14px;background:var(--panel2);
+  border-left:3px solid var(--oro);font-size:13.5px;line-height:1.55;color:var(--tx2)}
+.onb-nota b{color:var(--tx)}
+
+.onb-pie{position:sticky;bottom:0;background:var(--bg);padding:12px 0 4px;
+  border-top:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;gap:12px}
+.onb-paso{font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--tx2);font-weight:700}
+.onb-pie button{min-height:48px;padding:12px 22px}
+
+.onb-res{display:grid;gap:9px;margin-top:4px}
+.onb-res div{display:flex;gap:10px;align-items:flex-start;font-size:14.5px;line-height:1.45}
+.onb-res i{flex:0 0 20px;color:var(--brand-tx);font-style:normal;font-weight:800}
+
+@media (max-width:620px){
+  .onb{padding:10px 14px calc(14px + env(safe-area-inset-bottom))}
+  .onb-campos.dos{grid-template-columns:1fr}
+  .onb-chip{font-size:14px;padding:10px 13px}
+}
+
+/* =====================================================================
    AJUSTES
    ===================================================================== */
 .aj-cab{display:flex;align-items:center;gap:16px;padding:6px 4px 4px}
@@ -1288,6 +1348,30 @@ table.tab td.num{text-align:right;font-variant-numeric:tabular-nums;white-space:
   </div>
 </div>
 
+<!-- ================= CUESTIONARIO DE BIENVENIDA ================= -->
+<div id="vOnb" class="hidden">
+  <div class="onb">
+    <div class="onb-cab">
+      <button class="onb-atras" id="onbAtras" aria-label="Volver">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+             stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 5.5 8 12l6.5 6.5"/></svg>
+      </button>
+      <div class="onb-barra"><i id="onbBarra"></i></div>
+      <button class="onb-salta" id="onbSalir">Salir</button>
+    </div>
+
+    <div class="onb-cuerpo" id="onbCuerpo" tabindex="-1"></div>
+
+    <div class="onb-pie">
+      <div class="onb-paso" id="onbPaso">—</div>
+      <div class="row" style="gap:9px;justify-content:flex-end">
+        <button class="gh" id="onbSaltar">Saltar</button>
+        <button class="pri" id="onbSigue">Continuar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <div id="cargando" class="hidden">
   <div class="carga-caja">
     <img class="carga-logo" id="cargaLogo" alt="">
@@ -1882,6 +1966,11 @@ table.tab td.num{text-align:right;font-variant-numeric:tabular-nums;white-space:
         <button class="aj-fila" id="ajQuitarFoto" hidden>
           <span class="aj-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M9.5 7V5h5v2M6.5 7l1 13h9l1-13"/></svg></span>
           <span class="aj-tx">Quitar la foto de perfil</span><span class="aj-flecha">›</span>
+        </button>
+        <button class="aj-fila" id="ajCuestionario">
+          <span class="aj-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h8l4 4v14H6Z"/><path d="M14 3v4h4"/><path d="M9.5 11.5h5M9.5 15.5h3"/></svg></span>
+          <span class="aj-tx">Cuestionario de bienvenida<small>Alergias, lesiones, comida y objetivos</small></span>
+          <span class="aj-val" id="ajValCuest"></span><span class="aj-flecha">›</span>
         </button>
         <button class="aj-fila" id="ajMoneda">
           <span class="aj-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3.4" y="6.4" width="17.2" height="11.2" rx="2.6"/><circle cx="12" cy="12" r="2.5"/></svg></span>
@@ -2753,9 +2842,19 @@ function ok(res, msg){
    Al publicar una versión nueva: sube VERSION, pon la fecha y agrega
    su entrada arriba del todo en NOVEDADES.
    ===================================================================== */
-const VERSION = '5.8.0';
+const VERSION = '5.9.0';
 const FECHA_VERSION = '2026-09-05';
 const NOVEDADES = [
+  ['5.9.0', '2026-09-07', [
+    'Cuestionario de bienvenida al entrar por primera vez: 18 preguntas repartidas en cuerpo, gimnasio, comida, dinero y rutina. Ninguna es obligatoria y todas se pueden saltar.',
+    'Se pregunta por lesiones: la rutina deja de proponer ejercicios que carguen esa zona, y el plan lo recuerda arriba.',
+    'Se pregunta por alergias e intolerancias: quedan marcadas en el plan de comida y en la lista de compra.',
+    'También por lo que comes y lo que no soportas, cuántas comidas haces y cuánto tiempo tienes para cocinar.',
+    'Al terminar no solo se guarda: los hábitos que elegiste quedan creados con su hora, la meta de agua puesta, la meta de ahorro creada y la moneda fijada.',
+    'La última pantalla te dice exactamente qué quedó armado con tus respuestas.',
+    'Se puede repetir cuando quieras desde Ajustes, y llega con lo que ya habías contestado.',
+    'Términos actualizados a la 1.2: alergias y lesiones son datos de salud y queda escrito qué se hace con ellos, y qué NO hace la app.'
+  ]],
   ['5.8.0', '2026-09-07', [
     'Recuperar la contraseña quedó completo: el enlace del correo ahora abre una pantalla donde escribes la nueva y entras con ella. Antes el correo llegaba pero no había dónde cambiarla.',
     'Barra de fuerza mientras la escribes, hay que repetirla, y un ojo para verla si no confías en el teclado.',
@@ -3095,7 +3194,7 @@ function hashDiceRecuperar(){
    La aceptación se guarda en la tabla 'aceptaciones' (esquema_v9), que
    no se puede editar ni borrar: por eso sirve como prueba.
    ===================================================================== */
-const TERMINOS_VERSION = '1.1';
+const TERMINOS_VERSION = '1.2';
 const TERMINOS_FECHA   = '7 de septiembre de 2026';
 
 const TERMINOS = [
@@ -3117,7 +3216,9 @@ const TERMINOS = [
   ], p:[
       'Los porcentajes de grasa, masa muscular, agua y grasa visceral son estimaciones calculadas con fórmulas publicadas a partir de las medidas que tú escribes. No son mediciones: una cinta métrica mal puesta cambia el resultado, y ninguna fórmula reemplaza una prueba clínica.',
       'Las rutinas, los pesos sugeridos, las calorías y el gemelo 3D son proyecciones matemáticas, no un plan aprobado por un profesional que te haya visto.',
-      'Antes de empezar o cambiar un programa de ejercicio o de alimentación, consulta a un profesional de la salud, sobre todo si tienes una lesión, una condición médica, estás embarazada o tomas algún medicamento. Si sientes dolor, mareo o falta de aire mientras entrenas, para y busca atención.'
+      'Antes de empezar o cambiar un programa de ejercicio o de alimentación, consulta a un profesional de la salud, sobre todo si tienes una lesión, una condición médica, estás embarazada o tomas algún medicamento. Si sientes dolor, mareo o falta de aire mientras entrenas, para y busca atención.',
+      'Si le dices a la app que tienes una lesión, dejará de proponerte ejercicios que carguen esa zona. Eso no es rehabilitación ni un permiso para entrenar: quien decide qué puedes hacer con una lesión es tu médico o tu fisioterapeuta.',
+      'Si registras alergias o intolerancias, la app las marca en tu plan y evita sugerirte esos alimentos. NO revisa etiquetas, ingredientes ni trazas, y no puede protegerte de una reacción. Leer lo que comes sigue siendo tu responsabilidad, y con una alergia grave esa responsabilidad no se delega en una aplicación.'
   ]},
 
   { t:'Sobre dinero', clave:[
@@ -3132,6 +3233,7 @@ const TERMINOS = [
       'Todo lo que registras se guarda en una base de datos de Supabase con una regla activa que hace que cada usuario solo pueda leer y escribir sus propias filas. Ni otros usuarios ni la app ven tus datos de otra persona.'
   ], l:[
       'Tu foto de perfil es opcional. Si la pones, se guarda en dos tamaños: la grande solo la ves tú, y una miniatura que se muestra en el ranking únicamente mientras tu participación esté activa.',
+      'Las alergias, intolerancias y lesiones que registres son opcionales, se guardan bajo la misma regla que el resto de tus datos y solo las usa la app para armar tu plan. No se comparten con nadie, no salen en el ranking y puedes borrarlas cuando quieras desde Ajustes.',
       'Se guarda lo que tú escribes: hábitos, series, medidas, movimientos de dinero, cuentas y las tasas que registras.',
       'El correo con el que entras lo administra Supabase para autenticarte.',
       'No se venden tus datos, no se ceden a terceros con fines publicitarios y no hay rastreadores de terceros dentro de la app.',
@@ -3184,9 +3286,10 @@ const TERMINOS = [
 ];
 
 const TERMINOS_CAMBIO =
-  'Qué cambió en esta versión: si activas tu participación en el ranking y tienes foto de perfil, ' +
-  'ahora se muestra una miniatura tuya junto a tu nombre. Antes la foto no se veía en ningún lado. ' +
-  'La foto completa sigue siendo solo tuya, y apagando tu participación la miniatura desaparece.';
+  'Qué cambió en esta versión: al entrar por primera vez la app te pregunta por alergias, ' +
+  'intolerancias y lesiones para armar tu plan. Son datos de salud, son opcionales, y solo los ' +
+  'lees tú: no salen en el ranking ni en ningún reporte. La app no revisa etiquetas de comida ' +
+  'ni sustituye a un médico o un fisioterapeuta.';
 
 function pintarTerminos(){
   $('#tmSub').textContent = 'Versión ' + TERMINOS_VERSION + ' · ' + TERMINOS_FECHA;
@@ -4032,6 +4135,12 @@ function pintarAjustes(){
   $('#ajValPerfil').textContent = faltan.length ? 'faltan datos' : 'completo';
   $('#ajValPerfil').style.color = faltan.length ? 'var(--oro)' : '';
 
+  const nAl = (P.alergias || []).length, nLe = (P.lesiones || []).length;
+  $('#ajValCuest').textContent = (P.onboarding_v >= ONB_VERSION)
+    ? ((nAl || nLe) ? [nAl ? nAl + ' alergias' : '', nLe ? nLe + ' lesiones' : ''].filter(Boolean).join(' · ')
+                    : 'hecho')
+    : 'pendiente';
+  $('#ajValCuest').style.color = (P.onboarding_v >= ONB_VERSION) ? '' : 'var(--oro)';
   $('#ajValMoneda').textContent = (typeof monedaRef === 'function' ? monedaRef() : (P.moneda_ref || '$'));
   $('#ajValAlias').textContent  = P.alias || P.nombre || '—';
   $('#ajRanking').checked = !!P.ranking_publico;
@@ -4062,6 +4171,7 @@ $('#ajArchivo').onchange = async (e) => {
 $('#ajQuitarFoto').onclick = () => guardarAvatar(null);
 
 $('#ajPerfil').onclick    = () => abrirPerfil();
+$('#ajCuestionario').onclick = () => abrirOnboarding();
 $('#ajMoneda').onclick    = () => $('#btnMoneda').click();
 $('#ajSupuestos').onclick = () => $('#btnSupuestos').click();
 $('#ajAlias').onclick     = () => $('#btnRankCfg').click();
@@ -4506,6 +4616,50 @@ $('#btnRepGuardar').onclick = async () => {
 /* =====================================================================
    MODULO GYM
    ===================================================================== */
+/* =====================================================================
+   LO QUE SE HACE CON LAS LESIONES Y LAS ALERGIAS
+   Un cuestionario que pregunta y no cambia nada es peor que no
+   preguntar: gasta la paciencia del usuario y no devuelve nada.
+   ===================================================================== */
+
+/* Cada zona lesionada apaga los grupos musculares que la cargan. */
+const LESION_GRUPOS = {
+  'Hombro':       ['hombro','pecho','trapecio'],
+  'Rodilla':      ['pierna','gluteo','pantorrilla'],
+  'Espalda baja': ['espalda','pierna','gluteo'],
+  'Cuello':       ['trapecio','hombro'],
+  'Muñeca':       ['antebrazo','biceps','triceps'],
+  'Codo':         ['biceps','triceps','antebrazo'],
+  'Cadera':       ['gluteo','pierna'],
+  'Tobillo':      ['pantorrilla','pierna','cardio']
+};
+
+function gruposAEvitar(){
+  const L = (S.perfil && S.perfil.lesiones) || [];
+  const fuera = new Set();
+  L.forEach(x => (LESION_GRUPOS[x] || []).forEach(g => fuera.add(g)));
+  return fuera;
+}
+
+/* Aviso reutilizable: qué se está evitando y por qué. */
+function avisoLesiones(){
+  const L = (S.perfil && S.perfil.lesiones) || [];
+  if (!L.length) return '';
+  const g = [...gruposAEvitar()].map(x => NOMBRE_GRUPO[x] || x);
+  return '<div class="onb-nota" style="margin:0 0 14px">' +
+    '<b>La rutina cuida ' + esc(L.join(', ').toLowerCase()) + '.</b> ' +
+    (g.length ? 'Se evitan los ejercicios de ' + esc(g.join(', ').toLowerCase()) + '. ' : '') +
+    'Puedes quitarlo en Ajustes → Información personal. Esto no sustituye a un fisioterapeuta.</div>';
+}
+
+function avisoAlergias(){
+  const A = (S.perfil && S.perfil.alergias) || [];
+  if (!A.length) return '';
+  return '<div class="onb-nota" style="margin:0 0 14px">' +
+    '<b>Evita: ' + esc(A.join(', ').toLowerCase()) + '.</b> ' +
+    'Está marcado en tu plan, pero la app no revisa etiquetas: leer los ingredientes sigue siendo cosa tuya.</div>';
+}
+
 const GRUPOS = [
   ['pecho','Pecho'], ['espalda','Espalda'], ['pierna','Pierna'], ['gluteo','Glúteo'],
   ['pantorrilla','Pantorrilla'], ['hombro','Hombro'], ['trapecio','Trapecio'],
@@ -5088,6 +5242,7 @@ function pintarDatos(){
 function pintarPlan(){
   const p = S.perfil || {}, c = $('#cuPlan'), pl = planNutricion(p);
   if (!pl){ c.innerHTML = '<p class="muted">Completa tus datos y aquí aparece tu plan: calorías, proteína, carbohidratos y grasas.</p>'; return; }
+  const cabAlergias = avisoAlergias();
   const [clase, col] = IMC_CLASE(pl.imc);
   const kcalMacro = { prot: pl.prot*4, carb: pl.carb*4, gras: pl.gras*9 };
   const totalM = kcalMacro.prot + kcalMacro.carb + kcalMacro.gras;
@@ -5142,7 +5297,7 @@ function pintarPlan(){
     }
   }
 
-  c.innerHTML = bloqueMeta +
+  c.innerHTML = cabAlergias + bloqueMeta +
     '<div class="grid g4">' +
       '<div class="stat"><div class="n">' + pl.kcal.toLocaleString('es') + '</div><div class="l">kcal por día</div></div>' +
       '<div class="stat"><div class="n">' + pl.prot + ' g</div><div class="l">Proteína</div></div>' +
@@ -6868,7 +7023,9 @@ function pintarPlan180(){
   let html;
   try { html = v(); }
   catch(e){ html = '<div class="card mala"><h2 style="margin-top:0">Algo falló al calcular</h2><p class="muted">' + esc(String(e && e.message || e)) + '</p></div>'; }
-  cont.innerHTML = html;
+  // lo que el usuario pidió cuidar se recuerda en cada vista del plan
+  const aviso = (COACH.secc === 'comida') ? avisoAlergias() : avisoLesiones();
+  cont.innerHTML = aviso + html;
   conectarPlan();
   conectarSelector();
   conectarVacios('#plCuerpo');
@@ -9378,11 +9535,343 @@ $('#guiaSig').onclick = () => {
   else cerrarGuia(true);
 };
 
+/* =====================================================================
+   CUESTIONARIO DE BIENVENIDA
+   ---------------------------------------------------------------------
+   Cada paso está descrito como dato, no como pantalla escrita a mano:
+   para añadir, quitar o reordenar preguntas se toca esta lista y ya.
+   Ninguna es obligatoria salvo las tres que sostienen todos los
+   cálculos, y todas se pueden saltar: un cuestionario largo que no deja
+   entrar es la forma más segura de perder a alguien en la instalación.
+   ===================================================================== */
+const ONB_VERSION = 1;
+const O = { paso:0, r:{}, guardando:false };
+
+const ONB_LESIONES = ['Hombro','Rodilla','Espalda baja','Cuello','Muñeca','Codo','Cadera','Tobillo'];
+const ONB_ALERGIAS = ['Maní','Frutos secos','Mariscos','Pescado','Huevo','Leche o lactosa',
+                      'Gluten','Soya','Ajonjolí','Fresas'];
+const ONB_HABITOS = [
+  ['agua',      'Beber agua',            'salud',    'tarde',  3,   'litros', 10],
+  ['entrenar',  'Entrenar',              'salud',    'tarde',  1,   'vez',    20],
+  ['dormir',    'Acostarme temprano',    'descanso', 'noche',  1,   'vez',    10],
+  ['pantallas', 'Sin pantallas al dormir','descanso','noche',  1,   'vez',    10],
+  ['planear',   'Planificar el día',     'trabajo',  'manana', 1,   'vez',    10],
+  ['gastos',    'Registrar mis gastos',  'finanzas', 'noche',  1,   'vez',    10],
+  ['leer',      'Leer',                  'personal', 'noche',  20,  'minutos',10],
+  ['caminar',   'Caminar',               'salud',    'tarde',  30,  'minutos',10],
+  ['estudiar',  'Estudiar',              'estudio',  'noche',  1,   'vez',    15],
+  ['estirar',   'Estirar al levantarme', 'salud',    'manana', 10,  'minutos',10]
+];
+
+const ONB = [
+  { tipo:'intro', tit:'Vamos a conocerte',
+    des:'Unas preguntas para que la app deje de darte consejos genéricos. Son tres minutos, ' +
+        'puedes saltar cualquiera y cambiarlas después en Ajustes.' },
+
+  { bloque:'Para empezar', tit:'¿Qué te trajo aquí?', campo:'motivo', tipo:'uno', col:true,
+    ops:[['bajar_grasa','Bajar grasa'],['ganar_musculo','Ganar músculo'],
+         ['dinero','Ordenar mi dinero'],['constancia','Ser constante de una vez'],['todo','Todo un poco']] },
+
+  { bloque:'Tu cuerpo', tit:'¿Sexo y fecha de nacimiento?',
+    des:'Con esto se calculan tus calorías y tu composición corporal. Sin ellos, todo lo demás son números inventados.',
+    tipo:'campos', campos:[
+      { campo:'sexo', et:'Sexo', tipo:'select', ops:[['hombre','Hombre'],['mujer','Mujer']] },
+      { campo:'fecha_nacimiento', et:'Fecha de nacimiento', tipo:'date' }] },
+
+  { bloque:'Tu cuerpo', tit:'¿Cuánto mides y cuánto pesas?',
+    des:'El peso de hoy, el que marque la báscula. No hace falta que sea el que te gustaría.',
+    tipo:'campos', dos:true, campos:[
+      { campo:'estatura_cm', et:'Estatura (cm)', tipo:'number', ph:'175' },
+      { campo:'peso_kg', et:'Peso (kg)', tipo:'number', paso:'0.1', ph:'80' }] },
+
+  { bloque:'Tu cuerpo', tit:'¿Qué quieres que pase con ese peso?', campo:'objetivo', tipo:'uno', col:true,
+    ops:[['bajar_grasa','Bajar grasa','Perder peso cuidando el músculo'],
+         ['mantener','Mantenerme','Estar igual pero mejor'],
+         ['ganar_musculo','Ganar músculo','Subir peso con cabeza']] },
+
+  { bloque:'Tu cuerpo', tit:'¿Tienes un peso en mente?',
+    des:'Opcional. Si lo pones, la app te dice si el ritmo que llevas es sano o demasiado rápido.',
+    tipo:'campos', dos:true, campos:[
+      { campo:'peso_objetivo', et:'Peso objetivo (kg)', tipo:'number', paso:'0.1', ph:'75' },
+      { campo:'fecha_objetivo', et:'¿Para cuándo?', tipo:'date' }] },
+
+  { bloque:'Tu cuerpo', tit:'¿Cómo es tu día normal?', campo:'nivel_actividad', tipo:'uno', col:true,
+    des:'Sin contar el entrenamiento. Casi todo el mundo se sobrestima aquí.',
+    ops:[['sedentario','Sentado casi todo el día','Oficina, poco movimiento'],
+         ['ligero','Algo de movimiento','De pie a ratos, caminatas cortas'],
+         ['moderado','En movimiento','De pie o caminando buena parte del día'],
+         ['alto','Trabajo físico','Cargando o moviéndome todo el día']] },
+
+  { bloque:'Gimnasio', tit:'¿Cuánto llevas entrenando?', campo:'experiencia', tipo:'uno', col:true,
+    ops:[['nunca','Nunca o casi nunca'],['menos6','Menos de 6 meses'],
+         ['1a2','Entre 6 meses y 2 años'],['mas2','Más de 2 años']] },
+
+  { bloque:'Gimnasio', tit:'¿Cuántos días a la semana puedes entrenar?',
+    des:'Di la verdad, no lo que te gustaría. Un plan de 3 días que cumples le gana a uno de 6 que abandonas.',
+    campo:'dias_entreno_semana', tipo:'uno',
+    ops:[[2,'2 días'],[3,'3 días'],[4,'4 días'],[5,'5 días'],[6,'6 días']] },
+
+  { bloque:'Gimnasio', tit:'¿Con qué entrenas?', campo:'equipo', tipo:'uno', col:true,
+    ops:[['gimnasio','Gimnasio completo'],['mancuernas','Mancuernas en casa'],
+         ['bandas','Bandas elásticas'],['corporal','Solo mi peso corporal']] },
+
+  { bloque:'Gimnasio', tit:'¿Alguna zona que debas cuidar?', campo:'lesiones', tipo:'varios',
+    des:'Marca lo que te moleste o tengas lesionado. La app no te propondrá ejercicios que carguen esa zona.',
+    ops: ONB_LESIONES.map(x => [x, x]), libre:'lesiones_txt', libreEt:'Otra cosa que deba evitar',
+    nota:'Esto no es rehabilitación. Si tienes una lesión activa, quien decide qué puedes hacer es tu médico o tu fisioterapeuta, no una app.' },
+
+  { bloque:'Comida', tit:'¿Comes de alguna forma en particular?', campo:'dieta_pref', tipo:'uno', col:true,
+    ops:[['sin_restriccion','Como de todo'],['vegetariano','Vegetariano'],['vegano','Vegano'],
+         ['sin_gluten','Sin gluten'],['keto','Baja en carbohidratos'],['otra','Otra']] },
+
+  { bloque:'Comida', tit:'¿Alergias o intolerancias?', campo:'alergias', tipo:'varios',
+    des:'Lo que marques queda señalado en tu plan de comida y en la lista de compra.',
+    ops: ONB_ALERGIAS.map(x => [x, x]), libre:'alergias_txt', libreEt:'Otra alergia o intolerancia',
+    nota:'<b>La app no revisa etiquetas ni ingredientes.</b> Solo evita sugerírtelo. Si tu alergia es grave, la responsabilidad de leer lo que comes sigue siendo tuya.' },
+
+  { bloque:'Comida', tit:'¿Qué comes casi siempre y qué no soportas?',
+    des:'Un plan hecho de comida que no te gusta no lo sigue nadie.',
+    tipo:'campos', campos:[
+      { campo:'come_si', et:'Lo que sí comes seguido', tipo:'text', ph:'Pollo, arroz, huevos, plátano' },
+      { campo:'come_no', et:'Lo que no comes ni loco', tipo:'text', ph:'Hígado, pescado, brócoli' }] },
+
+  { bloque:'Comida', tit:'¿Cuántas veces comes y cuánto tiempo tienes para cocinar?',
+    tipo:'campos', dos:true, campos:[
+      { campo:'comidas_dia', et:'Comidas al día', tipo:'number', ph:'3' },
+      { campo:'cocina_min', et:'Minutos por comida', tipo:'number', ph:'25' }] },
+
+  { bloque:'Comida', tit:'¿Cuánta agua quieres tomar al día?',
+    des:'Se convierte en tu meta diaria del vaso. Puedes cambiarla cuando quieras.',
+    campo:'agua_meta_ml', tipo:'uno',
+    ops:[[1500,'1,5 litros'],[2000,'2 litros'],[2500,'2,5 litros'],[3000,'3 litros'],[3500,'3,5 litros']] },
+
+  { bloque:'Dinero', tit:'¿En qué moneda quieres ver tus totales?',
+    des:'Puedes tener cuentas en varias monedas; esta es solo la que suma el total de arriba.',
+    campo:'moneda_ref', tipo:'uno',
+    ops:[['USD','Dólares'],['VES','Bolívares'],['EUR','Euros'],['COP','Pesos colombianos'],['PEN','Soles']] },
+
+  { bloque:'Dinero', tit:'¿Tienes deudas que quieras atacar?', campo:'tiene_deudas', tipo:'uno',
+    des:'Si dices que sí, el Copiloto te arma el orden de pago cuando las registres.',
+    ops:[[true,'Sí, tengo deudas'],[false,'No, ninguna']] },
+
+  { bloque:'Dinero', tit:'¿Cuál es tu próxima meta de ahorro?',
+    des:'Opcional. Si la pones, queda creada y con su barra de avance.',
+    tipo:'campos', dos:true, campos:[
+      { campo:'meta_titulo', et:'Para qué', tipo:'text', ph:'Fondo de emergencia' },
+      { campo:'meta_monto', et:'Cuánto', tipo:'number', ph:'1000' }] },
+
+  { bloque:'Tu rutina', tit:'¿A qué hora te levantas y a qué hora te acuestas?',
+    des:'Con esto se colocan los recordatorios a una hora que tenga sentido para ti.',
+    tipo:'campos', dos:true, campos:[
+      { campo:'hora_despertar', et:'Me levanto', tipo:'time', ph:'06:30' },
+      { campo:'hora_dormir', et:'Me acuesto', tipo:'time', ph:'22:30' }] },
+
+  { bloque:'Tu rutina', tit:'¿Qué hábitos quieres construir?', campo:'habitos', tipo:'varios',
+    des:'Elige de tres a cinco. Al terminar quedan creados y listos para marcar hoy mismo. Más de cinco a la vez casi nunca sobrevive la primera semana.',
+    ops: ONB_HABITOS.map(h => [h[0], h[1]]) },
+
+  { tipo:'fin', tit:'Listo', des:'Esto es lo que quedó armado con tus respuestas.' }
+];
+
+/* ---------- pintar el paso ---------- */
+function onbPintar(){
+  const P = ONB[O.paso], c = $('#onbCuerpo');
+  $('#onbBarra').style.width = Math.round(100 * O.paso / (ONB.length - 1)) + '%';
+  $('#onbPaso').textContent = O.paso === 0 ? '' : 'Paso ' + O.paso + ' de ' + (ONB.length - 2);
+  $('#onbAtras').disabled = O.paso === 0;
+  $('#onbSaltar').classList.toggle('hidden', P.tipo === 'intro' || P.tipo === 'fin');
+  $('#onbSigue').textContent = P.tipo === 'intro' ? 'Empezar'
+                             : P.tipo === 'fin' ? 'Entrar a la app' : 'Continuar';
+
+  let h = '';
+  if (P.bloque) h += '<div class="onb-bloque">' + esc(P.bloque) + '</div>';
+  h += '<h2 class="onb-tit">' + esc(P.tit) + '</h2>';
+  if (P.des) h += '<p class="onb-des">' + esc(P.des) + '</p>';
+
+  if (P.tipo === 'uno' || P.tipo === 'varios'){
+    const val = O.r[P.campo];
+    h += '<div class="onb-chips' + (P.col ? ' col' : '') + '">' + P.ops.map(o => {
+      const marcado = P.tipo === 'uno'
+        ? String(val) === String(o[0])
+        : Array.isArray(val) && val.indexOf(o[0]) >= 0;
+      return '<button class="onb-chip' + (marcado ? ' on' : '') + '" data-v="' + esc(String(o[0])) + '">' +
+        esc(o[1]) + (o[2] ? '<small>' + esc(o[2]) + '</small>' : '') + '</button>';
+    }).join('') + '</div>';
+    if (P.libre) h += '<div style="margin-top:14px"><label>' + esc(P.libreEt) + '</label>' +
+      '<input id="onbLibre" value="' + esc(O.r[P.libre] || '') + '" placeholder="Escríbelo aquí"></div>';
+  }
+
+  if (P.tipo === 'campos'){
+    h += '<div class="onb-campos' + (P.dos ? ' dos' : '') + '">' + P.campos.map(f => {
+      const v = O.r[f.campo] == null ? '' : O.r[f.campo];
+      if (f.tipo === 'select')
+        return '<div><label>' + esc(f.et) + '</label><select data-c="' + f.campo + '">' +
+          '<option value="">—</option>' + f.ops.map(o =>
+            '<option value="' + esc(o[0]) + '"' + (String(v) === String(o[0]) ? ' selected' : '') + '>' +
+            esc(o[1]) + '</option>').join('') + '</select></div>';
+      return '<div><label>' + esc(f.et) + '</label><input data-c="' + f.campo + '" type="' + f.tipo + '"' +
+        (f.paso ? ' step="' + f.paso + '"' : '') + (f.ph ? ' placeholder="' + esc(f.ph) + '"' : '') +
+        ' value="' + esc(v) + '"></div>';
+    }).join('') + '</div>';
+  }
+
+  if (P.tipo === 'fin') h += '<div class="onb-res">' + onbResumen() + '</div>';
+  if (P.nota) h += '<div class="onb-nota">' + P.nota + '</div>';
+  c.innerHTML = h;
+
+  c.querySelectorAll('.onb-chip').forEach(b => b.onclick = () => {
+    const bruto = b.dataset.v;
+    const v = bruto === 'true' ? true : bruto === 'false' ? false
+            : (/^-?\d+$/.test(bruto) ? Number(bruto) : bruto);
+    if (P.tipo === 'uno'){
+      O.r[P.campo] = v;
+      c.querySelectorAll('.onb-chip').forEach(x => x.classList.toggle('on', x === b));
+      setTimeout(onbAvanzar, 240);                 // una respuesta, un toque
+    } else {
+      const lista = Array.isArray(O.r[P.campo]) ? O.r[P.campo].slice() : [];
+      const i = lista.indexOf(v);
+      if (i >= 0) lista.splice(i, 1); else lista.push(v);
+      O.r[P.campo] = lista;
+      b.classList.toggle('on', i < 0);
+    }
+  });
+  c.scrollTop = 0; window.scrollTo(0, 0);
+}
+
+/* Lee lo que haya en pantalla antes de moverse de paso. */
+function onbLeer(){
+  const P = ONB[O.paso];
+  $('#onbCuerpo').querySelectorAll('[data-c]').forEach(el => {
+    const v = el.value.trim();
+    O.r[el.dataset.c] = v === '' ? null : (el.type === 'number' ? Number(v) : v);
+  });
+  const l = $('#onbLibre');
+  if (l && P.libre) O.r[P.libre] = l.value.trim() || null;
+}
+
+function onbAvanzar(){
+  onbLeer();
+  if (O.paso < ONB.length - 1){ O.paso++; onbPintar(); }
+  else onbTerminar();
+}
+
+/* ---------- qué quedó armado ---------- */
+function onbResumen(){
+  const r = O.r, lin = [];
+  const habs = (r.habitos || []).length;
+  if (habs) lin.push(habs + (habs === 1 ? ' hábito creado' : ' hábitos creados') + ' y listos para marcar hoy');
+  if (r.agua_meta_ml) lin.push('Tu meta de agua queda en ' + (r.agua_meta_ml / 1000).toString().replace('.', ',') + ' litros');
+  if (r.objetivo) lin.push('Tu plan apunta a ' + (r.objetivo === 'bajar_grasa' ? 'bajar grasa'
+    : r.objetivo === 'ganar_musculo' ? 'ganar músculo' : 'mantenerte'));
+  if ((r.lesiones || []).length || r.lesiones_txt)
+    lin.push('La rutina evitará: ' + [...(r.lesiones || []), r.lesiones_txt].filter(Boolean).join(', ').toLowerCase());
+  if ((r.alergias || []).length || r.alergias_txt)
+    lin.push('Tu plan de comida marcará: ' + [...(r.alergias || []), r.alergias_txt].filter(Boolean).join(', ').toLowerCase());
+  if (r.dias_entreno_semana) lin.push('Rutina pensada para ' + r.dias_entreno_semana + ' días a la semana');
+  if (r.meta_titulo && r.meta_monto) lin.push('Meta de ahorro «' + r.meta_titulo + '» creada');
+  if (r.moneda_ref) lin.push('Tus totales se verán en ' + r.moneda_ref);
+  if (!lin.length) lin.push('Saltaste todo. No pasa nada: puedes completarlo desde Ajustes cuando quieras.');
+  return lin.map(x => '<div><i>✓</i><span>' + esc(x) + '</span></div>').join('');
+}
+
+/* ---------- guardar ---------- */
+async function onbTerminar(){
+  if (O.guardando) return;
+  O.guardando = true;
+  $('#onbSigue').disabled = true;
+  const r = O.r;
+
+  const lesiones = [...(r.lesiones || []), r.lesiones_txt].filter(Boolean);
+  const alergias = [...(r.alergias || []), r.alergias_txt].filter(Boolean);
+
+  const perfil = { id: S.user.id, onboarding: true, onboarding_v: ONB_VERSION };
+  const copiar = ['motivo','sexo','fecha_nacimiento','estatura_cm','peso_kg','objetivo',
+                  'peso_objetivo','fecha_objetivo','nivel_actividad','experiencia',
+                  'dias_entreno_semana','equipo','dieta_pref','come_si','come_no',
+                  'comidas_dia','cocina_min','agua_meta_ml','moneda_ref','tiene_deudas',
+                  'hora_despertar','hora_dormir'];
+  copiar.forEach(k => { if (r[k] != null && r[k] !== '') perfil[k] = r[k]; });
+  if (lesiones.length) perfil.lesiones = lesiones;
+  if (alergias.length) perfil.alergias = alergias;
+
+  const { error } = await sb.from('perfiles').upsert(perfil, { onConflict:'id' });
+  if (error){
+    O.guardando = false; $('#onbSigue').disabled = false;
+    if (faltaTabla(error) || /column|alergias|lesiones|onboarding_v/i.test(error.message || ''))
+      return toast('Antes tienes que correr esquema_v12.txt en Supabase');
+    return toast('No se pudo guardar: ' + error.message);
+  }
+
+  // los hábitos elegidos se crean de verdad, con hora según lo que dijo
+  const elegidos = r.habitos || [];
+  if (elegidos.length){
+    const hDesp = r.hora_despertar || '07:00', hDorm = r.hora_dormir || '22:00';
+    const hora = (mom) => mom === 'manana' ? hDesp : mom === 'noche' ? hDorm : '18:00';
+    const filas = elegidos.map((k, i) => {
+      const h = ONB_HABITOS.find(x => x[0] === k); if (!h) return null;
+      const meta = (k === 'agua' && r.agua_meta_ml) ? r.agua_meta_ml / 1000 : h[4];
+      return { user_id:S.user.id, nombre:h[1], categoria:h[2], momento:h[3],
+               meta_diaria:meta, unidad:h[5], puntos:h[6], dias_semana:[1,2,3,4,5,6,7],
+               activo:true, orden:i, recordatorio:hora(h[3]) };
+    }).filter(Boolean);
+    const rh = await sb.from('habitos').insert(filas);
+    if (rh.error) console.error(rh.error);
+  }
+
+  if (r.meta_titulo && Number(r.meta_monto) > 0){
+    await sb.from('metas_ahorro').insert({ user_id:S.user.id, titulo:r.meta_titulo,
+      objetivo:Number(r.meta_monto), acumulado:0, activa:true });
+  }
+
+  guardarLocal('stricto_guia', '1');
+  $('#vOnb').classList.add('hidden');
+  O.guardando = false; $('#onbSigue').disabled = false;
+  toast('Listo. Bienvenido a STRICTO');
+  await cargarTodo();
+  pintarFoto();
+  if (S.tab === 'ajustes') pintarAjustes();
+}
+
+function abrirOnboarding(){
+  O.paso = 0; O.guardando = false;
+  const P = S.perfil || {};
+  // si ya tenía datos, se muestran para no preguntar lo mismo dos veces
+  O.r = { sexo:P.sexo, fecha_nacimiento:P.fecha_nacimiento, estatura_cm:P.estatura_cm,
+          peso_kg:P.peso_kg, objetivo:P.objetivo, peso_objetivo:P.peso_objetivo,
+          fecha_objetivo:P.fecha_objetivo, nivel_actividad:P.nivel_actividad,
+          experiencia:P.experiencia, dias_entreno_semana:P.dias_entreno_semana,
+          equipo:P.equipo, dieta_pref:P.dieta_pref, come_si:P.come_si, come_no:P.come_no,
+          comidas_dia:P.comidas_dia, cocina_min:P.cocina_min, agua_meta_ml:P.agua_meta_ml,
+          moneda_ref:P.moneda_ref, tiene_deudas:P.tiene_deudas, motivo:P.motivo,
+          hora_despertar:P.hora_despertar, hora_dormir:P.hora_dormir,
+          lesiones:(P.lesiones || []).filter(x => ONB_LESIONES.indexOf(x) >= 0),
+          alergias:(P.alergias || []).filter(x => ONB_ALERGIAS.indexOf(x) >= 0),
+          lesiones_txt:(P.lesiones || []).filter(x => ONB_LESIONES.indexOf(x) < 0).join(', ') || null,
+          alergias_txt:(P.alergias || []).filter(x => ONB_ALERGIAS.indexOf(x) < 0).join(', ') || null,
+          habitos:[] };
+  $('#vOnb').classList.remove('hidden');
+  onbPintar();
+}
+
+$('#onbSigue').onclick  = onbAvanzar;
+$('#onbSaltar').onclick = () => { const P = ONB[O.paso];
+  if (P.campo && ONB[O.paso].tipo === 'varios') O.r[P.campo] = [];
+  onbAvanzar(); };
+$('#onbAtras').onclick  = () => { onbLeer(); if (O.paso > 0){ O.paso--; onbPintar(); } };
+$('#onbSalir').onclick  = async () => {
+  if (!confirm('¿Salir del cuestionario? Lo que hayas respondido hasta aquí no se guarda, ' +
+               'pero puedes volver a empezarlo desde Ajustes.')) return;
+  guardarLocal('stricto_guia', '1');
+  await sb.from('perfiles').upsert({ id:S.user.id, onboarding:true }, { onConflict:'id' });
+  $('#vOnb').classList.add('hidden');
+  if (S.perfil) S.perfil.onboarding = true;
+};
+
 function quizasGuia(){
   let vista = false;
   try{ vista = localStorage.getItem('stricto_guia') === '1'; }catch(e){}
   const nuevo = !S.perfil || !S.perfil.onboarding;
-  if (!vista && nuevo) setTimeout(abrirGuia, 900);
+  if (!vista && nuevo) setTimeout(abrirOnboarding, 700);
 }
 
 
