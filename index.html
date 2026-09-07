@@ -50,6 +50,7 @@
 }
 
 *{box-sizing:border-box}
+[hidden]{display:none !important}
 body{margin:0;background:var(--bg);color:var(--tx);
   font-family:var(--f-texto);font-weight:500;font-size:15px;line-height:1.55;
   -webkit-font-smoothing:antialiased}
@@ -440,6 +441,87 @@ dialog::backdrop{background:rgba(0,0,0,.6)}
 
 /* ---------- navegación en dos niveles ---------- */
 /* =====================================================================
+   AJUSTES
+   ===================================================================== */
+.aj-cab{display:flex;align-items:center;gap:16px;padding:6px 4px 4px}
+.aj-foto{position:relative;width:74px;height:74px;flex:0 0 74px;border-radius:50%;
+  border:2px solid var(--line);background:var(--panel2);padding:0;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;overflow:visible;
+  -webkit-tap-highlight-color:transparent}
+.aj-foto img{width:100%;height:100%;border-radius:50%;object-fit:cover;display:block}
+.aj-foto #ajFotoIni{font-family:'Exo 2',system-ui,sans-serif;font-weight:800;font-size:27px;
+  color:var(--brand-tx);letter-spacing:.02em}
+.aj-foto-lapiz{position:absolute;right:-3px;bottom:-3px;width:27px;height:27px;border-radius:50%;
+  background:var(--brand);color:var(--brand-ink,#06231A);display:flex;align-items:center;
+  justify-content:center;border:2.5px solid var(--bg)}
+.aj-foto-lapiz svg{width:13px;height:13px}
+.aj-cab-tx{min-width:0;flex:1}
+.aj-cab-tx h2{margin:0 0 2px;font-size:22px;line-height:1.15;overflow-wrap:anywhere;
+  text-transform:none;letter-spacing:0;font-family:'Exo 2',system-ui,sans-serif;font-weight:800}
+.aj-cab-tx h2::before{display:none}
+.aj-correo{color:var(--tx2);font-size:13.5px;margin-bottom:7px;overflow-wrap:anywhere}
+.aj-nota{font-size:12.5px;margin:10px 4px 4px;line-height:1.5}
+
+.aj-grupo{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--tx2);
+  font-weight:700;margin:26px 4px 8px}
+.aj-grupo.aj-peligro{color:var(--bad)}
+
+.aj-lista{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);
+  overflow:hidden}
+.aj-lista-peligro{border-color:color-mix(in srgb, var(--bad) 45%, var(--line))}
+.aj-fila{display:flex;align-items:center;gap:13px;width:100%;min-height:58px;
+  padding:12px 15px;background:transparent;border:0;border-bottom:1px solid var(--line);
+  color:var(--tx);text-align:left;font-family:inherit;font-size:15px;cursor:pointer;
+  transition:background .16s ease;-webkit-tap-highlight-color:transparent}
+.aj-lista > *:last-child{border-bottom:0}
+.aj-fila:hover{background:var(--panel2)}
+.aj-fila.aj-fija{cursor:default}
+.aj-fila.aj-fija:hover{background:transparent}
+.aj-fila:focus-visible{outline:2px solid var(--brand);outline-offset:-3px}
+.aj-ico{flex:0 0 34px;height:34px;border-radius:11px;background:var(--panel2);
+  display:flex;align-items:center;justify-content:center;color:var(--tx2)}
+.aj-ico svg{width:18px;height:18px}
+.aj-tx{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px;line-height:1.35}
+.aj-tx small{color:var(--tx2);font-size:12.3px;line-height:1.42;font-weight:400}
+.aj-val{color:var(--tx2);font-size:13.5px;white-space:nowrap;max-width:42%;
+  overflow:hidden;text-overflow:ellipsis}
+.aj-flecha{color:var(--tx2);font-size:20px;line-height:1;flex:0 0 auto;opacity:.65}
+.aj-mal{color:var(--bad)}
+.aj-mal .aj-ico{color:var(--bad);background:color-mix(in srgb, var(--bad) 14%, transparent)}
+.aj-mal .aj-flecha{color:var(--bad)}
+
+/* interruptor */
+.aj-sw{flex:0 0 auto;display:inline-flex;cursor:pointer;padding:6px 0}
+.aj-sw input{position:absolute;opacity:0;width:0;height:0}
+.aj-sw i{display:block;width:46px;height:27px;border-radius:999px;background:var(--panel2);
+  border:1px solid var(--line);position:relative;transition:background .22s ease, border-color .22s ease}
+.aj-sw i::after{content:"";position:absolute;top:3px;left:3px;width:19px;height:19px;border-radius:50%;
+  background:var(--tx2);transition:transform .22s cubic-bezier(.3,1.3,.5,1), background .22s ease}
+.aj-sw input:checked + i{background:var(--brand);border-color:var(--brand)}
+.aj-sw input:checked + i::after{transform:translateX(19px);background:#fff}
+.aj-sw input:focus-visible + i{outline:2px solid var(--brand);outline-offset:2px}
+
+.aj-pie{text-align:center;font-size:11.5px;letter-spacing:.14em;text-transform:uppercase;
+  margin-top:26px}
+
+/* foto en la cabecera */
+.hd-foto{width:38px;height:38px;flex:0 0 38px;border-radius:50%;padding:0;cursor:pointer;
+  border:1.5px solid var(--line);background:var(--panel2);overflow:hidden;
+  display:flex;align-items:center;justify-content:center;-webkit-tap-highlight-color:transparent}
+.hd-foto img{width:100%;height:100%;object-fit:cover;display:block}
+.hd-foto #hdFotoIni{font-family:'Exo 2',system-ui,sans-serif;font-weight:800;font-size:15px;
+  color:var(--brand-tx)}
+.hd-foto:hover{border-color:var(--brand)}
+
+@media (max-width:620px){
+  .aj-cab{gap:13px}
+  .aj-foto{width:66px;height:66px;flex-basis:66px}
+  .aj-cab-tx h2{font-size:19.5px}
+  .aj-fila{padding:12px 13px;gap:11px}
+  .aj-val{max-width:34%}
+}
+
+/* =====================================================================
    NAVEGACIÓN PRINCIPAL · barra de menisco
    La pestaña activa no se desliza: la barra se derrite a su alrededor.
    ===================================================================== */
@@ -447,7 +529,7 @@ nav#navG{position:fixed;left:0;right:0;bottom:0;z-index:39;display:block;overflo
   padding:0 14px calc(10px + env(safe-area-inset-bottom));
   background:linear-gradient(180deg, rgba(0,0,0,0) 0%, var(--bg) 26%, var(--bg) 100%);
   pointer-events:none}
-nav#navG .mn{max-width:520px;margin:0 auto;pointer-events:auto}
+nav#navG .mn{max-width:560px;margin:0 auto;pointer-events:auto}
 #vApp.hidden ~ nav#navG{display:none}
 .mn{--mn-top:44px;--mn-alto:56px;
   position:relative;height:calc(var(--mn-top) + var(--mn-alto) + 26px);touch-action:pan-y}
@@ -458,7 +540,7 @@ nav#navG .mn{max-width:520px;margin:0 auto;pointer-events:auto}
   transition:stroke .22s ease}
 
 .mn-btns{position:absolute;left:0;right:0;top:var(--mn-top);height:var(--mn-alto);
-  display:grid;grid-template-columns:repeat(5,1fr);align-items:center;z-index:2}
+  display:grid;grid-template-columns:repeat(6,1fr);align-items:center;z-index:2}
 .mn-btns button{background:none;border:0;padding:0;min-height:var(--mn-alto);cursor:pointer;
   display:flex;align-items:center;justify-content:center;color:var(--tx2);
   transition:color .25s ease, opacity .25s ease;-webkit-tap-highlight-color:transparent}
@@ -1104,8 +1186,9 @@ table.tab td.num{text-align:right;font-variant-numeric:tabular-nums;white-space:
       </div>
       <div class="row">
         <span class="tag fire" id="hdNivel">Principiante</span>
-        <button class="gh sm" id="btnTema" title="Cambiar tema">Tema</button>
-        <button class="gh sm" id="btnOut">Salir</button>
+        <button class="hd-foto" id="hdFoto" aria-label="Ajustes y perfil" title="Ajustes">
+          <img id="hdFotoImg" alt="" hidden><span id="hdFotoIni">?</span>
+        </button>
       </div>
     </div>
     
@@ -1609,6 +1692,121 @@ table.tab td.num{text-align:right;font-variant-numeric:tabular-nums;white-space:
       </div>
     </section>
 
+
+    <!-- AJUSTES -->
+    <section id="tAjustes" class="hidden">
+
+      <div class="aj-cab">
+        <button class="aj-foto" id="ajFoto" aria-label="Cambiar foto de perfil">
+          <img id="ajFotoImg" alt="" hidden>
+          <span id="ajFotoIni">?</span>
+          <span class="aj-foto-lapiz" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                 stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
+          </span>
+        </button>
+        <div class="aj-cab-tx">
+          <h2 id="ajNombre">—</h2>
+          <div class="aj-correo" id="ajCorreo">—</div>
+          <span class="tag fire" id="ajNivel">Principiante</span>
+        </div>
+      </div>
+      <input type="file" id="ajArchivo" accept="image/png,image/jpeg,image/webp" hidden>
+      <p class="muted aj-nota" id="ajFotoNota">Toca la foto para cambiarla. Se guarda solo en tu perfil:
+         nadie más la ve, ni siquiera en el ranking.</p>
+
+      <div class="aj-grupo">Cuenta</div>
+      <div class="aj-lista">
+        <button class="aj-fila" id="ajPerfil">
+          <span class="aj-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="7.6" r="3.2"/><path d="M5 20c0-3.6 3.1-6.2 7-6.2s7 2.6 7 6.2"/></svg></span>
+          <span class="aj-tx">Información personal<small>Sexo, edad, estatura, peso y objetivo</small></span>
+          <span class="aj-val" id="ajValPerfil"></span><span class="aj-flecha">›</span>
+        </button>
+        <button class="aj-fila" id="ajQuitarFoto" hidden>
+          <span class="aj-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M9.5 7V5h5v2M6.5 7l1 13h9l1-13"/></svg></span>
+          <span class="aj-tx">Quitar la foto de perfil</span><span class="aj-flecha">›</span>
+        </button>
+        <button class="aj-fila" id="ajMoneda">
+          <span class="aj-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3.4" y="6.4" width="17.2" height="11.2" rx="2.6"/><circle cx="12" cy="12" r="2.5"/></svg></span>
+          <span class="aj-tx">Moneda de referencia<small>En qué moneda ves los totales</small></span>
+          <span class="aj-val" id="ajValMoneda">—</span><span class="aj-flecha">›</span>
+        </button>
+        <button class="aj-fila" id="ajSupuestos">
+          <span class="aj-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19V5M4 19h16"/><path d="M7.4 15.2l3.6-4.1 3 2.4 4.8-6.2"/></svg></span>
+          <span class="aj-tx">Supuestos del Copiloto<small>Inflación, retorno y edad de jubilación</small></span>
+          <span class="aj-flecha">›</span>
+        </button>
+      </div>
+
+      <div class="aj-grupo">Ranking</div>
+      <div class="aj-lista">
+        <div class="aj-fila aj-fija">
+          <span class="aj-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M8 20h8M12 15.5V20"/><path d="M6.5 4h11v4.5a5.5 5.5 0 0 1-11 0Z"/><path d="M6.5 5.5H4V7a3 3 0 0 0 2.7 3M17.5 5.5H20V7a3 3 0 0 1-2.7 3"/></svg></span>
+          <span class="aj-tx">Aparecer en el ranking<small>Se comparte tu alias y cuatro números, nada más</small></span>
+          <label class="aj-sw"><input type="checkbox" id="ajRanking"><i></i></label>
+        </div>
+        <button class="aj-fila" id="ajAlias">
+          <span class="aj-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 19.5 12 4l7.5 15.5"/><path d="M7.4 14.6h9.2"/></svg></span>
+          <span class="aj-tx">Nombre que ven los demás</span>
+          <span class="aj-val" id="ajValAlias">—</span><span class="aj-flecha">›</span>
+        </button>
+      </div>
+
+      <div class="aj-grupo">Preferencias</div>
+      <div class="aj-lista">
+        <button class="aj-fila" id="ajTema">
+          <span class="aj-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.6v2.2M12 19.2v2.2M4.4 12H2.2M21.8 12h-2.2M6.6 6.6 5 5M19 19l-1.6-1.6M6.6 17.4 5 19M19 5l-1.6 1.6"/></svg></span>
+          <span class="aj-tx">Tema</span>
+          <span class="aj-val" id="ajValTema">—</span><span class="aj-flecha">›</span>
+        </button>
+        <div class="aj-fila aj-fija">
+          <span class="aj-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9.5a6 6 0 1 1 12 0c0 4.4 1.5 5.6 1.5 5.6H4.5S6 13.9 6 9.5Z"/><path d="M10.2 18.4a2 2 0 0 0 3.6 0"/></svg></span>
+          <span class="aj-tx">Recordatorios<small id="ajNotifSub">Avisos a la hora de cada hábito</small></span>
+          <label class="aj-sw"><input type="checkbox" id="ajNotif"><i></i></label>
+        </div>
+      </div>
+
+      <div class="aj-grupo">Seguridad y cuenta</div>
+      <div class="aj-lista">
+        <button class="aj-fila" id="ajClave">
+          <span class="aj-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="10.5" width="16" height="10.5" rx="2.5"/><path d="M8 10.5V7a4 4 0 0 1 8 0v3.5"/></svg></span>
+          <span class="aj-tx">Cambiar contraseña<small>Te llega un correo con el enlace</small></span>
+          <span class="aj-flecha">›</span>
+        </button>
+        <button class="aj-fila" id="ajTerm">
+          <span class="aj-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h8l4 4v14H6Z"/><path d="M14 3v4h4"/><path d="M9 12h6M9 16h6"/></svg></span>
+          <span class="aj-tx">Términos de uso</span>
+          <span class="aj-val" id="ajValTerm">—</span><span class="aj-flecha">›</span>
+        </button>
+        <button class="aj-fila" id="ajVersion">
+          <span class="aj-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.4"/><path d="M12 11v5.2M12 7.8h.01"/></svg></span>
+          <span class="aj-tx">Novedades de la versión</span>
+          <span class="aj-val" id="ajValVersion">—</span><span class="aj-flecha">›</span>
+        </button>
+        <button class="aj-fila" id="ajConexion">
+          <span class="aj-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="6.2" rx="7.4" ry="2.9"/><path d="M4.6 6.2v11.6c0 1.6 3.3 2.9 7.4 2.9s7.4-1.3 7.4-2.9V6.2"/><path d="M4.6 12c0 1.6 3.3 2.9 7.4 2.9s7.4-1.3 7.4-2.9"/></svg></span>
+          <span class="aj-tx">Conexión a Supabase<small>Solo si cambias de proyecto</small></span>
+          <span class="aj-flecha">›</span>
+        </button>
+        <button class="aj-fila" id="ajSalir">
+          <span class="aj-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M15 17.5V20H4.5V4H15v2.5"/><path d="M9.6 12h10.2M16.8 8.8 20 12l-3.2 3.2"/></svg></span>
+          <span class="aj-tx">Cerrar sesión</span>
+          <span class="aj-flecha">›</span>
+        </button>
+      </div>
+
+      <div class="aj-grupo aj-peligro">Zona de riesgo</div>
+      <div class="aj-lista aj-lista-peligro">
+        <button class="aj-fila aj-mal" id="ajBorrar">
+          <span class="aj-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M9.5 7V5h5v2M6.5 7l1 13h9l1-13"/></svg></span>
+          <span class="aj-tx">Borrar mi cuenta<small>Se van tus hábitos, series, medidas y dinero. No se puede deshacer.</small></span>
+          <span class="aj-flecha">›</span>
+        </button>
+      </div>
+
+    </section>
+
     <!-- REPORTE -->
     <section id="tReporte" class="hidden">
       <div class="card">
@@ -1643,7 +1841,9 @@ table.tab td.num{text-align:right;font-variant-numeric:tabular-nums;white-space:
     <p class="muted" style="text-align:center;letter-spacing:.16em;text-transform:uppercase;font-size:11px;margin-top:28px">
       Stricto · Mide. Mejora. Triunfa.<br>
       <button class="gh sm" id="btnVersion" style="margin-top:8px;letter-spacing:.06em">versión</button>
-      <button class="gh sm" id="btnTerminos" style="margin-top:8px;letter-spacing:.06em">términos</button></p>
+      <button class="gh sm" id="btnTerminos" style="margin-top:8px;letter-spacing:.06em">términos</button>
+      <button class="gh sm" id="btnTema" hidden>Tema</button>
+      <button class="gh sm" id="btnOut" hidden>Salir</button></p>
   </div>
 </div>
 
@@ -1834,6 +2034,7 @@ table.tab td.num{text-align:right;font-variant-numeric:tabular-nums;white-space:
           <button data-g="gym" aria-label="Gym" title="Gym"></button>
           <button data-g="cuerpo" aria-label="Cuerpo" title="Cuerpo"></button>
           <button data-g="dinero" aria-label="Dinero" title="Dinero"></button>
+          <button data-g="ajustes" aria-label="Ajustes" title="Ajustes"></button>
         </div>
         <div class="mn-perla" id="mnPerla" role="presentation"></div>
         <div class="mn-eti" id="mnEti">Hoy</div>
@@ -2363,9 +2564,19 @@ function ok(res, msg){
    Al publicar una versión nueva: sube VERSION, pon la fecha y agrega
    su entrada arriba del todo en NOVEDADES.
    ===================================================================== */
-const VERSION = '5.4.0';
+const VERSION = '5.5.0';
 const FECHA_VERSION = '2026-09-05';
 const NOVEDADES = [
+  ['5.5.0', '2026-09-07', [
+    'Sexta sección: Ajustes. Ahí se juntó todo lo que estaba repartido — perfil, moneda, tema, recordatorios, ranking, términos y cerrar sesión.',
+    'Foto de perfil: la eliges del teléfono, la app la recorta a cuadrado y la reduce a 256 px antes de guardarla. Sale en ajustes y en la cabecera.',
+    'Tu foto es privada: vive en tu propia fila con la misma protección que el resto de tus datos, y no aparece en el ranking.',
+    'Sin foto se ven tus iniciales, no un hueco.',
+    'Interruptores de verdad para aparecer en el ranking y para los recordatorios, que guardan al momento.',
+    'Cambiar contraseña desde ajustes: te llega el correo con el enlace.',
+    'Borrar la cuenta desde la app: pide escribir BORRAR y confirmar, y elimina de verdad todos tus datos y tu acceso. Lo exige Google Play para publicar.',
+    'La cabecera quedó limpia: los botones de Tema y Salir se fueron a Ajustes y en su lugar está tu foto.'
+  ]],
   ['5.4.0', '2026-09-07', [
     'Navegación nueva abajo: las cinco secciones son iconos y la activa sale en una perla de color; la barra se derrite a su alrededor en vez de deslizarse.',
     'Cada sección tiene su color, del verde de la marca al dorado: Hoy, Avance, Gym, Cuerpo y Dinero.',
@@ -2927,6 +3138,7 @@ async function entrar(user){
   actualizarRapido();
   pintarSubnav();
   mnActualizar(false);
+  pintarFoto();
   quizasGuia();
 }
 
@@ -3332,9 +3544,10 @@ const NAVG = [
   { k:'progreso', n:'Progreso', hijos:[['progreso','Progreso'], ['metas','Metas'], ['reporte','Reporte']] },
   { k:'gym',      n:'Gym',      hijos:[['gym','Gimnasio']] },
   { k:'cuerpo',   n:'Cuerpo',   hijos:[['cuerpo','Mis medidas'], ['avatar','Gemelo 3D'], ['plan','Entrenador']] },
-  { k:'dinero',   n:'Dinero',   hijos:[['finanzas','Resumen'], ['copiloto','Copiloto']] }
+  { k:'dinero',   n:'Dinero',   hijos:[['finanzas','Resumen'], ['copiloto','Copiloto']] },
+  { k:'ajustes',  n:'Ajustes',  hijos:[['ajustes','Ajustes']] }
 ];
-const TODAS = ['hoy','habitos','progreso','metas','gym','cuerpo','avatar','plan','finanzas','copiloto','reporte'];
+const TODAS = ['hoy','habitos','progreso','metas','gym','cuerpo','avatar','plan','finanzas','copiloto','reporte','ajustes'];
 const grupoDe = (t) => (NAVG.find(g => g.hijos.some(h => h[0] === t)) || NAVG[0]).k;
 S.grupo = 'hoy';
 S.ultima = {};   // recuerda en qué subsección estabas de cada grupo
@@ -3358,11 +3571,190 @@ function mostrarTab(t, dir){
   if (t === 'plan'){ if (!G.cargado) cargarGym();
                      if (!COACH.cargado) cargarPlan(); else pintarPlan180(); }
   if (t === 'reporte') setTimeout(() => pintarReporte(S.repTipo || 'diario'), 400);
+  if (t === 'ajustes') pintarAjustes();
   animarSeccion($('#t' + t.charAt(0).toUpperCase() + t.slice(1)), dir || 0);
   if (t !== 'plan'){ const br = $('#barraRutina'); if (br) br.classList.add('hidden');
                      document.body.classList.remove('con-barra'); }
   actualizarRapido();
 }
+
+/* =====================================================================
+   AJUSTES
+   Casi nada aquí es nuevo: la pantalla reúne cosas que ya existían y
+   estaban repartidas por la app. Lo único nuevo es la foto de perfil y
+   el borrado de cuenta.
+   ===================================================================== */
+
+const AJ_MAX = 256;          // lado máximo de la foto en píxeles
+const AJ_PESO = 190000;      // tope de la data URL; el servidor corta en 400 000
+
+function inicialesDe(nombre, correo){
+  const t = (nombre || '').trim() || (correo || '').trim();
+  if (!t) return '?';
+  const p = t.split(/[\s@._-]+/).filter(Boolean);
+  return ((p[0] || '')[0] + (p.length > 1 ? (p[1] || '')[0] : '')).toUpperCase() || '?';
+}
+
+function pintarFoto(){
+  const url = (S.perfil && S.perfil.avatar) || '';
+  const ini = inicialesDe(S.perfil && S.perfil.nombre, S.user && S.user.email);
+  [['#ajFotoImg', '#ajFotoIni'], ['#hdFotoImg', '#hdFotoIni']].forEach(([i, t]) => {
+    const img = $(i), tx = $(t); if (!img || !tx) return;
+    if (url){ img.src = url; img.hidden = false; tx.hidden = true; }
+    else    { img.removeAttribute('src'); img.hidden = true; tx.hidden = false; tx.textContent = ini; }
+  });
+  const q = $('#ajQuitarFoto'); if (q) q.hidden = !url;
+}
+
+/* Reduce la imagen en el navegador: recorta al cuadrado del centro y
+   baja la calidad hasta que quepa. Así nunca sube un archivo de 4 MB. */
+function encogerImagen(archivo){
+  return new Promise((listo, falla) => {
+    if (!/^image\/(png|jpeg|webp)$/.test(archivo.type)) return falla(new Error('Tiene que ser una imagen JPG, PNG o WEBP.'));
+    if (archivo.size > 12 * 1024 * 1024) return falla(new Error('Esa imagen pesa demasiado. Prueba con una más pequeña.'));
+    const lector = new FileReader();
+    lector.onerror = () => falla(new Error('No se pudo leer el archivo.'));
+    lector.onload = () => {
+      const img = new Image();
+      img.onerror = () => falla(new Error('El archivo no es una imagen válida.'));
+      img.onload = () => {
+        const lado = Math.min(img.width, img.height);
+        const cx = (img.width - lado) / 2, cy = (img.height - lado) / 2;
+        const c = document.createElement('canvas');
+        c.width = c.height = AJ_MAX;
+        const g = c.getContext('2d');
+        g.imageSmoothingQuality = 'high';
+        g.drawImage(img, cx, cy, lado, lado, 0, 0, AJ_MAX, AJ_MAX);
+        let q = 0.84, url = c.toDataURL('image/jpeg', q);
+        while (url.length > AJ_PESO && q > 0.4){ q -= 0.1; url = c.toDataURL('image/jpeg', q); }
+        if (url.length > AJ_PESO) return falla(new Error('No se pudo comprimir lo suficiente.'));
+        listo(url);
+      };
+      img.src = lector.result;
+    };
+    lector.readAsDataURL(archivo);
+  });
+}
+
+async function guardarAvatar(url){
+  if (!S.perfil) S.perfil = { id: S.user.id };
+  const antes = S.perfil.avatar || null;
+  S.perfil.avatar = url; pintarFoto();
+  const { error } = await sb.from('perfiles').upsert({ id: S.user.id, avatar: url }, { onConflict:'id' });
+  if (error){
+    S.perfil.avatar = antes; pintarFoto();
+    if (faltaTabla(error) || /avatar/i.test(error.message || ''))
+      return toast('Antes tienes que correr esquema_v10.txt en Supabase');
+    return toast('No se pudo guardar: ' + error.message);
+  }
+  toast(url ? 'Foto actualizada' : 'Foto quitada');
+}
+
+/* ---------- pintar la pantalla ---------- */
+function pintarAjustes(){
+  if (!$('#tAjustes')) return;
+  const P = S.perfil || {};
+  $('#ajNombre').textContent = P.nombre || 'Sin nombre';
+  $('#ajCorreo').textContent = (S.user && S.user.email) || '—';
+  $('#ajNivel').textContent  = $('#hdNivel') ? $('#hdNivel').textContent : '';
+  pintarFoto();
+
+  const faltan = [];
+  if (!P.sexo) faltan.push('sexo');
+  if (!P.fecha_nacimiento) faltan.push('edad');
+  if (!P.estatura_cm) faltan.push('estatura');
+  $('#ajValPerfil').textContent = faltan.length ? 'faltan datos' : 'completo';
+  $('#ajValPerfil').style.color = faltan.length ? 'var(--oro)' : '';
+
+  $('#ajValMoneda').textContent = (typeof monedaRef === 'function' ? monedaRef() : (P.moneda_ref || '$'));
+  $('#ajValAlias').textContent  = P.alias || P.nombre || '—';
+  $('#ajRanking').checked = !!P.ranking_publico;
+  $('#ajNotif').checked   = !!P.notificaciones;
+
+  const t = (typeof TEMAS !== 'undefined' ? TEMAS.find(x => x.id === (leerLocal('stricto_tema') || 'noche')) : null);
+  $('#ajValTema').textContent = t ? t.nombre : '—';
+  $('#ajValTerm').textContent = 'v' + TERMINOS_VERSION;
+  $('#ajValVersion').textContent = 'v' + VERSION;
+
+  const sub = $('#ajNotifSub');
+  if (sub && 'Notification' in window && Notification.permission === 'denied')
+    sub.textContent = 'El navegador tiene los avisos bloqueados';
+}
+
+/* ---------- filas ---------- */
+$('#ajFoto').onclick = () => $('#ajArchivo').click();
+$('#hdFoto').onclick = () => mnIrAGrupo('ajustes');
+
+$('#ajArchivo').onchange = async (e) => {
+  const f = e.target.files && e.target.files[0];
+  e.target.value = '';                       // permite volver a elegir la misma
+  if (!f) return;
+  toast('Preparando la foto…');
+  try { await guardarAvatar(await encogerImagen(f)); }
+  catch (err){ toast(err.message || 'No se pudo usar esa imagen'); }
+};
+$('#ajQuitarFoto').onclick = () => guardarAvatar(null);
+
+$('#ajPerfil').onclick    = () => abrirPerfil();
+$('#ajMoneda').onclick    = () => $('#btnMoneda').click();
+$('#ajSupuestos').onclick = () => $('#btnSupuestos').click();
+$('#ajAlias').onclick     = () => $('#btnRankCfg').click();
+$('#ajTema').onclick      = () => $('#btnTema').click();
+$('#ajTerm').onclick      = () => abrirTerminos(true);
+$('#ajVersion').onclick   = () => $('#btnVersion').click();
+$('#ajConexion').onclick  = () => { $('#btnCfgEdit').click();
+  toast('Sal de la sesión para cambiar la conexión'); };
+$('#ajSalir').onclick     = async () => { await sb.auth.signOut(); location.reload(); };
+
+$('#ajRanking').onchange = async (e) => {
+  const v = e.target.checked;
+  const { error } = await sb.from('perfiles').upsert({ id:S.user.id, ranking_publico:v }, { onConflict:'id' });
+  if (error){ e.target.checked = !v; return toast('No se pudo guardar: ' + error.message); }
+  if (S.perfil) S.perfil.ranking_publico = v;
+  toast(v ? 'Ya apareces en el ranking' : 'Saliste del ranking');
+  if (G.cargado) cargarGym();
+};
+
+$('#ajNotif').onchange = async (e) => {
+  const v = e.target.checked;
+  if (v && 'Notification' in window && Notification.permission === 'default'){
+    const r = await Notification.requestPermission();
+    if (r !== 'granted'){ e.target.checked = false;
+      return toast('El navegador no dio permiso para avisar'); }
+  }
+  const { error } = await sb.from('perfiles').upsert({ id:S.user.id, notificaciones:v }, { onConflict:'id' });
+  if (error){ e.target.checked = !v; return toast('No se pudo guardar: ' + error.message); }
+  if (S.perfil) S.perfil.notificaciones = v;
+  if (typeof arrancarRecordatorios === 'function') arrancarRecordatorios();
+  if (typeof pintarEstadoNotif === 'function') pintarEstadoNotif();
+  toast(v ? 'Recordatorios activados' : 'Recordatorios apagados');
+};
+
+$('#ajClave').onclick = async () => {
+  const correo = S.user && S.user.email;
+  if (!correo) return toast('No hay correo en la sesión');
+  const { error } = await sb.auth.resetPasswordForEmail(correo,
+    { redirectTo: location.href.split('#')[0] });
+  toast(error ? traducirAuth(error.message) : 'Te enviamos el correo para cambiarla');
+};
+
+/* Borrar la cuenta: dos confirmaciones y hay que escribir la palabra. */
+$('#ajBorrar').onclick = async () => {
+  const correo = (S.user && S.user.email) || '';
+  const dicho = prompt('Esto borra tu cuenta y todo lo que has registrado. No se puede deshacer.\n\n' +
+                       'Si estás seguro, escribe BORRAR en mayúsculas:');
+  if (dicho !== 'BORRAR') return toast('No se borró nada');
+  if (!confirm('Última vez: se va todo lo de ' + correo + '. ¿Seguimos?')) return toast('No se borró nada');
+  const { error } = await sb.rpc('borrar_mi_cuenta');
+  if (error){
+    if (/does not exist|schema cache/i.test(error.message || ''))
+      return toast('Antes tienes que correr esquema_v10.txt en Supabase');
+    return toast('No se pudo borrar: ' + error.message);
+  }
+  await sb.auth.signOut();
+  alert('Tu cuenta y tus datos fueron borrados. Gracias por haberla usado.');
+  location.reload();
+};
 
 function pintarSubnav(){
   const g = NAVG.find(x => x.k === S.grupo);
@@ -3388,11 +3780,16 @@ const MN_ICONOS = {
   progreso: '<path d="M4 4.5v15h15.5"/><path d="M7.4 15.2l3.6-4.1 3 2.4 4.8-6.2"/>',
   gym:      '<path d="M6.6 8v8M4 9.6v4.8M17.4 8v8M20 9.6v4.8"/><path d="M6.6 12h10.8"/>',
   cuerpo:   '<circle cx="12" cy="6.4" r="2.9"/><path d="M5.8 20.4c0-3.6 2.8-6.3 6.2-6.3s6.2 2.7 6.2 6.3"/>',
-  dinero:   '<rect x="3.4" y="6.4" width="17.2" height="11.2" rx="2.6"/><circle cx="12" cy="12" r="2.5"/><path d="M6.6 12h.01M17.4 12h.01"/>'
+  dinero:   '<rect x="3.4" y="6.4" width="17.2" height="11.2" rx="2.6"/><circle cx="12" cy="12" r="2.5"/><path d="M6.6 12h.01M17.4 12h.01"/>',
+  ajustes:  '<circle cx="12" cy="12" r="3.1"/><path d="M19.1 14.4a1.6 1.6 0 0 0 .32 1.76l.06.06a1.9 1.9 0 1 1-2.7 2.7l-.05-.06a1.6 1.6 0 0 0-1.77-.32 1.6 1.6 0 0 0-.96 1.46v.17a1.9 1.9 0 1 1-3.8 0v-.09a1.6 1.6 0 0 0-1.04-1.46 1.6 1.6 0 0 0-1.77.32l-.05.06a1.9 1.9 0 1 1-2.7-2.7l.06-.06a1.6 1.6 0 0 0 .32-1.76 1.6 1.6 0 0 0-1.46-.97h-.17a1.9 1.9 0 1 1 0-3.8h.09a1.6 1.6 0 0 0 1.46-1.04 1.6 1.6 0 0 0-.32-1.77l-.06-.05a1.9 1.9 0 1 1 2.7-2.7l.05.06a1.6 1.6 0 0 0 1.77.32h.08A1.6 1.6 0 0 0 10.3 3.2v-.17a1.9 1.9 0 1 1 3.8 0v.09a1.6 1.6 0 0 0 .96 1.46 1.6 1.6 0 0 0 1.77-.32l.05-.06a1.9 1.9 0 1 1 2.7 2.7l-.06.05a1.6 1.6 0 0 0-.32 1.77v.08a1.6 1.6 0 0 0 1.46.97h.17a1.9 1.9 0 1 1 0 3.8h-.09a1.6 1.6 0 0 0-1.46.96Z"/>'
 };
-const MN_COLOR = { hoy:'#00E676', progreso:'#4FDE7A', gym:'#8BD64F', cuerpo:'#BFCB40', dinero:'#D4AF37' };
-const MN_NOMBRE = { hoy:'Hoy', progreso:'Avance', gym:'Gym', cuerpo:'Cuerpo', dinero:'Dinero' };
-const MN_ORDEN = ['hoy','progreso','gym','cuerpo','dinero'];
+/* La rampa de contenido va del verde de la marca al dorado de los logros.
+   Ajustes se sale de la rampa a propósito: no es contenido, es el sistema. */
+const MN_COLOR = { hoy:'#00E676', progreso:'#4FDE7A', gym:'#8BD64F', cuerpo:'#BFCB40',
+                   dinero:'#D4AF37', ajustes:'#8FA6C4' };
+const MN_NOMBRE = { hoy:'Hoy', progreso:'Avance', gym:'Gym', cuerpo:'Cuerpo',
+                    dinero:'Dinero', ajustes:'Ajustes' };
+const MN_ORDEN = ['hoy','progreso','gym','cuerpo','dinero','ajustes'];
 
 const mnSvg = (d) => '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" ' +
                      'stroke-linecap="round" stroke-linejoin="round">' + d + '</svg>';
@@ -3421,7 +3818,7 @@ function mnMedir(){
   const anchoNav = cont.getBoundingClientRect().width;
   if (!anchoNav) return false;
   MN.W = anchoNav;
-  MN.centros = MN_ORDEN.map((k, i) => anchoNav * (i + 0.5) / 5);
+  MN.centros = MN_ORDEN.map((k, i) => anchoNav * (i + 0.5) / MN_ORDEN.length);
   const svg = $('#mnSvg'), aire = MN.rn * 1.5;
   const arriba = parseFloat(getComputedStyle(cont).getPropertyValue('--mn-top')) || 44;
   svg.setAttribute('viewBox', '0 ' + (-aire) + ' ' + MN.W + ' ' + (MN.H + aire));
@@ -8509,7 +8906,8 @@ function actualizarRapido(){
   const hayDialogo = !!document.querySelector('dialog[open]');
   const hayHoja = !$('#hojaRapida').classList.contains('hidden');
   const hayBarra = !$('#barraRutina').classList.contains('hidden');
-  f.classList.toggle('oculto', !S.user || $('#vApp').classList.contains('hidden') || hayDialogo || hayHoja || hayBarra);
+  f.classList.toggle('oculto', !S.user || $('#vApp').classList.contains('hidden') ||
+    S.tab === 'ajustes' || hayDialogo || hayHoja || hayBarra);
 }
 /* cualquier diálogo que se abra o cierre esconde o devuelve el botón */
 (function(){
