@@ -896,25 +896,113 @@ table.tab td.num{text-align:right;font-variant-numeric:tabular-nums;white-space:
   .agua-num{font-size:24px}
 }
 /* ===================== DINERO · cabecera y pagos fijos ===================== */
-.fi-hero{position:relative;padding:18px 16px 16px;
-  background:linear-gradient(165deg, color-mix(in srgb, var(--brand) 13%, var(--panel)) 0%, var(--panel) 62%)}
-.fi-mesnav{display:flex;align-items:center;justify-content:center;gap:6px;margin-bottom:14px}
-.fi-mesnav span{font-size:12px;letter-spacing:.11em;text-transform:uppercase;color:var(--tx2);
-  font-weight:700;min-width:132px;text-align:center}
-.fi-mesnav button{padding:6px 14px;min-height:38px;background:transparent;border-color:transparent;color:var(--tx2)}
-.fi-lbl{font-size:12px;color:var(--tx2);letter-spacing:.04em}
-.fi-total{font-family:var(--f-titulo);font-weight:800;font-size:38px;line-height:1.05;
-  margin-top:2px;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
-.fi-sub{font-size:13px;color:var(--tx2);margin-top:5px}
-.fi-sub b{font-weight:650}
-.fi-acc{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:18px}
-.fi-acc button{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;
-  padding:12px 4px;min-height:70px;background:var(--panel2);border:1px solid var(--line);
-  border-radius:14px;font-size:12px;color:var(--tx);font-weight:600;line-height:1}
-.fi-acc button:active{transform:scale(.96)}
-.fi-acc button i{display:grid;place-items:center;width:22px;height:22px;color:var(--brand-tx)}
-.fi-acc button svg{width:21px;height:21px}
-.fi-acc button.on{border-color:var(--brand);background:var(--brand-soft)}
+/* =====================================================================
+   DINERO · panel de saldo
+   El panel va en verde en los dos temas: es una superficie de color, no
+   de fondo, así que su texto es blanco siempre.
+   ===================================================================== */
+.fi-panel{position:relative;margin:-16px -16px 0;padding:18px 20px 46px;
+  border-radius:0 0 30px 30px;color:#fff;overflow:hidden;
+  background:linear-gradient(158deg,#00B863 0%,#04874F 46%,#05603A 100%)}
+.fi-panel::after{content:"";position:absolute;right:-70px;top:-90px;width:250px;height:250px;
+  border-radius:50%;background:rgba(255,255,255,.07);pointer-events:none}
+
+.fi-top{display:flex;align-items:center;gap:11px;position:relative;z-index:1}
+.fi-yo{width:42px;height:42px;flex:0 0 42px;border-radius:50%;padding:0;overflow:hidden;
+  border:2px solid rgba(255,255,255,.35);background:rgba(255,255,255,.16);cursor:pointer;
+  display:flex;align-items:center;justify-content:center;-webkit-tap-highlight-color:transparent}
+.fi-yo img{width:100%;height:100%;object-fit:cover;display:block}
+.fi-yo span{font-family:var(--f-titulo);font-weight:800;font-size:16px;color:#fff}
+.fi-saludo{flex:1;min-width:0;line-height:1.25}
+.fi-saludo b{display:block;font-family:var(--f-titulo);font-weight:700;font-size:17px;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.fi-saludo span{font-size:12.5px;color:rgba(255,255,255,.72)}
+.fi-cir{position:relative;width:38px;height:38px;flex:0 0 38px;border-radius:50%;padding:0;
+  border:1px solid rgba(255,255,255,.25);background:rgba(255,255,255,.14);color:#fff;
+  cursor:pointer;display:flex;align-items:center;justify-content:center;
+  -webkit-tap-highlight-color:transparent;transition:background .18s}
+.fi-cir:hover{background:rgba(255,255,255,.24)}
+.fi-cir svg{width:18px;height:18px}
+.fi-punto{position:absolute;top:7px;right:8px;width:8px;height:8px;border-radius:50%;
+  background:#FFD24A;border:1.5px solid #04874F}
+
+.fi-pill{display:flex;align-items:center;gap:9px;margin:20px auto 0;padding:8px 14px;
+  min-height:40px;border-radius:999px;border:1px solid rgba(255,255,255,.24);
+  background:rgba(3,60,36,.32);color:#fff;font-size:13.5px;font-weight:600;cursor:pointer;
+  max-width:min(100%,320px);position:relative;z-index:1;-webkit-tap-highlight-color:transparent}
+.fi-pill span:nth-child(2){overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.fi-pill svg{width:15px;height:15px;flex:0 0 15px;opacity:.8}
+.fi-pill-ic{flex:0 0 24px;width:24px;height:24px;border-radius:7px;display:flex;
+  align-items:center;justify-content:center;font-family:var(--f-titulo);font-weight:800;
+  font-size:11px;background:rgba(255,255,255,.9);color:#05603A;letter-spacing:.01em}
+
+.fi-lblrow{display:flex;align-items:center;justify-content:center;gap:8px;margin-top:22px;
+  position:relative;z-index:1}
+.fi-lbl{font-size:12.5px;color:rgba(255,255,255,.75);letter-spacing:.03em}
+.fi-ojo{width:26px;height:26px;padding:0;border:0;background:none;color:rgba(255,255,255,.8);
+  cursor:pointer;display:flex;align-items:center;justify-content:center}
+.fi-ojo svg{width:17px;height:17px}
+.fi-total{font-family:var(--f-titulo);font-weight:800;font-size:clamp(34px,10vw,46px);
+  line-height:1.05;margin-top:3px;text-align:center;font-variant-numeric:tabular-nums;
+  overflow-wrap:anywhere;position:relative;z-index:1}
+.fi-total .dec{color:rgba(255,255,255,.55)}
+.fi-total-bs{font-size:14.5px;font-weight:650;color:rgba(255,255,255,.78);margin-top:2px;
+  text-align:center;position:relative;z-index:1}
+.fi-sub{font-size:12.5px;color:rgba(255,255,255,.72);margin-top:7px;text-align:center;
+  position:relative;z-index:1}
+.fi-sub b{font-weight:700;color:#fff}
+.fi-sub .sube,.fi-sub .baja{color:#fff}
+
+.fi-mesnav{display:flex;align-items:center;justify-content:center;gap:4px;margin-top:16px;
+  position:relative;z-index:1}
+.fi-mesnav span{font-size:11.5px;letter-spacing:.11em;text-transform:uppercase;
+  color:rgba(255,255,255,.8);font-weight:700;min-width:124px;text-align:center}
+.fi-mesnav button{min-height:34px;padding:4px 12px;border:0;background:transparent;
+  color:rgba(255,255,255,.75);cursor:pointer;font-size:12px}
+.fi-mesnav button:hover{color:#fff}
+
+/* la fila de acciones monta sobre el panel */
+.fi-acc{position:relative;z-index:2;display:flex;align-items:center;gap:9px;
+  margin:-28px 0 16px;padding:10px;border-radius:22px;background:var(--panel);
+  border:1px solid var(--line);box-shadow:0 12px 30px rgba(0,0,0,.22)}
+.fi-acc-pri{flex:1;min-height:52px;border-radius:16px;border:0;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  font-family:var(--f-titulo);font-weight:700;font-size:15px;color:var(--brand-ink);
+  background:var(--brand);-webkit-tap-highlight-color:transparent}
+.fi-acc-pri i{display:grid;place-items:center;width:19px;height:19px}
+.fi-acc-pri svg{width:19px;height:19px}
+.fi-acc-cir{width:52px;height:52px;flex:0 0 52px;border-radius:50%;border:0;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;color:#fff;background:#12211B;
+  -webkit-tap-highlight-color:transparent;transition:transform .15s}
+.fi-acc-cir:active,.fi-acc-pri:active{transform:scale(.95)}
+.fi-acc-cir i{display:grid;place-items:center;width:20px;height:20px}
+.fi-acc-cir svg{width:20px;height:20px}
+.fi-acc-cir.on{background:var(--brand);color:var(--brand-ink)}
+
+/* movimientos recientes */
+.mv-grupo{font-size:10.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--tx2);
+  font-weight:750;margin:16px 0 4px}
+.mv-grupo:first-child{margin-top:8px}
+.mv{display:flex;align-items:center;gap:12px;width:100%;padding:11px 0;min-height:60px;
+  background:transparent;border:0;border-bottom:1px solid var(--line);text-align:left;
+  color:var(--tx);cursor:pointer;-webkit-tap-highlight-color:transparent}
+.mv:last-child{border-bottom:0}
+.mv .tx{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px;line-height:1.3}
+.mv .tx b{font-weight:650;font-size:14.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.mv .tx span{font-size:11.5px;color:var(--tx2)}
+.mv .mo{text-align:right;flex:0 0 auto;display:flex;flex-direction:column;gap:2px;line-height:1.3}
+.mv .mo b{font-weight:700;font-size:14.5px;font-variant-numeric:tabular-nums;white-space:nowrap}
+.mv .mo span{font-size:11px;color:var(--tx2);white-space:nowrap}
+.mv .mo .sube{color:var(--ok)}
+.mv .mo .baja{color:var(--tx)}
+.mv-vacio{color:var(--tx2);margin:10px 0 0}
+
+@media (max-width:620px){
+  .fi-panel{margin:-14px -14px 0;padding:16px 16px 44px;border-radius:0 0 26px 26px}
+  .fi-acc{gap:8px;padding:9px}
+  .fi-acc-cir{width:48px;height:48px;flex-basis:48px}
+  .fi-acc-pri{min-height:48px;font-size:14px}
+}
 
 .pg-grupo{font-size:10.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--tx2);
   font-weight:750;margin:16px 0 7px;display:flex;align-items:center;gap:9px}
@@ -949,14 +1037,11 @@ table.tab td.num{text-align:right;font-variant-numeric:tabular-nums;white-space:
 @media (max-width:620px){
   .fi-total{font-size:34px}
   .fi-acc{gap:7px}
-  .fi-acc button{font-size:11.5px;padding:11px 2px;min-height:66px}
 }
 @media (max-width:360px){
   .fi-total{font-size:30px}
-  .fi-acc button span{font-size:11px}
 }
 /* ===================== CUENTAS Y TASA ===================== */
-.fi-total-bs{font-size:15px;font-weight:650;color:var(--tx2);margin-top:1px;
   font-variant-numeric:tabular-nums}
 .ta-caja{background:var(--panel2);border:1px solid var(--line);border-radius:12px;
   padding:11px 13px;margin-bottom:12px}
@@ -1501,23 +1586,67 @@ table.tab td.num{text-align:right;font-variant-numeric:tabular-nums;white-space:
 
     <section id="tFinanzas" class="hidden">
 
-      <!-- ============ CABECERA: los dos números y los cuatro accesos ============ -->
-      <div class="card fi-hero">
-        <div class="fi-mesnav">
-          <button class="sm" id="fiAnt" aria-label="Mes anterior">&#9664;</button>
-          <span id="fiMes">Mes</span>
-          <button class="sm" id="fiSig" aria-label="Mes siguiente">&#9654;</button>
+      <!-- ============ CABECERA ============ -->
+      <div class="fi-panel">
+        <div class="fi-top">
+          <button class="fi-yo" id="fiYo" aria-label="Ir a ajustes">
+            <img id="fiYoImg" alt="" hidden><span id="fiYoIni">?</span>
+          </button>
+          <div class="fi-saludo">
+            <b id="fiHola">Hola</b>
+            <span id="fiMomento">—</span>
+          </div>
+          <button class="fi-cir" id="fiCampana" aria-label="Próximos pagos">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+                 stroke-linecap="round" stroke-linejoin="round">
+              <path d="M6 9.5a6 6 0 1 1 12 0c0 4.4 1.5 5.6 1.5 5.6H4.5S6 13.9 6 9.5Z"/>
+              <path d="M10.2 18.6a2 2 0 0 0 3.6 0"/></svg>
+            <i class="fi-punto hidden" id="fiPunto"></i>
+          </button>
+          <button class="fi-cir" id="fiEngrane" aria-label="Ajustes">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+                 stroke-linecap="round" stroke-linejoin="round">
+              <path d="M4 7.5h9M17 7.5h3M4 16.5h3M11 16.5h9"/>
+              <circle cx="15" cy="7.5" r="2.2"/><circle cx="9" cy="16.5" r="2.2"/></svg>
+          </button>
         </div>
-        <div class="fi-lbl" id="fiLbl">Ahorro acumulado</div>
+
+        <button class="fi-pill" id="fiSelCuenta">
+          <span class="fi-pill-ic" id="fiPillIc">$</span>
+          <span id="fiPillTx">Todas las cuentas</span>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+               stroke-linecap="round" stroke-linejoin="round"><path d="m6 9.5 6 6 6-6"/></svg>
+        </button>
+
+        <div class="fi-lblrow">
+          <span class="fi-lbl" id="fiLbl">Saldo disponible</span>
+          <button class="fi-ojo" id="fiOjo" aria-label="Ocultar o mostrar el saldo"></button>
+        </div>
         <div class="fi-total" id="fiTotal">0</div>
         <div class="fi-total-bs hidden" id="fiTotalBs"></div>
         <div class="fi-sub" id="fiSub"></div>
-        <div class="fi-acc">
-          <button data-a="anadir"><i id="icAnadir"></i><span>Añadir</span></button>
-          <button data-a="ahorro"><i id="icAhorro"></i><span>Ahorro</span></button>
-          <button data-a="limite"><i id="icLimite"></i><span>Límite</span></button>
-          <button data-a="mas"><i id="icMas"></i><span>Más</span></button>
+
+        <div class="fi-mesnav">
+          <button id="fiAnt" aria-label="Mes anterior">&#9664;</button>
+          <span id="fiMes">Mes</span>
+          <button id="fiSig" aria-label="Mes siguiente">&#9654;</button>
         </div>
+      </div>
+
+      <div class="fi-acc">
+        <button class="fi-acc-pri" data-a="anadir"><i id="icAnadir"></i><span>Añadir</span></button>
+        <button class="fi-acc-cir" data-a="ingreso" aria-label="Registrar ingreso"><i id="icIngreso"></i></button>
+        <button class="fi-acc-cir" data-a="traspaso" aria-label="Traspasar entre cuentas"><i id="icTraspaso"></i></button>
+        <button class="fi-acc-cir" data-a="mas" aria-label="Más opciones"><i id="icMas"></i></button>
+      </div>
+
+      <!-- ============ MOVIMIENTOS RECIENTES ============ -->
+      <div class="card fi-recientes">
+        <div class="row" style="justify-content:space-between;align-items:center;margin-bottom:4px">
+          <h2 style="margin:0">Movimientos recientes</h2>
+          <button class="gh sm" id="fiVerTodo">Ver todo</button>
+        </div>
+        <div id="fiLista"></div>
       </div>
 
       <!-- ============ CUENTAS ============ -->
@@ -1539,15 +1668,6 @@ table.tab td.num{text-align:right;font-variant-numeric:tabular-nums;white-space:
           <button class="sm" id="btnNuevoPago">+ Pago fijo</button>
         </div>
         <div id="fiPagos" style="margin-top:12px"></div>
-      </div>
-
-      <!-- ============ MOVIMIENTOS ============ -->
-      <div class="card">
-        <div class="row" style="justify-content:space-between;align-items:center;margin-bottom:10px">
-          <h2 style="margin:0">Movimientos</h2>
-          <span class="muted" id="fiMesMov"></span>
-        </div>
-        <div id="fiLista"></div>
       </div>
 
       <!-- ============ ANÁLISIS · se abre con el botón Más ============ -->
@@ -2192,6 +2312,16 @@ table.tab td.num{text-align:right;font-variant-numeric:tabular-nums;white-space:
   </div>
 </dialog>
 
+<!-- ============ DIÁLOGO: qué cuenta miro ============ -->
+<dialog id="dlgVerCuenta">
+  <h3 style="margin:0 0 4px">Qué cuenta miras</h3>
+  <p class="muted" style="margin:0 0 8px;font-size:13px">Cambia el saldo de arriba y la lista de movimientos.</p>
+  <div id="cvLista" style="max-height:56vh;overflow-y:auto"></div>
+  <div class="row" style="justify-content:flex-end;margin-top:14px">
+    <button class="pri" id="cvCerrar">Listo</button>
+  </div>
+</dialog>
+
 <!-- ============ DIÁLOGO: cuenta ============ -->
 <dialog id="dlgCuenta">
   <h3 id="cuTitulo">Nueva cuenta</h3>
@@ -2589,9 +2719,19 @@ function ok(res, msg){
    Al publicar una versión nueva: sube VERSION, pon la fecha y agrega
    su entrada arriba del todo en NOVEDADES.
    ===================================================================== */
-const VERSION = '5.6.0';
+const VERSION = '5.7.0';
 const FECHA_VERSION = '2026-09-05';
 const NOVEDADES = [
+  ['5.7.0', '2026-09-07', [
+    'Dinero se rehizo: panel verde con tu foto, el saludo por la hora del día y el saldo grande con los decimales atenuados.',
+    'Pastilla para elegir qué cuenta miras: cambia el saldo de arriba y filtra la lista de movimientos a esa cuenta.',
+    'Botón del ojo para tapar el saldo cuando no quieras que se vea en la pantalla.',
+    'Fila de acciones montada sobre el panel: Añadir en grande, y al lado ingreso, traspaso y el detalle.',
+    'Los movimientos dejaron de ser una tabla: ahora son filas con la placa de la marca, agrupadas en Hoy, Ayer, Esta semana y La semana pasada.',
+    'Se muestran los ocho más recientes y «Ver todo» abre el resto. Tocar uno pregunta si lo borras.',
+    'La campana avisa con un punto cuando tienes pagos que vencen en los próximos tres días.',
+    'El botón flotante ya no aparece en Dinero ni en Ajustes: tapaba la lista y ya hay un botón de añadir más grande.'
+  ]],
   ['5.6.0', '2026-09-07', [
     'El ranking muestra la foto de quien participa. Quien no tenga foto sale con sus iniciales sobre un color propio, nunca un hueco.',
     'Se guarda una miniatura aparte de 64 px para eso: es lo único que ven los demás. Tu foto completa sigue sin salir de tu perfil.',
@@ -8260,7 +8400,7 @@ const CLASE_SUGERIDA = {
 };
 const MESES = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
 
-const F = { mov:[], presup:[], metas:[], pagos:[], cuentas:[], tasas:[], deudas:[],
+const F = { cuentaVista:null, mov:[], presup:[], metas:[], pagos:[], cuentas:[], tasas:[], deudas:[],
             mes:hoyISO().slice(0,7), tipo:'gasto', hgTipo:'gasto', pagoEdit:null, cuentaEdit:null,
             deudaEdit:null, faltaPagos:false, faltaCuentas:false, faltaDeudas:false, cargado:false };
 
@@ -8656,27 +8796,66 @@ function pintarMetasAhorro(r){
   });
 }
 
+/* Agrupa por cercanía, no por fecha suelta: hoy, ayer, esta semana, antes. */
+function grupoDeFecha(f, hoy){
+  if (f === hoy) return 'Hoy';
+  if (f === sumarDias(hoy, -1)) return 'Ayer';
+  if (f >= lunesDe(hoy)) return 'Esta semana';
+  if (f >= lunesDe(sumarDias(hoy, -7))) return 'La semana pasada';
+  return 'Antes';
+}
+
 function pintarMovimientos(){
-  const c = $('#fiLista'), mv = delMes(F.mes).slice().sort((a,b) => b.fecha.localeCompare(a.fecha));
-  if (!mv.length){ c.innerHTML = '<p class="muted">Nada registrado este mes.</p>'; return; }
-  c.innerHTML = '<div style="overflow-x:auto"><table class="datos"><tr>' +
-    '<th>Fecha</th><th>Categoría</th><th>Detalle</th><th>Monto</th><th></th></tr>' +
-    mv.map(m => '<tr data-id="' + m.id + '">' +
-      '<td class="muted">' + m.fecha.slice(8,10) + '/' + m.fecha.slice(5,7) + '</td>' +
-      '<td>' + esc(m.categoria) + (m.fijo ? ' <span class="tag">fijo</span>' : '') +
-        (m.cuenta_id && cuentaDe(m.cuenta_id) ? '<br><span class="muted" style="font-size:11px">' +
-          esc(cuentaDe(m.cuenta_id).nombre) + '</span>' : '') + '</td>' +
-      '<td class="muted">' + esc(m.descripcion || '—') + '</td>' +
-      '<td class="' + (m.tipo === 'ingreso' ? 'sube' : m.tipo === 'traspaso' ? 'muted' : '') + '">' +
-        (m.tipo === 'ingreso' ? '+' : m.tipo === 'traspaso' ? '' : '−') + ' ' +
-        plata(m.monto, m.moneda || monedaRef()) + '</td>' +
-      '<td><button class="sm bo">✕</button></td></tr>').join('') + '</table></div>';
-  c.querySelectorAll('.bo').forEach(b => b.onclick = async () => {
-    const id = b.closest('tr').dataset.id;
-    if (!ok(await sb.from('movimientos').delete().eq('id', id))) return;
+  const c = $('#fiLista'), hoy = hoyISO(), cv = cuentaVista();
+  let mv = delMes(F.mes).slice().sort((a, b) =>
+    b.fecha.localeCompare(a.fecha) || String(b.id).localeCompare(String(a.id)));
+  if (cv) mv = mv.filter(m => m.cuenta_id === cv.id || m.cuenta_destino_id === cv.id);
+
+  if (!mv.length){
+    c.innerHTML = '<p class="mv-vacio">' +
+      (cv ? 'Nada registrado este mes en ' + esc(cv.nombre) + '.' : 'Nada registrado este mes.') + '</p>';
+    $('#fiVerTodo').classList.add('hidden');
+    return;
+  }
+
+  const todos = F.verTodo === true;
+  const lista = todos ? mv : mv.slice(0, 8);
+  $('#fiVerTodo').classList.remove('hidden');
+  $('#fiVerTodo').textContent = todos ? 'Ver menos' : ('Ver todo (' + mv.length + ')');
+
+  let grupo = null, html = '';
+  lista.forEach(m => {
+    const g = grupoDeFecha(m.fecha, hoy);
+    if (g !== grupo){ grupo = g; html += '<div class="mv-grupo">' + esc(g) + '</div>'; }
+
+    const cta = cuentaDe(m.cuenta_id);
+    const titulo = m.descripcion || m.categoria || 'Movimiento';
+    const abajo = [m.descripcion ? m.categoria : null, cta ? cta.nombre : null]
+      .filter(Boolean).join(' · ') || fechaCorta(m.fecha);
+    const signo = m.tipo === 'ingreso' ? '+' : m.tipo === 'traspaso' ? '' : '−';
+    const cls   = m.tipo === 'ingreso' ? 'sube' : m.tipo === 'traspaso' ? 'muted' : 'baja';
+
+    html += '<button class="mv" data-id="' + esc(m.id) + '">' +
+      placaMarca(titulo, icoDeCat(m.categoria)) +
+      '<span class="tx"><b>' + esc(titulo) + '</b><span>' +
+        esc(abajo) + (m.fijo ? ' · fijo' : '') + '</span></span>' +
+      '<span class="mo"><b class="' + cls + '">' + signo +
+        esc(plata(m.monto, m.moneda || monedaRef())) + '</b>' +
+      '<span>' + esc(fechaCorta(m.fecha)) + '</span></span></button>';
+  });
+  c.innerHTML = html;
+
+  // tocar un movimiento pregunta si borrarlo
+  c.querySelectorAll('[data-id]').forEach(b => b.onclick = async () => {
+    const m = mv.find(x => String(x.id) === b.dataset.id); if (!m) return;
+    if (!confirm('¿Borrar «' + (m.descripcion || m.categoria) + '» de ' +
+                 plata(m.monto, m.moneda || monedaRef()) + '?')) return;
+    if (!ok(await sb.from('movimientos').delete().eq('id', m.id))) return;
     await cargarFinanzas();
   });
 }
+
+$('#fiVerTodo').onclick = () => { F.verTodo = !F.verTodo; pintarMovimientos(); };
 
 /* ---------- acciones ---------- */
 $('#fiAnt').onclick = () => { F.mes = mesSumar(F.mes, -1); pintarFinanzas(); };
@@ -8976,7 +9155,7 @@ function actualizarRapido(){
   const hayHoja = !$('#hojaRapida').classList.contains('hidden');
   const hayBarra = !$('#barraRutina').classList.contains('hidden');
   f.classList.toggle('oculto', !S.user || $('#vApp').classList.contains('hidden') ||
-    S.tab === 'ajustes' || hayDialogo || hayHoja || hayBarra);
+    S.tab === 'ajustes' || S.tab === 'finanzas' || hayDialogo || hayHoja || hayBarra);
 }
 /* cualquier diálogo que se abra o cierre esconde o devuelve el botón */
 (function(){
@@ -10918,7 +11097,9 @@ function marcaDe(nombre){
   if (!t) return null;
   const m = MARCAS.find(x => x.r.test(t));
   if (m) return { color:m.c, letras:m.t };
-  const p = t.replace(/[^\p{L}\p{N} ]/gu, ' ').split(/\s+/).filter(Boolean);
+  const CONECTORES = /^(de|del|la|el|los|las|y|en|al|a|con|por|para|un|una|mi|su)$/i;
+  const p = t.replace(/[^\p{L}\p{N} ]/gu, ' ').split(/\s+/)
+             .filter(w => w && !CONECTORES.test(w));
   const letras = ((p[0] || '?')[0] + (p[1] ? p[1][0] : (p[0] || '')[1] || '')).toUpperCase();
   return { color: colorDeTexto(t), letras: letras };
 }
@@ -10936,6 +11117,10 @@ function svgIco(k){
   return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" ' +
          'stroke-linecap="round" stroke-linejoin="round">' + (ICO[k] || ICO.punto) + '</svg>';
 }
+/* flechas de las acciones rápidas */
+ICO.flechaSube = '<path d="M7.5 16.5 16.5 7.5"/><path d="M9.5 7.5h7v7"/>';
+ICO.cambio     = '<path d="M4 8.2h13M13.6 4.8 17 8.2l-3.4 3.4"/><path d="M20 15.8H7M10.4 12.4 7 15.8l3.4 3.4"/>';
+
 const ICO_CAT = {
   'Vivienda':'casa', 'Hogar':'casa', 'Transporte':'bus', 'Servicios':'rayo',
   'Alimentación':'carrito', 'Restaurantes':'taza', 'Salud':'corazon', 'Bienestar':'pesa',
@@ -11024,29 +11209,139 @@ function ahorroAcumulado(){
   return { total:aho, fuente: aho > 0 ? 'de lo que marcaste como ahorro' : 'crea una meta de ahorro para empezar' };
 }
 
+/* ---------- cabecera de Dinero ---------- */
+const OJO_ABIERTO = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" ' +
+  'stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 12S6 5.6 12 5.6 21.5 12 21.5 12 18 18.4 12 18.4 2.5 12 2.5 12Z"/>' +
+  '<circle cx="12" cy="12" r="2.9"/></svg>';
+const OJO_CERRADO = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" ' +
+  'stroke-linecap="round" stroke-linejoin="round"><path d="M4 4.5 20 19.5"/>' +
+  '<path d="M9.6 6.1A9.5 9.5 0 0 1 12 5.8c6 0 9.5 6.2 9.5 6.2a17 17 0 0 1-3.3 3.9"/>' +
+  '<path d="M6.4 8.1A17 17 0 0 0 2.5 12S6 18.2 12 18.2c1 0 1.9-.2 2.7-.4"/></svg>';
+
+const saldoOculto = () => leerLocal('fi_oculto') === '1';
+
+/* Parte el número para poder atenuar los decimales, como en las apps de banco. */
+function montoConDecimales(txt){
+  const m = /^(.*?)([.,]\d+)$/.exec(String(txt));
+  return m ? esc(m[1]) + '<span class="dec">' + esc(m[2]) + '</span>' : esc(txt);
+}
+
+function cuentaVista(){
+  if (!F.cuentaVista) return null;
+  const c = cuentaDe(F.cuentaVista);
+  return c && c.activa ? c : null;
+}
+
 function pintarHero(){
   const r = resumen(F.mes), a = ahorroAcumulado(), ref = monedaRef();
   const T = totalCuentas();
   const hayCuentas = T.n > 0;
-  $('#fiLbl').textContent = hayCuentas ? 'Total en tus cuentas' : 'Ahorro acumulado';
-  $('#fiTotal').textContent = hayCuentas ? plata(T.ref, ref) : money(a.total);
+  const cv = cuentaVista();
+
+  // saludo
+  const P = S.perfil || {};
+  $('#fiHola').textContent = 'Hola, ' + ((P.nombre || '').split(' ')[0] || 'qué tal');
+  const h = new Date().getHours();
+  $('#fiMomento').textContent = h < 12 ? 'Buenos días' : h < 19 ? 'Buenas tardes' : 'Buenas noches';
+  const img = $('#fiYoImg'), ini = $('#fiYoIni');
+  if (P.avatar){ img.src = P.avatar; img.hidden = false; ini.hidden = true; }
+  else { img.hidden = true; ini.hidden = false; ini.textContent = inicialesDe(P.nombre, S.user && S.user.email); }
+
+  // pastilla de cuenta
+  if (cv){
+    const m = marcaDe(cv.nombre);
+    const c = placaColores(m.color);
+    $('#fiPillIc').textContent = m.letras;
+    $('#fiPillIc').style.background = c.fondo;
+    $('#fiPillIc').style.color = c.tinta;
+    $('#fiPillTx').textContent = cv.nombre + ' · ' + (MON[cv.moneda] ? MON[cv.moneda].s : cv.moneda);
+  } else {
+    $('#fiPillIc').textContent = simboloDe(ref);
+    $('#fiPillIc').style.background = 'rgba(255,255,255,.9)';
+    $('#fiPillIc').style.color = '#05603A';
+    $('#fiPillTx').textContent = hayCuentas
+      ? 'Todas las cuentas · ' + T.n + (T.n === 1 ? ' cuenta' : ' cuentas') : 'Sin cuentas todavía';
+  }
+  $('#fiSelCuenta').classList.toggle('hidden', !hayCuentas);
+
+  // el número grande
+  let etiqueta, grande, chico;
+  if (cv){
+    etiqueta = 'Saldo de ' + cv.nombre;
+    const sd = saldoCuenta(cv);
+    grande = plata(sd, cv.moneda);
+    const otra = cv.moneda === 'VES' ? convertir(sd, 'VES', ref, hoyISO()) : aBs(sd, cv.moneda, hoyISO());
+    chico = otra == null ? 'sin tasa del día' : plata(otra, cv.moneda === 'VES' ? ref : 'VES');
+  } else if (hayCuentas){
+    etiqueta = 'Saldo disponible';
+    grande = plata(T.ref, ref);
+    chico = ref !== 'VES' ? plata(T.bs, 'VES') + (T.incompleto ? ' · falta alguna tasa' : '') : '';
+  } else {
+    etiqueta = 'Ahorro acumulado';
+    grande = money(a.total);
+    chico = '';
+  }
+  $('#fiLbl').textContent = etiqueta;
+  const oculto = saldoOculto();
+  $('#fiTotal').innerHTML = oculto ? '••••••' : montoConDecimales(grande);
+  $('#fiOjo').innerHTML = oculto ? OJO_CERRADO : OJO_ABIERTO;
   const bs = $('#fiTotalBs');
-  if (hayCuentas && ref !== 'VES'){
-    bs.classList.remove('hidden');
-    bs.textContent = plata(T.bs, 'VES') + (T.incompleto ? '  · falta alguna tasa' : '');
-  } else bs.classList.add('hidden');
+  if (chico && !oculto){ bs.classList.remove('hidden'); bs.textContent = chico; }
+  else bs.classList.add('hidden');
+
   const signo = r.balance > 0 ? '+' : '';
-  $('#fiSub').innerHTML = 'Balance de ' + esc(mesNombre(F.mes).toLowerCase()) + ': ' +
-    '<b class="' + (r.balance < 0 ? 'baja' : r.balance > 0 ? 'sube' : '') + '">' +
-    signo + esc(money(r.balance)) + '</b>' +
-    (hayCuentas ? ' · <span class="muted">Ahorro ' + esc(money(a.total)) + '</span>'
-                : ' · <span class="muted">' + esc(a.fuente) + '</span>');
-  $('#icAnadir').innerHTML = svgIco('mas');
-  $('#icAhorro').innerHTML = svgIco('hucha');
-  $('#icLimite').innerHTML = svgIco('limite');
-  $('#icMas').innerHTML    = svgIco('puntos');
-  $('#fiMesMov').textContent = mesNombre(F.mes);
+  $('#fiSub').innerHTML = oculto ? '&nbsp;' :
+    'Balance de ' + esc(mesNombre(F.mes).toLowerCase()) + ': ' +
+    '<b>' + signo + esc(money(r.balance)) + '</b>' +
+    (hayCuentas ? ' · Ahorro ' + esc(money(a.total)) : ' · ' + esc(a.fuente));
+
+  // aviso de pagos que vencen en los próximos tres días
+  const hoy = hoyISO(), tope = sumarDias(hoy, 3);
+  const porVencer = (F.pagos || []).filter(p => p.activo).some(p => {
+    const v = ultimaFechaVencida(p, hoy);
+    const f = (v && !pagoRegistrado(p, v)) ? v : proximaFecha(p, hoy);
+    return f && f <= tope;
+  });
+  $('#fiPunto').classList.toggle('hidden', !porVencer);
+
+  $('#icAnadir').innerHTML   = svgIco('mas');
+  $('#icIngreso').innerHTML  = svgIco('flechaSube');
+  $('#icTraspaso').innerHTML = svgIco('cambio');
+  $('#icMas').innerHTML      = svgIco('puntos');
 }
+
+$('#fiOjo').onclick = () => { guardarLocal('fi_oculto', saldoOculto() ? '0' : '1'); pintarHero(); };
+$('#fiYo').onclick = () => mnIrAGrupo('ajustes');
+$('#fiEngrane').onclick = () => mnIrAGrupo('ajustes');
+$('#fiCampana').onclick = () => {
+  const c = $('#fiPagos'); if (c) c.scrollIntoView({ behavior:'smooth', block:'center' });
+};
+
+/* Elegir qué cuenta se mira. Cambia el número grande y filtra la lista. */
+$('#fiSelCuenta').onclick = () => {
+  const act = (F.cuentas || []).filter(x => x.activa);
+  if (!act.length) return $('#btnNuevaCuenta').click();
+  const cuerpo = $('#cvLista');
+  cuerpo.innerHTML = [{ id:null, nombre:'Todas las cuentas' }].concat(act).map(x => {
+    const sel = (x.id || null) === (F.cuentaVista || null);
+    const ic = x.id ? placaMarca(x.nombre) : '<span class="ic mk" style="background:var(--brand);color:var(--brand-ink)">' +
+                esc(simboloDe(monedaRef())) + '</span>';
+    const der = x.id ? plata(saldoCuenta(x), x.moneda) : plata(totalCuentas().ref, monedaRef());
+    return '<button class="mv" data-cv="' + (x.id || '') + '">' + ic +
+      '<span class="tx"><b>' + esc(x.nombre) + '</b><span>' +
+      (x.id ? esc(TIPO_CUENTA[x.tipo] || 'Cuenta') : 'Suma de todas') + '</span></span>' +
+      '<span class="mo"><b>' + esc(der) + '</b>' +
+      (sel ? '<span style="color:var(--brand-tx)">viendo</span>' : '<span>&nbsp;</span>') +
+      '</span></button>';
+  }).join('');
+  cuerpo.querySelectorAll('[data-cv]').forEach(b => b.onclick = () => {
+    F.cuentaVista = b.dataset.cv || null;
+    $('#dlgVerCuenta').close();
+    pintarHero(); pintarMovimientos();
+  });
+  $('#dlgVerCuenta').showModal();
+};
+$('#cvCerrar').onclick = () => $('#dlgVerCuenta').close();
 
 /* ---------- próximos pagos ---------- */
 function textoCuando(f, pagado, hoy){
@@ -11390,19 +11685,15 @@ $('#hgLeer').onclick = () => {
 /* ---------- los cuatro accesos ---------- */
 $$('.fi-acc button').forEach(b => b.onclick = () => {
   const a = b.dataset.a;
-  if (a === 'anadir') return abrirHojaGasto('gasto');
-  if (a === 'limite') return $('#btnPresup').click();
-  const an = $('#fiAnalisis');
-  if (a === 'ahorro'){
-    an.classList.remove('hidden'); $('#icMas').closest('button').classList.add('on');
-    setTimeout(() => $('#fiMetasCard').scrollIntoView({ behavior:'smooth', block:'start' }), 60);
-    return;
-  }
+  if (a === 'anadir')   return abrirHojaGasto('gasto');
+  if (a === 'ingreso')  return abrirHojaGasto('ingreso');
+  if (a === 'traspaso') return $('#btnTraspaso').click();
   if (a === 'mas'){
+    const an = $('#fiAnalisis');
     const abierto = !an.classList.contains('hidden');
     an.classList.toggle('hidden', abierto);
     b.classList.toggle('on', !abierto);
-    b.querySelector('span').textContent = abierto ? 'Más' : 'Menos';
+    b.setAttribute('aria-label', abierto ? 'Más opciones' : 'Ocultar el detalle');
     if (!abierto) setTimeout(() => an.scrollIntoView({ behavior:'smooth', block:'start' }), 60);
   }
 });
