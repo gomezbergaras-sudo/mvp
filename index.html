@@ -440,6 +440,78 @@ dialog::backdrop{background:rgba(0,0,0,.6)}
 
 
 /* ---------- navegación en dos niveles ---------- */
+/* ---------- análisis: la rosca ---------- */
+.an-card{padding-top:22px}
+.an-rosca{position:relative;width:100%;max-width:300px;margin:0 auto}
+.an-rosca svg{width:100%;height:auto;display:block;overflow:visible}
+.an-centro{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;
+  justify-content:center;text-align:center;pointer-events:none;padding:0 18%}
+.an-mes{font-size:12.5px;color:var(--tx2);letter-spacing:.04em}
+.an-total{font-family:var(--f-titulo);font-weight:800;font-size:clamp(26px,7.5vw,34px);
+  line-height:1.08;margin-top:2px;overflow-wrap:anywhere}
+.an-vs{font-size:12.5px;margin-top:4px;display:flex;align-items:center;gap:5px}
+.an-vs i{width:7px;height:7px;border-radius:50%;background:currentColor;flex:0 0 7px}
+.an-chips{display:flex;gap:7px;justify-content:center;flex-wrap:wrap;margin-top:18px}
+.an-chip{padding:7px 14px;min-height:36px;border-radius:999px;cursor:pointer;font-size:13px;
+  border:1px solid var(--line);background:var(--panel2);color:var(--tx2);font-family:inherit}
+.an-chip.on{background:var(--brand-soft);border-color:var(--brand);color:var(--brand-tx);font-weight:650}
+
+/* ---------- análisis: barras por día ---------- */
+.an-barras{display:flex;align-items:flex-end;gap:2px;height:120px;margin-top:10px;
+  padding-bottom:16px;position:relative}
+.an-bar{flex:1;min-width:3px;border-radius:3px 3px 0 0;background:var(--brand);
+  opacity:.85;position:relative;transition:opacity .15s}
+.an-bar.hoy{background:var(--oro);opacity:1}
+.an-bar.cero{background:var(--line);opacity:.6;min-height:2px}
+.an-bar span{position:absolute;bottom:-16px;left:50%;transform:translateX(-50%);
+  font-size:9.5px;color:var(--tx2);white-space:nowrap}
+.an-media{position:absolute;left:0;right:0;border-top:1px dashed var(--tx2);opacity:.5}
+.an-media b{position:absolute;right:0;top:-15px;font-size:10px;color:var(--tx2);font-weight:600}
+
+/* ---------- análisis: lista ---------- */
+.an-fila{display:flex;align-items:center;gap:12px;padding:11px 0;min-height:58px;
+  border-bottom:1px solid var(--line)}
+.an-fila:last-child{border-bottom:0}
+.an-fila .tx{flex:1;min-width:0}
+.an-fila .tx b{font-weight:650;font-size:14.5px;display:block}
+.an-fila .tx span{font-size:11.5px;color:var(--tx2)}
+.an-fila .mo{text-align:right;flex:0 0 auto}
+.an-fila .mo b{font-weight:700;font-size:14.5px;font-variant-numeric:tabular-nums;display:block}
+.an-pct{display:inline-block;margin-top:2px;padding:2px 7px;border-radius:999px;
+  background:var(--panel2);color:var(--tx2);font-size:11px;font-weight:600;
+  font-variant-numeric:tabular-nums}
+.an-raya{height:4px;border-radius:3px;background:var(--panel2);margin-top:6px;overflow:hidden}
+.an-raya i{display:block;height:100%;border-radius:3px}
+
+/* ---------- menú de la semana ---------- */
+.mu-dia{margin-bottom:12px}
+.mu-dia h3{font-family:var(--f-titulo);font-weight:750;font-size:15px;margin:0 0 8px;
+  letter-spacing:.06em;text-transform:uppercase;color:var(--brand-tx)}
+.mu-comida{display:flex;gap:12px;padding:10px 0;border-bottom:1px solid var(--line)}
+.mu-comida:last-child{border-bottom:0}
+.mu-cual{flex:0 0 86px;font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;
+  color:var(--tx2);font-weight:700;padding-top:2px}
+.mu-que{flex:1;min-width:0;line-height:1.4}
+.mu-que b{font-weight:650;font-size:14.5px}
+.mu-que span{display:block;color:var(--tx2);font-size:12.5px;margin-top:2px}
+.mu-kcal{flex:0 0 auto;text-align:right;font-size:12px;color:var(--tx2);
+  font-variant-numeric:tabular-nums;white-space:nowrap;padding-top:3px}
+.mu-evita{background:var(--bad-soft,rgba(255,107,107,.12));border-left:3px solid var(--bad);
+  padding:12px 14px;border-radius:12px;margin-bottom:14px;font-size:14px;line-height:1.5}
+.mu-evita b{color:var(--bad)}
+.mu-compra{display:grid;gap:12px}
+.mu-compra div b{display:block;font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--tx2);margin-bottom:4px}
+.mu-vacio{text-align:center;padding:26px 16px;color:var(--tx2);line-height:1.6}
+.mu-cargando{display:flex;align-items:center;gap:12px;padding:20px 0;color:var(--tx2)}
+.mu-punto{width:9px;height:9px;border-radius:50%;background:var(--brand);
+  animation:muLate 1s ease-in-out infinite}
+@keyframes muLate{0%,100%{opacity:.25;transform:scale(.8)}50%{opacity:1;transform:scale(1.15)}}
+@media (max-width:620px){
+  .mu-comida{flex-wrap:wrap;gap:4px 10px}
+  .mu-cual{flex-basis:100%}
+  .mu-kcal{flex-basis:auto}
+}
 /* contraseña nueva */
 .cl-campo{position:relative}
 .cl-campo input{padding-right:44px}
@@ -472,6 +544,67 @@ dialog::backdrop{background:rgba(0,0,0,.6)}
   .rk-foto{flex-basis:26px;width:26px;height:26px}
   .rk-ini{font-size:11px}
   .rk-quien{gap:7px}
+}
+
+/* =====================================================================
+   REGISTRO EN DOS TOQUES
+   Teclado propio en vez del nativo: los botones del sistema en el móvil
+   son pequeños y cambian de sitio según el teclado que tenga puesto.
+   ===================================================================== */
+#vRap{position:fixed;inset:0;z-index:58;background:var(--bg);overflow-y:auto}
+.rp{max-width:440px;margin:0 auto;min-height:100dvh;display:flex;flex-direction:column;
+  padding:12px 18px calc(16px + env(safe-area-inset-bottom))}
+.rp-cab{display:flex;align-items:center;gap:12px;padding:4px 0 10px}
+.rp-x{width:40px;height:40px;flex:0 0 40px;padding:0;border-radius:50%;cursor:pointer;
+  border:1px solid var(--line);background:var(--panel);color:var(--tx);
+  display:flex;align-items:center;justify-content:center}
+.rp-x svg{width:18px;height:18px}
+.rp-tipo{flex:1;display:flex;gap:4px;padding:4px;border-radius:999px;background:var(--panel2);
+  border:1px solid var(--line)}
+.rp-tipo button{flex:1;min-height:42px;border:0;border-radius:999px;background:transparent;
+  color:var(--tx2);font-family:inherit;font-size:14px;font-weight:600;cursor:pointer;
+  transition:background .18s, color .18s}
+.rp-tipo button.on{background:var(--brand);color:var(--brand-ink)}
+
+.rp-monto{display:flex;align-items:baseline;justify-content:center;gap:6px;
+  padding:26px 0 6px;min-height:104px}
+.rp-sig{font-family:var(--f-titulo);font-weight:800;font-size:34px;color:var(--tx2)}
+.rp-num{font-family:var(--f-titulo);font-weight:800;font-size:clamp(44px,14vw,64px);
+  line-height:1;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+.rp-mon{font-family:var(--f-titulo);font-weight:700;font-size:22px;color:var(--tx2)}
+.rp-num.cero{color:var(--tx3,var(--tx2));opacity:.45}
+
+.rp-cuenta{display:flex;align-items:center;gap:9px;margin:0 auto 14px;padding:8px 14px;
+  min-height:42px;border-radius:999px;border:1px solid var(--line);background:var(--panel);
+  color:var(--tx);font-size:13.5px;font-weight:600;cursor:pointer;max-width:100%}
+.rp-cuenta svg{width:14px;height:14px;opacity:.6;flex:0 0 14px}
+.rp-cuenta > span:nth-child(2){overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rp-cuenta .ic{flex:0 0 24px;width:24px;height:24px;border-radius:7px;font-size:10.5px}
+
+.rp-teclado{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-top:auto}
+.rp-tecla{min-height:62px;border-radius:18px;border:1px solid var(--line);background:var(--panel);
+  color:var(--tx);font-family:var(--f-titulo);font-weight:700;font-size:25px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  -webkit-tap-highlight-color:transparent;transition:transform .08s, background .12s}
+.rp-tecla:active{transform:scale(.94);background:var(--panel2)}
+.rp-tecla svg{width:24px;height:24px}
+.rp-sigue{width:100%;min-height:56px;margin-top:12px;font-size:16px}
+
+.rp-resumen{display:flex;align-items:center;justify-content:space-between;gap:12px;
+  padding:14px 16px;border-radius:16px;background:var(--panel);border:1px solid var(--line);
+  margin-bottom:16px;font-family:var(--f-titulo);font-weight:700;font-size:19px}
+.rp-cats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;padding-bottom:10px}
+.rp-cat{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;
+  min-height:94px;padding:12px 6px;border-radius:18px;cursor:pointer;
+  border:1px solid var(--line);background:var(--panel);color:var(--tx);
+  font-size:12.5px;font-weight:600;line-height:1.25;text-align:center;
+  -webkit-tap-highlight-color:transparent;transition:transform .1s, border-color .15s}
+.rp-cat:active{transform:scale(.95)}
+.rp-cat:hover{border-color:var(--brand)}
+.rp-cat .ic{flex:0 0 40px;width:40px;height:40px;border-radius:13px;font-size:14px}
+@media (max-width:380px){
+  .rp-cats{grid-template-columns:repeat(2,1fr)}
+  .rp-tecla{min-height:56px;font-size:23px}
 }
 
 /* =====================================================================
@@ -1372,6 +1505,49 @@ table.tab td.num{text-align:right;font-variant-numeric:tabular-nums;white-space:
   </div>
 </div>
 
+<!-- ================= REGISTRO EN DOS TOQUES ================= -->
+<div id="vRap" class="hidden">
+  <div class="rp">
+    <div class="rp-cab">
+      <button class="rp-x" id="rpCerrar" aria-label="Cerrar">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+             stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+      </button>
+      <div class="rp-tipo">
+        <button id="rpGasto" class="on">Gasto</button>
+        <button id="rpIngreso">Ingreso</button>
+      </div>
+      <button class="rp-x rp-mas" id="rpDetalle" aria-label="Con más detalle">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+             stroke-linecap="round"><path d="M5 12h.01M12 12h.01M19 12h.01"/></svg>
+      </button>
+    </div>
+
+    <!-- paso 1: el monto -->
+    <div id="rpPaso1">
+      <div class="rp-monto">
+        <span class="rp-sig" id="rpSigno">−</span>
+        <span class="rp-num" id="rpNum">0</span>
+        <span class="rp-mon" id="rpMoneda">$</span>
+      </div>
+      <button class="rp-cuenta" id="rpCuenta">
+        <span id="rpCuentaIc"></span><span id="rpCuentaTx">Elegir cuenta</span>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+             stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"/></svg>
+      </button>
+      <div class="rp-teclado" id="rpTeclado"></div>
+      <button class="pri rp-sigue" id="rpSigue">Continuar</button>
+    </div>
+
+    <!-- paso 2: la categoría -->
+    <div id="rpPaso2" class="hidden">
+      <div class="rp-resumen"><span id="rpResumen">—</span>
+        <button class="gh sm" id="rpVolver">Cambiar</button></div>
+      <div class="rp-cats" id="rpCats"></div>
+    </div>
+  </div>
+</div>
+
 <div id="cargando" class="hidden">
   <div class="carga-caja">
     <img class="carga-logo" id="cargaLogo" alt="">
@@ -2050,6 +2226,45 @@ table.tab td.num{text-align:right;font-variant-numeric:tabular-nums;white-space:
         </button>
       </div>
 
+    </section>
+
+    <!-- MENÚ DE LA SEMANA -->
+    <section id="tMenu" class="hidden">
+      <div class="card">
+        <div class="row" style="justify-content:space-between;align-items:flex-start;gap:12px">
+          <div>
+            <h2 style="margin:0">Menú de la semana</h2>
+            <p class="muted" style="margin:4px 0 0;font-size:13.5px">
+              Hecho con lo que comes, lo que no soportas, tus alergias y lo que se consigue donde vives.</p>
+          </div>
+          <span class="tag" id="mnSaldo">—</span>
+        </div>
+        <div class="row" style="margin-top:14px;gap:9px">
+          <button class="pri" id="btnMenu">Generar mi menú</button>
+          <button class="sm hidden" id="btnMenuOtro">Hacer otro</button>
+        </div>
+        <div class="lg-err" id="mnErr" role="status" aria-live="polite" style="text-align:left"></div>
+      </div>
+      <div id="mnCuerpo"></div>
+    </section>
+
+    <!-- ANÁLISIS -->
+    <section id="tAnalisis" class="hidden">
+      <div class="card an-card">
+        <div class="an-rosca" id="anRosca"></div>
+        <div class="an-chips" id="anChips"></div>
+      </div>
+      <div class="card">
+        <div class="row" style="justify-content:space-between;align-items:baseline;margin-bottom:6px">
+          <h2 style="margin:0">Día a día</h2>
+          <span class="muted" id="anDiaSub" style="font-size:12px"></span>
+        </div>
+        <div class="an-barras" id="anBarras"></div>
+      </div>
+      <div class="card">
+        <h2>Por categoría</h2>
+        <div id="anLista"></div>
+      </div>
     </section>
 
     <!-- REPORTE -->
@@ -2842,9 +3057,28 @@ function ok(res, msg){
    Al publicar una versión nueva: sube VERSION, pon la fecha y agrega
    su entrada arriba del todo en NOVEDADES.
    ===================================================================== */
-const VERSION = '5.9.0';
+const VERSION = '6.1.0';
 const FECHA_VERSION = '2026-09-05';
 const NOVEDADES = [
+  ['6.1.0', '2026-09-15', [
+    'Registrar un gasto ahora son dos toques: escribes el monto en un teclado grande y tocas la categoría. Ya está.',
+    'El teclado es propio, no el del sistema: teclas de 62 px que no se mueven de sitio y coma en vez de punto.',
+    'La fecha es hoy, la cuenta es la última que usaste y el tipo de gasto se deduce de la categoría. Si necesitas cambiar algo, el botón de los tres puntos abre el formulario completo.',
+    'Doce categorías de uso diario en la rejilla, cada una con su placa de color. Para ingresos salen otras seis.',
+    'Sección nueva: Dinero → Análisis. Un anillo con el reparto por categoría, el total del mes en el centro y cuánto subiste o bajaste frente al mes anterior.',
+    'Barras por día del mes con la media marcada y el día de hoy en dorado.',
+    'Lista por categoría con cuántos movimientos, cuánto y qué porcentaje del total.',
+    'Arreglado: si fallaba el registro automático de un pago fijo, todo el módulo de dinero se quedaba sin cargar.'
+  ]],
+  ['6.0.0', '2026-09-09', [
+    'Menú de la semana generado con inteligencia artificial, dentro de Cuerpo → Menú.',
+    'Se arma con lo que respondiste: tus calorías, tus alergias, lo que comes seguido, lo que no soportas, cuánto tiempo tienes para cocinar, tu presupuesto y lo que se consigue en tu país.',
+    'Trae los siete días con sus comidas, la lista de compra y trucos para cumplirlo.',
+    'La llave de la API vive en el servidor de Supabase: la app nunca la ve y nadie puede sacarla del código.',
+    'Hay un tope de generaciones por usuario y por día, para que nadie pueda dispararle la factura a nadie.',
+    'Las calorías y los macros los calcula la app, no el modelo: el modelo solo arma los platos.',
+    'Términos actualizados a la 1.3 con qué se envía exactamente, qué no se envía y qué no es este menú.'
+  ]],
   ['5.9.0', '2026-09-07', [
     'Cuestionario de bienvenida al entrar por primera vez: 18 preguntas repartidas en cuerpo, gimnasio, comida, dinero y rutina. Ninguna es obligatoria y todas se pueden saltar.',
     'Se pregunta por lesiones: la rutina deja de proponer ejercicios que carguen esa zona, y el plan lo recuerda arriba.',
@@ -3194,7 +3428,7 @@ function hashDiceRecuperar(){
    La aceptación se guarda en la tabla 'aceptaciones' (esquema_v9), que
    no se puede editar ni borrar: por eso sirve como prueba.
    ===================================================================== */
-const TERMINOS_VERSION = '1.2';
+const TERMINOS_VERSION = '1.3';
 const TERMINOS_FECHA   = '7 de septiembre de 2026';
 
 const TERMINOS = [
@@ -3227,6 +3461,15 @@ const TERMINOS = [
       'Las proyecciones de patrimonio, jubilación, deudas y devaluación se calculan con los datos y los supuestos que tú introduces, incluidas las tasas de cambio que tú registras a mano. Si un dato está mal, el resultado está mal.',
       'Una simulación de escenarios muestra lo que pasaría si el futuro se pareciera al pasado que le diste. El futuro no tiene esa obligación. Las decisiones sobre tu dinero son tuyas y sus consecuencias también.',
       'La app no se conecta a tus bancos, no mueve dinero y no ejecuta ninguna operación por ti.'
+  ]},
+
+  { t:'El menú con inteligencia artificial', clave:[
+      'El menú de la semana lo genera un modelo de inteligencia artificial. Es opcional: solo se genera cuando tú lo pides.'
+  ], p:[
+      'Para armarlo se envían a la API de Claude, de Anthropic, únicamente los datos que hacen falta: tu objetivo, tus calorías y macros calculados, cuántas comidas haces, cuánto tiempo tienes para cocinar, tu forma de comer, tu presupuesto, tu país, tus alergias e intolerancias y lo que dijiste que comes y que no comes.',
+      'NO se envía tu nombre, tu correo, tu foto, tus medidas corporales, tus series del gimnasio, tus cuentas ni ningún movimiento de dinero.',
+      'Anthropic no usa lo que entra por su API para entrenar sus modelos. La app guarda los tres últimos menús que generaste, y puedes borrarlos.',
+      'El menú es una sugerencia generada automáticamente. No es una dieta prescrita, no es una indicación médica ni nutricional, y como todo lo que genera un modelo, puede equivocarse. Si tienes una alergia grave, una condición médica o estás embarazada, no sigas un menú generado por una app sin consultarlo antes.'
   ]},
 
   { t:'Tus datos', p:[
@@ -3286,10 +3529,11 @@ const TERMINOS = [
 ];
 
 const TERMINOS_CAMBIO =
-  'Qué cambió en esta versión: al entrar por primera vez la app te pregunta por alergias, ' +
-  'intolerancias y lesiones para armar tu plan. Son datos de salud, son opcionales, y solo los ' +
-  'lees tú: no salen en el ranking ni en ningún reporte. La app no revisa etiquetas de comida ' +
-  'ni sustituye a un médico o un fisioterapeuta.';
+  'Qué cambió en esta versión: si pides el menú de la semana, tus datos de comida ' +
+  '(objetivo, calorías, alergias, lo que comes y lo que no, presupuesto y país) se envían a la ' +
+  'API de Claude, de Anthropic, para armarlo. No se envía tu nombre, tu correo, tu foto, tus ' +
+  'medidas, tus series ni nada de tu dinero. Anthropic no entrena sus modelos con lo que entra ' +
+  'por su API. Generar el menú es voluntario: si no lo pides, no sale nada de la app.';
 
 function pintarTerminos(){
   $('#tmSub').textContent = 'Versión ' + TERMINOS_VERSION + ' · ' + TERMINOS_FECHA;
@@ -4000,11 +4244,11 @@ const NAVG = [
   { k:'hoy',      n:'Hoy',      hijos:[['hoy','Resumen'], ['habitos','Mis hábitos']] },
   { k:'progreso', n:'Progreso', hijos:[['progreso','Progreso'], ['metas','Metas'], ['reporte','Reporte']] },
   { k:'gym',      n:'Gym',      hijos:[['gym','Gimnasio']] },
-  { k:'cuerpo',   n:'Cuerpo',   hijos:[['cuerpo','Mis medidas'], ['avatar','Gemelo 3D'], ['plan','Entrenador']] },
-  { k:'dinero',   n:'Dinero',   hijos:[['finanzas','Resumen'], ['copiloto','Copiloto']] },
+  { k:'cuerpo',   n:'Cuerpo',   hijos:[['cuerpo','Mis medidas'], ['avatar','Gemelo 3D'], ['plan','Entrenador'], ['menu','Menú']] },
+  { k:'dinero',   n:'Dinero',   hijos:[['finanzas','Resumen'], ['analisis','Análisis'], ['copiloto','Copiloto']] },
   { k:'ajustes',  n:'Ajustes',  hijos:[['ajustes','Ajustes']] }
 ];
-const TODAS = ['hoy','habitos','progreso','metas','gym','cuerpo','avatar','plan','finanzas','copiloto','reporte','ajustes'];
+const TODAS = ['hoy','habitos','progreso','metas','gym','cuerpo','avatar','plan','finanzas','analisis','copiloto','reporte','ajustes','menu'];
 const grupoDe = (t) => (NAVG.find(g => g.hijos.some(h => h[0] === t)) || NAVG[0]).k;
 S.grupo = 'hoy';
 S.ultima = {};   // recuerda en qué subsección estabas de cada grupo
@@ -4029,6 +4273,8 @@ function mostrarTab(t, dir){
                      if (!COACH.cargado) cargarPlan(); else pintarPlan180(); }
   if (t === 'reporte') setTimeout(() => pintarReporte(S.repTipo || 'diario'), 400);
   if (t === 'ajustes') pintarAjustes();
+  if (t === 'menu'){ if (!MU.cargado) cargarMenu(); else pintarMenu(); }
+  if (t === 'analisis'){ if (!F.cargado) cargarFinanzas(); else pintarAnalisis(); }
   animarSeccion($('#t' + t.charAt(0).toUpperCase() + t.slice(1)), dir || 0);
   if (t !== 'plan'){ const br = $('#barraRutina'); if (br) br.classList.add('hidden');
                      document.body.classList.remove('con-barra'); }
@@ -5238,6 +5484,148 @@ function pintarDatos(){
     '<div class="stat" style="padding:11px 13px"><div class="l">' + f[0] + '</div>' +
     '<div style="font-weight:600;margin-top:2px">' + f[1] + '</div></div>').join('') + '</div>';
 }
+
+/* =====================================================================
+   MENÚ DE LA SEMANA
+   La app NO habla con la API de Claude: habla con una función de
+   Supabase que guarda la llave. Aquí no hay ninguna credencial, y la
+   política de seguridad de la página solo permite salir hacia Supabase.
+   ===================================================================== */
+const MU = { plan:null, saldo:null, cargado:false, generando:false };
+
+async function cargarMenu(){
+  if (MU.generando) return;
+  const [pl, sa] = await Promise.all([
+    sb.from('planes_comida').select('*').order('creado_en', { ascending:false }).limit(1),
+    sb.from('v_ia_saldo').select('*').maybeSingle()
+  ]);
+  MU.falta = faltaTabla(pl.error) || faltaTabla(sa.error);
+  MU.plan  = (!pl.error && pl.data && pl.data[0]) ? pl.data[0] : null;
+  MU.saldo = sa.error ? null : sa.data;
+  MU.cargado = true;
+  pintarMenu();
+}
+
+function pintarMenu(){
+  const c = $('#mnCuerpo'); if (!c) return;
+  const s = MU.saldo;
+
+  // saldo
+  const chip = $('#mnSaldo');
+  if (MU.falta){ chip.textContent = 'sin instalar'; chip.className = 'tag'; }
+  else if (!s){ chip.textContent = '—'; chip.className = 'tag'; }
+  else {
+    const quedan = Math.max(0, (s.tope_dia || 0) - (s.hoy || 0));
+    chip.textContent = quedan + ' de ' + s.tope_dia + ' hoy';
+    chip.className = 'tag' + (quedan === 0 ? ' bad' : quedan === 1 ? ' oro' : '');
+  }
+  const sinCupo = !!(s && s.hoy >= s.tope_dia);
+  $('#btnMenu').disabled = MU.generando || MU.falta || sinCupo;
+  $('#btnMenu').classList.toggle('hidden', !!MU.plan && !MU.generando);
+  $('#btnMenuOtro').classList.toggle('hidden', !MU.plan || MU.generando);
+  $('#btnMenuOtro').disabled = sinCupo;
+
+  if (MU.generando){
+    c.innerHTML = '<div class="card"><div class="mu-cargando"><i class="mu-punto"></i>' +
+      '<span>Armando tu menú. Tarda unos veinte segundos.</span></div></div>';
+    return;
+  }
+  if (MU.falta){
+    c.innerHTML = '<div class="card"><p class="muted" style="margin:0">Antes hay que instalarlo: ' +
+      'corre <b>esquema_v13.txt</b> en Supabase y despliega la función <b>plan-comida</b>. ' +
+      'Está explicado en las instrucciones.</p></div>';
+    return;
+  }
+  if (!MU.plan){
+    c.innerHTML = '<div class="card"><div class="mu-vacio">Todavía no tienes menú.<br>' +
+      'Toca <b>Generar mi menú</b> y se arma con lo que respondiste en el cuestionario.</div></div>';
+    return;
+  }
+
+  const P = MU.plan.contenido || {};
+  const dias = Array.isArray(P.dias) ? P.dias : [];
+  let h = '';
+
+  if (P.alergias && P.alergias.length)
+    h += '<div class="mu-evita"><b>Este menú evita: ' + esc(P.alergias.join(', ')) + '.</b> ' +
+         'Aun así, lee los ingredientes de lo que compres: la app no revisa etiquetas.</div>';
+
+  h += '<div class="card"><div class="row" style="justify-content:space-between;align-items:baseline">' +
+       '<h2 style="margin:0">Tu semana</h2>' +
+       '<span class="muted" style="font-size:12px">' + esc(fechaCorta(String(MU.plan.creado_en).slice(0,10))) + '</span></div>' +
+       (P.resumen ? '<p class="muted" style="margin:8px 0 0">' + esc(P.resumen) + '</p>' : '') +
+       '<div class="grid g4" style="margin-top:14px">' +
+         '<div class="stat"><div class="n">' + (P.kcal || 0) + '</div><div class="l">kcal al día</div></div>' +
+         '<div class="stat"><div class="n">' + (P.prot || 0) + ' g</div><div class="l">Proteína</div></div>' +
+         '<div class="stat"><div class="n">' + (P.carb || 0) + ' g</div><div class="l">Carbohidrato</div></div>' +
+         '<div class="stat"><div class="n">' + (P.gras || 0) + ' g</div><div class="l">Grasa</div></div>' +
+       '</div></div>';
+
+  if (dias.length){
+    h += '<div class="card">' + dias.map(d =>
+      '<div class="mu-dia"><h3>' + esc(d.dia || '') + '</h3>' +
+      (Array.isArray(d.comidas) ? d.comidas : []).map(m =>
+        '<div class="mu-comida">' +
+          '<div class="mu-cual">' + esc(m.nombre || '') + '</div>' +
+          '<div class="mu-que"><b>' + esc(m.plato || '') + '</b>' +
+            (m.porcion ? '<span>' + esc(m.porcion) + '</span>' : '') + '</div>' +
+          '<div class="mu-kcal">' + (m.kcal ? esc(m.kcal) + ' kcal' : '') +
+            (m.prot ? '<br>' + esc(m.prot) + ' g prot' : '') + '</div>' +
+        '</div>').join('') +
+      '</div>').join('') + '</div>';
+  }
+
+  if (Array.isArray(P.compra) && P.compra.length){
+    h += '<div class="card"><h2>Lista de compra</h2><div class="mu-compra">' +
+      P.compra.map(g => '<div><b>' + esc(g.grupo || '') + '</b>' +
+        esc((Array.isArray(g.items) ? g.items : []).join(' · ')) + '</div>').join('') +
+      '</div></div>';
+  }
+
+  if (Array.isArray(P.trucos) && P.trucos.length){
+    h += '<div class="card"><h2>Para que lo cumplas</h2><ul class="lista">' +
+      P.trucos.map(t => '<li>' + esc(t) + '</li>').join('') + '</ul></div>';
+  }
+
+  if (P.crudo){
+    h += '<div class="card"><h2>Respuesta sin formato</h2><p class="muted">El modelo no devolvió el ' +
+      'formato esperado. Esto es lo que dijo:</p><p>' + esc(P.crudo) + '</p></div>';
+  }
+
+  h += '<p class="muted" style="text-align:center;font-size:12px;margin-top:14px">' +
+       'Generado con IA a partir de tus respuestas. No es una indicación médica ni nutricional.</p>';
+  c.innerHTML = h;
+}
+
+async function generarMenu(){
+  const err = $('#mnErr');
+  err.classList.remove('lg-ok'); err.textContent = '';
+  MU.generando = true; pintarMenu();
+  try {
+    const { data, error } = await sb.functions.invoke('plan-comida', { body:{} });
+    MU.generando = false;
+    if (error){
+      // el cuerpo del error trae el motivo de verdad
+      let msg = '';
+      try { msg = (await error.context.json()).error; } catch(_e){}
+      err.textContent = msg || 'No se pudo generar. Intenta de nuevo en un momento.';
+      await cargarMenu(); return;
+    }
+    if (data && data.error){ err.textContent = data.error; await cargarMenu(); return; }
+    await cargarMenu();
+    toast('Menú listo');
+  } catch (e){
+    MU.generando = false;
+    err.textContent = 'No se pudo hablar con el servidor. Revisa tu conexión.';
+    pintarMenu();
+  }
+}
+
+$('#btnMenu').onclick = generarMenu;
+$('#btnMenuOtro').onclick = () => {
+  if (!confirm('Se reemplaza el menú actual por uno nuevo. ¿Seguimos?')) return;
+  generarMenu();
+};
 
 function pintarPlan(){
   const p = S.perfil || {}, c = $('#cuPlan'), pl = planNutricion(p);
@@ -8786,8 +9174,13 @@ async function cargarFinanzas(){
     if (!F.faltaPagos) console.warn('pagos fijos:', pg.error.message);
   } else {
     F.pagos = pg.data || []; F.faltaPagos = false;
-    const n = await registrarPagosVencidos();
-    if (n) toast(n === 1 ? 'Registré 1 pago fijo que ya venció' : 'Registré ' + n + ' pagos fijos que ya vencieron');
+    // Es un paso opcional. Si falla, que no se lleve por delante todo el
+    // módulo: sin este try, un error aquí dejaba F.cargado en false para
+    // siempre y las pantallas de dinero se quedaban vacías.
+    try {
+      const n = await registrarPagosVencidos();
+      if (n) toast(n === 1 ? 'Registré 1 pago fijo que ya venció' : 'Registré ' + n + ' pagos fijos que ya vencieron');
+    } catch (e){ console.warn('pagos automáticos:', e); }
   }
   F.cargado = true;
   pintarFinanzas();
@@ -8862,6 +9255,128 @@ function pintarFinanzas(){
   if (S.tab === 'copiloto') pintarCopiloto();
   pintarCategorias(r); pintarReglas(r); pintarMeses(); pintarRecorte(r);
   pintarConsejos(r); pintarMetasAhorro(r); pintarMovimientos();
+  pintarAnalisis();
+}
+
+/* =====================================================================
+   ANÁLISIS · la rosca, las barras y la lista
+   Todo sale de lo que ya hay registrado: no se calcula nada nuevo, se
+   enseña de una forma en la que se entiende de un vistazo.
+   ===================================================================== */
+const AN = { tipo:'gasto' };
+
+/* Un arco de anillo. Se dibuja con path y no con stroke-dasharray
+   porque así cada tramo lleva sus propias puntas redondeadas. */
+function anArco(cx, cy, r, ini, fin){
+  const g = Math.PI / 180;
+  const x1 = cx + r * Math.cos(ini * g), y1 = cy + r * Math.sin(ini * g);
+  const x2 = cx + r * Math.cos(fin * g), y2 = cy + r * Math.sin(fin * g);
+  const grande = (fin - ini) > 180 ? 1 : 0;
+  return 'M ' + x1.toFixed(2) + ' ' + y1.toFixed(2) +
+         ' A ' + r + ' ' + r + ' 0 ' + grande + ' 1 ' + x2.toFixed(2) + ' ' + y2.toFixed(2);
+}
+
+function pintarAnalisis(){
+  if (!$('#tAnalisis')) return;
+  const cats = porCategoria(F.mes, AN.tipo);
+  const total = cats.reduce((a, x) => a + x.monto, 0);
+  const prevMes = mesSumar(F.mes, -1);
+  const prevTotal = porCategoria(prevMes, AN.tipo).reduce((a, x) => a + x.monto, 0);
+
+  // ---- chips ----
+  $('#anChips').innerHTML =
+    ['gasto','ingreso'].map(t => '<button class="an-chip' + (AN.tipo === t ? ' on' : '') +
+      '" data-t="' + t + '">' + (t === 'gasto' ? 'Gastos' : 'Ingresos') + '</button>').join('') +
+    '<button class="an-chip" id="anMesAnt">◀ ' + esc(mesNombre(prevMes).split(' ')[0]) + '</button>' +
+    '<button class="an-chip on" style="cursor:default">' + esc(mesNombre(F.mes)) + '</button>' +
+    '<button class="an-chip" id="anMesSig">▶</button>';
+  $$('#anChips [data-t]').forEach(b => b.onclick = () => { AN.tipo = b.dataset.t; pintarAnalisis(); });
+  $('#anMesAnt').onclick = () => { F.mes = mesSumar(F.mes, -1); pintarFinanzas(); pintarAnalisis(); };
+  $('#anMesSig').onclick = () => { F.mes = mesSumar(F.mes,  1); pintarFinanzas(); pintarAnalisis(); };
+
+  // ---- la rosca ----
+  const R = 100, CX = 120, CY = 120, GROSOR = 22;
+  let svg = '';
+  if (total > 0){
+    const hueco = 3;                              // grados de separación entre tramos
+    let ang = -90;
+    svg = cats.map(c => {
+      const parte = c.monto / total;
+      const arco = Math.max(0.6, parte * 360 - hueco);
+      const d = anArco(CX, CY, R, ang, ang + arco);
+      ang += parte * 360;
+      const col = placaColores(marcaDe(c.categoria).color).fondo;
+      return '<path d="' + d + '" fill="none" stroke="' + col + '" stroke-width="' + GROSOR +
+             '" stroke-linecap="round"><title>' + esc(c.categoria) + '</title></path>';
+    }).join('');
+  } else {
+    svg = '<circle cx="' + CX + '" cy="' + CY + '" r="' + R + '" fill="none" ' +
+          'stroke="var(--line)" stroke-width="' + GROSOR + '"/>';
+  }
+  const dif = prevTotal > 0 ? Math.round(100 * (total - prevTotal) / prevTotal) : null;
+  const subeMal = AN.tipo === 'gasto' ? (dif > 0) : (dif < 0);
+  $('#anRosca').innerHTML =
+    '<svg viewBox="0 0 240 240" role="img" aria-label="Reparto por categoría">' + svg + '</svg>' +
+    '<div class="an-centro">' +
+      '<div class="an-mes">' + esc(mesNombre(F.mes)) + '</div>' +
+      '<div class="an-total">' + esc(money(total)) + '</div>' +
+      (dif == null
+        ? '<div class="an-vs muted">sin mes anterior</div>'
+        : '<div class="an-vs" style="color:' + (dif === 0 ? 'var(--tx2)' : subeMal ? 'var(--bad)' : 'var(--ok)') + '">' +
+          '<i></i>' + (dif > 0 ? '+' : '') + dif + '% frente a ' +
+          esc(mesNombre(prevMes).split(' ')[0].slice(0,3).toLowerCase()) + '.</div>') +
+    '</div>';
+
+  // ---- barras por día ----
+  const [anio, mes] = F.mes.split('-').map(Number);
+  const dias = ultimoDiaMes(anio, mes);
+  const porDia = new Array(dias).fill(0);
+  delMes(F.mes).filter(x => x.tipo === AN.tipo).forEach(x => {
+    const d = Number(x.fecha.slice(8, 10));
+    if (d >= 1 && d <= dias) porDia[d - 1] += montoRef(x);
+  });
+  const max = Math.max(...porDia, 1);
+  const conMov = porDia.filter(v => v > 0).length;
+  const media = conMov ? total / conMov : 0;
+  const hoyD = hoyISO().startsWith(F.mes) ? Number(hoyISO().slice(8, 10)) : -1;
+  $('#anBarras').innerHTML =
+    (media > 0 ? '<div class="an-media" style="bottom:' + (16 + (104 * media / max)).toFixed(1) + 'px">' +
+       '<b>media ' + esc(money(media)) + '</b></div>' : '') +
+    porDia.map((v, i) => {
+      const h = v > 0 ? Math.max(4, 104 * v / max) : 2;
+      const marca = (i + 1) === hoyD ? ' hoy' : v > 0 ? '' : ' cero';
+      const et = (i === 0 || (i + 1) % 5 === 0 || (i + 1) === dias);
+      return '<div class="an-bar' + marca + '" style="height:' + h.toFixed(1) + 'px" ' +
+             'title="' + (i+1) + ': ' + esc(money(v)) + '">' +
+             (et ? '<span>' + (i + 1) + '</span>' : '') + '</div>';
+    }).join('');
+  $('#anDiaSub').textContent = conMov
+    ? conMov + (conMov === 1 ? ' día con movimiento' : ' días con movimiento')
+    : 'sin movimientos';
+
+  // ---- lista por categoría ----
+  const c = $('#anLista');
+  if (!cats.length){
+    c.innerHTML = '<p class="muted" style="margin:0">Nada registrado este mes.</p>';
+    return;
+  }
+  const cuantos = {};
+  delMes(F.mes).filter(x => x.tipo === AN.tipo).forEach(x => {
+    cuantos[x.categoria] = (cuantos[x.categoria] || 0) + 1; });
+  c.innerHTML = cats.map(x => {
+    const pct = total > 0 ? (100 * x.monto / total) : 0;
+    const col = placaColores(marcaDe(x.categoria).color).fondo;
+    const n = cuantos[x.categoria] || 0;
+    return '<div class="an-fila">' + placaMarca(x.categoria, icoDeCat(x.categoria)) +
+      '<span class="tx"><b>' + esc(x.categoria) + '</b>' +
+        '<span>' + n + (n === 1 ? ' movimiento' : ' movimientos') +
+        (x.fijo > 0 ? ' · ' + esc(money(x.fijo)) + ' fijo' : '') + '</span>' +
+        '<span class="an-raya"><i style="width:' + pct.toFixed(1) + '%;background:' + col + '"></i></span>' +
+      '</span>' +
+      '<span class="mo"><b>' + esc(money(x.monto)) + '</b>' +
+        '<span class="an-pct">' + pct.toFixed(1).replace('.', ',') + '%</span></span>' +
+    '</div>';
+  }).join('');
 }
 
 function pintarCategorias(r){
@@ -9457,10 +9972,10 @@ function accionesRapidas(){
            f: () => { mostrarTab('gym'); setTimeout(() => { const el = $('#gyPeso'); if (el) el.focus(); }, 500); } });
   a.push({ e:'&#9878;', t:'Anotar mi peso', d:'Es lo que alimenta la tendencia',
            f: () => { mostrarTab('cuerpo'); setTimeout(() => abrirMedida('peso'), 300); } });
-  a.push({ e:'&#128181;', t:'Añadir un gasto', d:'Monto, categoría y de qué cuenta sale',
-           f: () => { mostrarTab('finanzas'); setTimeout(() => abrirHojaGasto('gasto'), 300); } });
+  a.push({ e:'&#128181;', t:'Añadir un gasto', d:'Dos toques: el monto y la categoría',
+           f: () => { mostrarTab('finanzas'); setTimeout(() => abrirRapido2('gasto'), 300); } });
   a.push({ e:'&#128176;', t:'Añadir un ingreso', d:'Sueldo, venta o cualquier entrada',
-           f: () => { mostrarTab('finanzas'); setTimeout(() => abrirHojaGasto('ingreso'), 300); } });
+           f: () => { mostrarTab('finanzas'); setTimeout(() => abrirRapido2('ingreso'), 300); } });
   a.push({ e:'&#128564;', t:'Cómo amanecí', d:'Sueño, estrés y energía',
            f: () => { mostrarTab('plan'); setTimeout(abrirRecup, 300); } });
   return a;
@@ -12199,6 +12714,142 @@ async function deshacerPago(p, f){
 $('#btnNuevoPago').onclick = () => abrirPago(null);
 
 /* ---------- hoja rápida de movimiento ---------- */
+/* =====================================================================
+   REGISTRO EN DOS TOQUES
+   Escribes el monto en un teclado grande y tocas la categoría. Eso es
+   todo: la fecha es hoy, la cuenta es la última que usaste y el tipo de
+   gasto se deduce de la categoría. Lo demás sigue estando en el formulario
+   largo, para cuando de verdad haga falta.
+   ===================================================================== */
+const RP = { tipo:'gasto', txt:'', cuenta:null, paso:1 };
+
+/* Las doce que se usan a diario, no las veinte del formulario. */
+const RP_CATS_GASTO = ['Alimentación','Restaurantes','Transporte','Servicios','Vivienda',
+                       'Salud','Entretenimiento','Suscripciones','Ropa','Educación','Familia','Otros'];
+const RP_CATS_INGRESO = ['Sueldo','Extra','Negocio','Inversión','Regalos','Otros'];
+
+function rpPintarMonto(){
+  const n = $('#rpNum');
+  n.textContent = RP.txt === '' ? '0' : RP.txt.replace('.', ',');
+  n.classList.toggle('cero', RP.txt === '');
+  $('#rpSigno').textContent = RP.tipo === 'ingreso' ? '+' : '−';
+  $('#rpSigno').style.color = RP.tipo === 'ingreso' ? 'var(--ok)' : '';
+  const c = cuentaDe(RP.cuenta);
+  $('#rpMoneda').textContent = simboloDe(c ? c.moneda : monedaRef());
+  $('#rpSigue').disabled = !(Number(RP.txt) > 0);
+}
+
+function rpPintarCuenta(){
+  const act = (F.cuentas || []).filter(x => x.activa);
+  const b = $('#rpCuenta');
+  b.classList.toggle('hidden', !act.length);
+  if (!act.length) return;
+  if (!RP.cuenta || !cuentaDe(RP.cuenta)) RP.cuenta = leerLocal('fi_ultima_cuenta') || act[0].id;
+  const c = cuentaDe(RP.cuenta) || act[0];
+  RP.cuenta = c.id;
+  $('#rpCuentaIc').outerHTML = placaMarca(c.nombre).replace('<span class="ic', '<span id="rpCuentaIc" class="ic');
+  $('#rpCuentaTx').textContent = c.nombre;
+}
+
+function rpTeclear(t){
+  if (t === 'del'){ RP.txt = RP.txt.slice(0, -1); }
+  else if (t === '.'){ if (!RP.txt.includes('.')) RP.txt = (RP.txt || '0') + '.'; }
+  else {
+    if (RP.txt.includes('.') && RP.txt.split('.')[1].length >= 2) return;
+    if (RP.txt.replace('.', '').length >= 9) return;
+    RP.txt = (RP.txt === '0' ? '' : RP.txt) + t;
+  }
+  rpPintarMonto();
+}
+
+function rpPintarTeclado(){
+  const teclas = ['1','2','3','4','5','6','7','8','9','.','0','del'];
+  $('#rpTeclado').innerHTML = teclas.map(t =>
+    '<button class="rp-tecla" data-t="' + t + '"' + (t === 'del' ? ' aria-label="Borrar"' : '') + '>' +
+    (t === 'del'
+      ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" ' +
+        'stroke-linecap="round" stroke-linejoin="round"><path d="M21 5H9L3 12l6 7h12Z"/>' +
+        '<path d="M18 9.5 13 14.5M13 9.5l5 5"/></svg>'
+      : t === '.' ? ',' : t) + '</button>').join('');
+  $$('#rpTeclado .rp-tecla').forEach(b => b.onclick = () => rpTeclear(b.dataset.t));
+}
+
+function rpPintarCats(){
+  const cats = RP.tipo === 'ingreso' ? RP_CATS_INGRESO : RP_CATS_GASTO;
+  $('#rpCats').innerHTML = cats.map(c =>
+    '<button class="rp-cat" data-c="' + esc(c) + '">' + placaMarca(c, icoDeCat(c)) +
+    '<span>' + esc(c) + '</span></button>').join('');
+  $$('#rpCats .rp-cat').forEach(b => b.onclick = () => rpGuardar(b.dataset.c));
+}
+
+function rpPaso(n){
+  RP.paso = n;
+  $('#rpPaso1').classList.toggle('hidden', n !== 1);
+  $('#rpPaso2').classList.toggle('hidden', n !== 2);
+  if (n === 2){
+    const c = cuentaDe(RP.cuenta);
+    $('#rpResumen').textContent = (RP.tipo === 'ingreso' ? '+ ' : '− ') +
+      plata(Number(RP.txt), c ? c.moneda : monedaRef());
+    rpPintarCats();
+  }
+}
+
+function abrirRapido2(tipo){
+  RP.tipo = tipo || 'gasto'; RP.txt = '';
+  $('#rpGasto').classList.toggle('on', RP.tipo === 'gasto');
+  $('#rpIngreso').classList.toggle('on', RP.tipo === 'ingreso');
+  rpPintarTeclado(); rpPintarCuenta(); rpPintarMonto(); rpPaso(1);
+  $('#vRap').classList.remove('hidden');
+}
+function cerrarRapido2(){ $('#vRap').classList.add('hidden'); }
+
+async function rpGuardar(categoria){
+  const monto = Number(RP.txt);
+  if (!(monto > 0)) return;
+  $$('#rpCats .rp-cat').forEach(b => b.disabled = true);
+  const c = cuentaDe(RP.cuenta);
+  const fila = {
+    user_id: S.user.id, fecha: hoyISO(), tipo: RP.tipo, categoria: categoria,
+    monto: monto, descripcion: null, fijo: false,
+    clase: RP.tipo === 'gasto' ? (CLASE_SUGERIDA[categoria] || 'necesidad') : null,
+    cuenta_id: c ? c.id : null, moneda: c ? c.moneda : monedaRef(),
+    tasa: c ? (tasaHoy(c.moneda) || null) : null
+  };
+  const r = await sb.from('movimientos').insert(fila);
+  $$('#rpCats .rp-cat').forEach(b => b.disabled = false);
+  if (r.error){ toast('No se pudo guardar: ' + r.error.message); return; }
+  if (c) guardarLocal('fi_ultima_cuenta', c.id);
+  cerrarRapido2();
+  toast((RP.tipo === 'ingreso' ? '+ ' : '− ') + plata(monto, fila.moneda) + ' en ' + categoria);
+  await cargarFinanzas();
+}
+
+$('#rpCerrar').onclick  = cerrarRapido2;
+$('#rpSigue').onclick   = () => { if (Number(RP.txt) > 0) rpPaso(2); };
+$('#rpVolver').onclick  = () => rpPaso(1);
+$('#rpGasto').onclick   = () => { RP.tipo = 'gasto';
+  $('#rpGasto').classList.add('on'); $('#rpIngreso').classList.remove('on'); rpPintarMonto(); };
+$('#rpIngreso').onclick = () => { RP.tipo = 'ingreso';
+  $('#rpIngreso').classList.add('on'); $('#rpGasto').classList.remove('on'); rpPintarMonto(); };
+$('#rpDetalle').onclick = () => { cerrarRapido2(); abrirHojaGasto(RP.tipo);
+  if (Number(RP.txt) > 0) $('#hgMonto').value = Number(RP.txt); };
+$('#rpCuenta').onclick  = () => {
+  const act = (F.cuentas || []).filter(x => x.activa);
+  if (act.length < 2) return;
+  const i = act.findIndex(x => x.id === RP.cuenta);
+  RP.cuenta = act[(i + 1) % act.length].id;
+  rpPintarCuenta(); rpPintarMonto();
+};
+/* el teclado físico también sirve */
+addEventListener('keydown', (e) => {
+  if ($('#vRap').classList.contains('hidden') || RP.paso !== 1) return;
+  if (/^[0-9]$/.test(e.key)) rpTeclear(e.key);
+  else if (e.key === ',' || e.key === '.') rpTeclear('.');
+  else if (e.key === 'Backspace') rpTeclear('del');
+  else if (e.key === 'Enter' && Number(RP.txt) > 0) rpPaso(2);
+  else if (e.key === 'Escape') cerrarRapido2();
+});
+
 function abrirHojaGasto(tipo){
   F.hgTipo = tipo || 'gasto';
   $('#hgTitulo').textContent = F.hgTipo === 'gasto' ? 'Nuevo gasto' : 'Nuevo ingreso';
@@ -12383,8 +13034,8 @@ $('#hgLeer').onclick = () => {
 /* ---------- los cuatro accesos ---------- */
 $$('.fi-acc button').forEach(b => b.onclick = () => {
   const a = b.dataset.a;
-  if (a === 'anadir')   return abrirHojaGasto('gasto');
-  if (a === 'ingreso')  return abrirHojaGasto('ingreso');
+  if (a === 'anadir')   return abrirRapido2('gasto');
+  if (a === 'ingreso')  return abrirRapido2('ingreso');
   if (a === 'traspaso') return $('#btnTraspaso').click();
   if (a === 'mas'){
     const an = $('#fiAnalisis');
